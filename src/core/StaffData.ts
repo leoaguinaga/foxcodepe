@@ -41,11 +41,11 @@ export const staffMembers: StaffMember[] = [
         imageUrl: PhotoLeonardo.src,
         href: "#",
     },
-    {
-        name: "Sandro Fatticcioni",
-        role: "Diseñador Gráfico",
-        role2: null,
-        imageUrl: PhotoSandro.src,
-        href: "#",
-    }
+    // {
+    //     name: "Sandro Fatticcioni",
+    //     role: "Diseñador Gráfico",
+    //     role2: null,
+    //     imageUrl: PhotoSandro.src,
+    //     href: "#",
+    // }
 ];
