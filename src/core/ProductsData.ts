@@ -1,5 +1,4 @@
 import type { ImageMetadata } from "astro";
-import ModuleIcon from "@/assets/icons/code.svg?url";
 
 import CalendarIcon from "@/assets/icons/calendar.svg?url";
 import CheckInIcon from "@/assets/icons/check-in.svg?url";
@@ -7,15 +6,17 @@ import CheckOutIcon from "@/assets/icons/check-out.svg?url";
 import InventoryIcon from "@/assets/icons/inventory.svg?url";
 import ChartIcon from "@/assets/icons/chart.svg?url";
 
+import ProfileIcon from "@/assets/icons/profile.svg?url";
+import OrderIcon from "@/assets/icons/order.svg?url";
+import DetailIcon from "@/assets/icons/detail.svg?url";
+import ProductIcon from "@/assets/icons/product.svg?url";
+
 import AlertIcon from "@/assets/icons/alert.svg?url";
 import WorkersIcon from "@/assets/icons/workers.svg?url";
 import DocumentsIcon from "@/assets/icons/documents.svg?url";
 import SettingsIcon from "@/assets/icons/settings.svg?url";
 import CertificateIcon from "@/assets/icons/certificate.svg?url";
 
-import MockupCertifox from "@/assets/images/mockup-certifox.png";
-import MockupEscapify from "@/assets/images/mockup-escapify.png";
-import MockupFoxrooms from "@/assets/images/mockup-foxrooms.png";
 import UserCertifox from "@/assets/images/user-persona/UserCertifox.png";
 import UserEscapify from "@/assets/images/user-persona/UserEscapify.png";
 import UserFoxrooms from "@/assets/images/user-persona/UserFoxRooms.png";
@@ -31,6 +32,12 @@ import CertifoxWorkers from "@/assets/images/modules/certifox/workers.png"
 import CertifoxCertificates from "@/assets/images/modules/certifox/certificates.png"
 import CertifoxDocuments from "@/assets/images/modules/certifox/documents.png"
 import CertifoxSettings from "@/assets/images/modules/certifox/settings.png"
+
+import EscapifyDashboard from "@/assets/images/modules/escapify/dashboard.jpeg"
+import EscapifyOrders from "@/assets/images/modules/escapify/orders.jpeg"
+import EscapifyProducts from "@/assets/images/modules/escapify/products.jpeg"
+import EscapfiyProfile from "@/assets/images/modules/escapify/profile.jpeg"
+import EscapifyDetails from "@/assets/images/modules/escapify/details.jpeg"
 
 export interface ProductModule {
     id: string;
@@ -57,6 +64,64 @@ export interface Product {
 }
 
 export const products: Product[] = [
+    {
+        id: "escapify",
+        category: "ECOMMERCE",
+        title: "Escapify: Tu tienda online lista en minutos",
+        description:
+            "Crea tu tienda en línea de manera rápida y sencilla con Escapify. Diseños personalizables, gestión de inventario y pasarelas de pago integradas para que puedas empezar a vender de inmediato.",
+        userPersona: {
+            image: UserEscapify,
+            alt: "Persona usuaria ideal de Escapify",
+        },
+        modules: [
+            {
+                id: "dashboard",
+                title: "Control total de tu empresa, en tiempo real",
+                description:
+                    "Visualiza KPIs, métricas clave y el rendimiento de tu negocio desde un solo lugar. Con Escapify, toma decisiones basadas en datos y mantén el control de cada operación sin perder tiempo.",
+                image: EscapifyDashboard,
+                icon: ChartIcon,
+            },
+            {
+                id: "products",
+                title: "Un ecosistema completo para gestionar y vender",
+                description:
+                    "Desde la gestión interna hasta la venta online, Escapify integra todas las herramientas que tu empresa necesita. Administra operaciones, controla sucursales y conecta con clientes, todo en un solo lugar.",
+                image: EscapifyProducts,
+                icon: ProductIcon,
+            },
+            {
+                id: "orders",
+                title: "Gestiona tus pedidos sin perder el control",
+                description:
+                    "Supervisa cada pedido en tiempo real, desde la creación hasta la entrega. Controla estados, pagos y seguimiento desde un solo lugar, evitando errores y mejorando la eficiencia operativa.",
+                image: EscapifyOrders,
+                icon: OrderIcon,
+            },
+            {
+                id: "details",
+                title: "Cada pedido, bajo control total",
+                description:
+                    "Accede a toda la información de un pedido en un solo lugar: productos, cliente, pagos, estado y seguimiento. Mantén trazabilidad completa y toma decisiones rápidas sin perder contexto.",
+                image: EscapifyDetails,
+                icon: DetailIcon,
+            },
+            {
+                id: "profile",
+                title: "Conoce a cada cliente en profundidad",
+                description:
+                    "Accede a toda la información de tus usuarios en un solo lugar: datos personales, historial de pedidos, actividad y comportamiento. Ofrece una mejor atención con contexto completo.",
+                image: EscapfiyProfile,
+                icon: ProfileIcon,
+            },
+        ],
+        secondaryFeature: {
+            title: "Ideal para marcas que venden online",
+            description:
+                "Encaja perfecto con emprendedores, tiendas retail y negocios que necesitan vender por internet sin depender de procesos manuales. Es útil para equipos que buscan controlar catálogo, pedidos y clientes desde una sola plataforma.",
+        },
+    },
     {
         id: "foxrooms",
         category: "RESERVAS",
@@ -171,64 +236,6 @@ export const products: Product[] = [
             title: "Hecho para instituciones que certifican",
             description:
                 "Encaja con centros de capacitación, consultoras, colegios profesionales, empresas y organizaciones que emiten certificados y necesitan trazabilidad, validación pública y control documental.",
-        },
-    },
-    {
-        id: "escapify",
-        category: "ECOMMERCE",
-        title: "Escapify: Tu tienda online lista en minutos",
-        description:
-            "Crea tu tienda en línea de manera rápida y sencilla con Escapify. Diseños personalizables, gestión de inventario y pasarelas de pago integradas para que puedas empezar a vender de inmediato.",
-        userPersona: {
-            image: UserEscapify,
-            alt: "Persona usuaria ideal de Escapify",
-        },
-        modules: [
-            {
-                id: "inventory",
-                title: "Inventario",
-                description:
-                    "Controla stock, precios, variantes y disponibilidad desde un panel centralizado para mantener tu tienda siempre actualizada.",
-                image: MockupEscapify,
-                icon: ModuleIcon,
-            },
-            {
-                id: "orders",
-                title: "Pedidos",
-                description:
-                    "Gestiona órdenes, estados de entrega y seguimiento operativo para atender compras sin perder visibilidad.",
-                image: MockupEscapify,
-                icon: ModuleIcon,
-            },
-            {
-                id: "customers",
-                title: "Clientes",
-                description:
-                    "Organiza compradores, historial de compras y datos clave para mejorar la atención y recompra.",
-                image: MockupEscapify,
-                icon: ModuleIcon,
-            },
-            {
-                id: "payments",
-                title: "Pagos",
-                description:
-                    "Integra métodos de pago y revisa transacciones para tener una operación comercial más clara.",
-                image: MockupEscapify,
-                icon: ModuleIcon,
-            },
-            {
-                id: "storefront",
-                title: "Catálogo",
-                description:
-                    "Publica productos, fotos, promociones y categorías con una experiencia lista para vender.",
-                image: MockupEscapify,
-                icon: ModuleIcon,
-            },
-        ],
-        secondaryFeature: {
-            title: "Ideal para marcas que venden online",
-            description:
-                "Encaja perfecto con emprendedores, tiendas retail y negocios que necesitan vender por internet sin depender de procesos manuales. Es útil para equipos que buscan controlar catálogo, pedidos y clientes desde una sola plataforma.",
         },
     },
 ];
