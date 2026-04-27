@@ -58,64 +58,6 @@ export interface Product {
 
 export const products: Product[] = [
     {
-        id: "escapify",
-        category: "ECOMMERCE",
-        title: "Escapify: Tu tienda online lista en minutos",
-        description:
-            "Crea tu tienda en línea de manera rápida y sencilla con Escapify. Diseños personalizables, gestión de inventario y pasarelas de pago integradas para que puedas empezar a vender de inmediato.",
-        userPersona: {
-            image: UserEscapify,
-            alt: "Persona usuaria ideal de Escapify",
-        },
-        modules: [
-            {
-                id: "inventory",
-                title: "Inventario",
-                description:
-                    "Controla stock, precios, variantes y disponibilidad desde un panel centralizado para mantener tu tienda siempre actualizada.",
-                image: MockupEscapify,
-                icon: ModuleIcon,
-            },
-            {
-                id: "orders",
-                title: "Pedidos",
-                description:
-                    "Gestiona órdenes, estados de entrega y seguimiento operativo para atender compras sin perder visibilidad.",
-                image: MockupEscapify,
-                icon: ModuleIcon,
-            },
-            {
-                id: "customers",
-                title: "Clientes",
-                description:
-                    "Organiza compradores, historial de compras y datos clave para mejorar la atención y recompra.",
-                image: MockupEscapify,
-                icon: ModuleIcon,
-            },
-            {
-                id: "payments",
-                title: "Pagos",
-                description:
-                    "Integra métodos de pago y revisa transacciones para tener una operación comercial más clara.",
-                image: MockupEscapify,
-                icon: ModuleIcon,
-            },
-            {
-                id: "storefront",
-                title: "Catálogo",
-                description:
-                    "Publica productos, fotos, promociones y categorías con una experiencia lista para vender.",
-                image: MockupEscapify,
-                icon: ModuleIcon,
-            },
-        ],
-        secondaryFeature: {
-            title: "Ideal para marcas que venden online",
-            description:
-                "Encaja perfecto con emprendedores, tiendas retail y negocios que necesitan vender por internet sin depender de procesos manuales. Es útil para equipos que buscan controlar catálogo, pedidos y clientes desde una sola plataforma.",
-        },
-    },
-    {
         id: "foxrooms",
         category: "RESERVAS",
         title: "FoxRooms: Sistema de reservas inteligente",
@@ -229,6 +171,64 @@ export const products: Product[] = [
             title: "Hecho para instituciones que certifican",
             description:
                 "Encaja con centros de capacitación, consultoras, colegios profesionales, empresas y organizaciones que emiten certificados y necesitan trazabilidad, validación pública y control documental.",
+        },
+    },
+    {
+        id: "escapify",
+        category: "ECOMMERCE",
+        title: "Escapify: Tu tienda online lista en minutos",
+        description:
+            "Crea tu tienda en línea de manera rápida y sencilla con Escapify. Diseños personalizables, gestión de inventario y pasarelas de pago integradas para que puedas empezar a vender de inmediato.",
+        userPersona: {
+            image: UserEscapify,
+            alt: "Persona usuaria ideal de Escapify",
+        },
+        modules: [
+            {
+                id: "inventory",
+                title: "Inventario",
+                description:
+                    "Controla stock, precios, variantes y disponibilidad desde un panel centralizado para mantener tu tienda siempre actualizada.",
+                image: MockupEscapify,
+                icon: ModuleIcon,
+            },
+            {
+                id: "orders",
+                title: "Pedidos",
+                description:
+                    "Gestiona órdenes, estados de entrega y seguimiento operativo para atender compras sin perder visibilidad.",
+                image: MockupEscapify,
+                icon: ModuleIcon,
+            },
+            {
+                id: "customers",
+                title: "Clientes",
+                description:
+                    "Organiza compradores, historial de compras y datos clave para mejorar la atención y recompra.",
+                image: MockupEscapify,
+                icon: ModuleIcon,
+            },
+            {
+                id: "payments",
+                title: "Pagos",
+                description:
+                    "Integra métodos de pago y revisa transacciones para tener una operación comercial más clara.",
+                image: MockupEscapify,
+                icon: ModuleIcon,
+            },
+            {
+                id: "storefront",
+                title: "Catálogo",
+                description:
+                    "Publica productos, fotos, promociones y categorías con una experiencia lista para vender.",
+                image: MockupEscapify,
+                icon: ModuleIcon,
+            },
+        ],
+        secondaryFeature: {
+            title: "Ideal para marcas que venden online",
+            description:
+                "Encaja perfecto con emprendedores, tiendas retail y negocios que necesitan vender por internet sin depender de procesos manuales. Es útil para equipos que buscan controlar catálogo, pedidos y clientes desde una sola plataforma.",
         },
     },
 ];
