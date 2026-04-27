@@ -3,9 +3,10 @@
 import Layout from "@/layouts/Layout.astro";
 import Hero from "@/sections/products/Hero.astro";
 import ProductsGrid from "@/sections/products/ProductsGrid.astro";
+import { seoPages } from "@/core/SeoData";
 ---
 
-<Layout>
+<Layout {...seoPages.products}>
     <div class="flex flex-col gap-y-10">
         <Hero />
         <ProductsGrid />

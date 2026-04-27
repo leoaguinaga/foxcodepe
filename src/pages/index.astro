@@ -7,9 +7,10 @@ import Features from "@/sections/home/Features.astro";
 import Products from "@/sections/home/Products.astro";
 import Services from "@/sections/home/Services.astro";
 import Schedule from "@/sections/home/Schedule.astro";
+import { seoPages } from "@/core/SeoData";
 ---
 
-<Layout>
+<Layout {...seoPages.home}>
 
     <div class="flex flex-col md:gap-y-10">
         <!-- <Hero /> -->

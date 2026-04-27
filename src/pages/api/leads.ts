@@ -44,7 +44,13 @@ const leadSchema = z.object({
 let sqlClient: postgres.Sql | null = null;
 
 function getEnv(name: "DATABASE_URL" | "PUBLIC_SITE_URL") {
-    return process.env[name] || import.meta.env[name];
+    const nodeProcess = (globalThis as typeof globalThis & {
+        process?: { env?: Partial<Record<"DATABASE_URL" | "PUBLIC_SITE_URL", string>> };
+    }).process as
+        | { env?: Partial<Record<"DATABASE_URL" | "PUBLIC_SITE_URL", string>> }
+        | undefined;
+
+    return nodeProcess?.env?.[name] || import.meta.env[name];
 }
 
 function jsonResponse(body: unknown, status: number) {

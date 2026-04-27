@@ -6,9 +6,10 @@ import HowWorks from "@/sections/about/HowWorks.astro";
 import Team from "@/sections/about/Team.astro";
 import Trust from "@/sections/about/Trust.astro";
 import Testimonials from "@/sections/about/Testimonials.astro";
+import { seoPages } from "@/core/SeoData";
 ---
 
-<Layout>
+<Layout {...seoPages.about}>
   <!-- <Hero /> -->
   <Trust />
 

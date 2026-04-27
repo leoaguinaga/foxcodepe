@@ -41,6 +41,9 @@ const { name, role, role2, imageUrl, href } = Astro.props;
         </div>
     </div>
 
-    <h4 class="text-white px-5 py-2 -mt-5 rounded-full bg-white/5 w-fit mx-auto">{name}</h4>
+    <div class="text-center -mt-5">
+        <h4 class="text-white px-5 py-2 rounded-full bg-white/5 w-fit mx-auto">{name}</h4>
+        {role2 && <p class="mt-2 text-xs text-white/50">{role2}</p>}
+    </div>
     
 </a>

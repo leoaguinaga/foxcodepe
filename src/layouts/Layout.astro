@@ -4,15 +4,76 @@ import Footer from "@/sections/shared/Footer.astro";
 import CTA from "@/sections/shared/CTA.astro";
 import ContactUsModal from "@/components/ContactUsModal";
 import LinksSidebar from "@/components/LinksSidebar.astro";
-import Analytics from '@vercel/analytics/astro'
+import { siteSeo, type SeoPage } from "@/core/SeoData";
 import "@/styles/global.css";
+
+interface Props extends Partial<SeoPage> {
+	image?: string;
+}
+
+const {
+	title,
+	description,
+	path,
+	keywords = [],
+	type = "website",
+	noindex = false,
+	image = "/og.png",
+} = Astro.props;
+
+const rawSiteUrl = import.meta.env.PUBLIC_SITE_URL || Astro.site?.toString() || "https://foxcode.pe";
+const siteUrl = rawSiteUrl.endsWith("/") ? rawSiteUrl : `${rawSiteUrl}/`;
+const canonicalPath = path || Astro.url.pathname;
+const canonicalUrl = new URL(canonicalPath, siteUrl).toString();
+const pageTitle = title ? siteSeo.titleTemplate.replace("%s", title) : siteSeo.defaultTitle;
+const pageDescription = description || siteSeo.defaultDescription;
+const pageKeywords = Array.from(new Set([...siteSeo.defaultKeywords, ...keywords])).join(", ");
+const ogImageUrl = new URL(image, siteUrl).toString();
+const robotsContent = noindex
+	? "noindex, nofollow"
+	: "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1";
+
+const structuredData = [
+	{
+		"@context": "https://schema.org",
+		"@type": "Organization",
+		name: siteSeo.name,
+		url: siteUrl,
+		logo: new URL("/favicon-dark.webp", siteUrl).toString(),
+		email: siteSeo.email,
+		telephone: siteSeo.phone,
+		sameAs: siteSeo.socialLinks,
+	},
+	{
+		"@context": "https://schema.org",
+		"@type": "WebSite",
+		name: siteSeo.name,
+		url: siteUrl,
+		inLanguage: siteSeo.language,
+	},
+	{
+		"@context": "https://schema.org",
+		"@type": "WebPage",
+		name: pageTitle,
+		description: pageDescription,
+		url: canonicalUrl,
+		isPartOf: {
+			"@type": "WebSite",
+			name: siteSeo.name,
+			url: siteUrl,
+		},
+		inLanguage: siteSeo.language,
+	},
+];
+
+const structuredDataJson = JSON.stringify(structuredData).replace(/</g, "\\u003c");
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang={siteSeo.language}>
 	<head>
 		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<link
 			rel="icon"
 			type="image/icon-x"
@@ -26,6 +87,29 @@ import "@/styles/global.css";
 			media="(prefers-color-scheme: dark)"
 		/>
 		<meta name="generator" content={Astro.generator} />
+		<meta name="description" content={pageDescription} />
+		<meta name="keywords" content={pageKeywords} />
+		<meta name="author" content={siteSeo.author} />
+		<meta name="robots" content={robotsContent} />
+		<meta name="theme-color" content="#ee4d31" />
+		<meta name="application-name" content={siteSeo.name} />
+		<meta name="apple-mobile-web-app-title" content={siteSeo.name} />
+		<link rel="canonical" href={canonicalUrl} />
+		<link rel="alternate" hreflang="es-PE" href={canonicalUrl} />
+		<link rel="alternate" hreflang="x-default" href={canonicalUrl} />
+
+		<meta property="og:site_name" content={siteSeo.name} />
+		<meta property="og:type" content={type} />
+		<meta property="og:title" content={pageTitle} />
+		<meta property="og:description" content={pageDescription} />
+		<meta property="og:url" content={canonicalUrl} />
+		<meta property="og:image" content={ogImageUrl} />
+		<meta property="og:locale" content={siteSeo.locale} />
+
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:title" content={pageTitle} />
+		<meta name="twitter:description" content={pageDescription} />
+		<meta name="twitter:image" content={ogImageUrl} />
 
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -34,7 +118,9 @@ import "@/styles/global.css";
 			rel="stylesheet"
 		/>
 
-		<title>FoxCode</title>
+		<script is:inline type="application/ld+json" set:html={structuredDataJson} />
+
+		<title>{pageTitle}</title>
 	</head>
 	<body class="bg-background text-text scroll-smooth w-full">
 		<div class="top-5 z-30 sticky max-xl:px-5">

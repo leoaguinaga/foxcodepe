@@ -3,9 +3,10 @@ import SelectServicePriceModal from "@/components/SelectServicePriceModal.astro"
 import Layout from "@/layouts/Layout.astro";
 import Hero from "@/sections/services/Hero.astro";
 import ServicesGrid from "@/sections/services/ServicesGrid.astro";
+import { seoPages } from "@/core/SeoData";
 ---
 
-<Layout>
+<Layout {...seoPages.services}>
     <Hero />
     <div id="servicios">
         <ServicesGrid />
