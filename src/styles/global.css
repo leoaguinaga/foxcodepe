@@ -39,3 +39,165 @@ html {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+.fox-date-input {
+  color-scheme: dark;
+  appearance: none;
+  min-height: 46px;
+  background-color: rgb(255 255 255 / 0.05);
+  cursor: pointer;
+  transition:
+    border-color 150ms ease,
+    background-color 150ms ease,
+    box-shadow 150ms ease;
+}
+
+.fox-date-input:hover {
+  background-color: rgb(255 255 255 / 0.1);
+}
+
+.fox-date-input:focus {
+  border-color: var(--color-primary);
+  outline: none;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-primary) 35%, transparent);
+}
+
+.fox-date-picker-panel {
+  position: absolute;
+  z-index: 9999;
+  width: min(20rem, calc(100vw - 2rem));
+  overflow: hidden;
+  border: 1px solid rgb(255 255 255 / 0.12);
+  border-radius: 0.75rem;
+  background: #18181a;
+  box-shadow: 0 24px 80px rgb(0 0 0 / 0.45);
+}
+
+.fox-date-picker-panel[hidden] {
+  display: none;
+}
+
+.fox-date-picker-header {
+  display: grid;
+  grid-template-columns: 2rem 1fr 2rem;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.875rem 0.875rem 0.625rem;
+}
+
+.fox-date-picker-nav,
+.fox-date-picker-day {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid transparent;
+  border-radius: 999px;
+  color: rgb(255 255 241 / 0.9);
+  transition:
+    border-color 150ms ease,
+    background-color 150ms ease,
+    color 150ms ease;
+}
+
+.fox-date-picker-nav {
+  width: 2rem;
+  height: 2rem;
+}
+
+.fox-date-picker-nav:hover,
+.fox-date-picker-day:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  background: rgb(255 255 255 / 0.06);
+}
+
+.fox-date-picker-title {
+  text-align: center;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.fox-date-picker-weekdays,
+.fox-date-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 0.125rem;
+  padding-inline: 0.75rem;
+}
+
+.fox-date-picker-weekdays {
+  padding-bottom: 0.375rem;
+}
+
+.fox-date-picker-weekdays span {
+  display: block;
+  text-align: center;
+  font-size: 0.75rem;
+  color: rgb(255 255 241 / 0.45);
+}
+
+.fox-date-picker-grid {
+  padding-bottom: 0.75rem;
+}
+
+.fox-date-picker-day {
+  aspect-ratio: 1;
+  width: 100%;
+  font-size: 0.875rem;
+}
+
+.fox-date-picker-day.is-muted {
+  color: rgb(255 255 241 / 0.25);
+}
+
+.fox-date-picker-day.is-disabled,
+.fox-date-picker-day:disabled {
+  cursor: not-allowed;
+  color: rgb(255 255 241 / 0.18);
+  background: transparent;
+  border-color: transparent;
+  text-decoration: line-through;
+}
+
+.fox-date-picker-day.is-disabled:hover,
+.fox-date-picker-day:disabled:hover {
+  color: rgb(255 255 241 / 0.18);
+  background: transparent;
+  border-color: transparent;
+}
+
+.fox-date-picker-day.is-selected {
+  border-color: var(--color-primary);
+  background: var(--color-primary);
+  color: white;
+  font-weight: 600;
+}
+
+.fox-date-picker-time {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-top: 1px solid rgb(255 255 255 / 0.1);
+  padding: 0.75rem;
+}
+
+.fox-date-picker-time label {
+  font-size: 0.75rem;
+  color: rgb(255 255 241 / 0.5);
+}
+
+.fox-date-picker-time select {
+  flex: 1;
+  border: 1px solid rgb(255 255 255 / 0.1);
+  border-radius: 0.5rem;
+  background: rgb(255 255 255 / 0.05);
+  color: var(--color-text);
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+}
+
+.fox-date-picker-time select:focus {
+  border-color: var(--color-primary);
+  outline: none;
+}

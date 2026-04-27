@@ -38,7 +38,7 @@ const servicesWithAddOns = services.map((service) => ({
                                 data-service-name={addOn.name}
                                 data-service-price={addOn.price}
                             >
-                                <span>{addOn.name} - ${addOn.price}</span>
+                                <span>{addOn.name} - S/. {addOn.price.toLocaleString("es-PE")}</span>
 
                                 {/* Icon X - shown on hover when selected */}
                                 <span class="icon-x hidden">

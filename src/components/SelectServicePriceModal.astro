@@ -64,14 +64,20 @@ import AddServices from "./AddServices.astro";
     interface QuoteItem {
         type: 'plan' | 'service';
         name: string;
-        price: number;
+        price: number | null;
+        priceLabel: string;
     }
 
     interface SelectedPlan {
         serviceId: string;
         serviceTitle: string;
         level: string;
-        price: number;
+        price: number | null;
+        priceLabel: string;
+    }
+
+    function formatSoles(price: number) {
+        return `S/. ${price.toLocaleString('es-PE')}`;
     }
 
     class QuoteManager {
@@ -94,36 +100,38 @@ import AddServices from "./AddServices.astro";
                 
                 if (button) {
                     const level = button.getAttribute('data-plan-level') || '';
-                    const price = button.getAttribute('data-plan-price') || '$0';
+                    const priceValue = button.getAttribute('data-plan-price-value') || '';
+                    const priceLabel = button.getAttribute('data-plan-price-label') || '$0';
                     const description = button.getAttribute('data-plan-description') || '';
                     const serviceId = button.getAttribute('data-service-id') || '';
                     const serviceTitle = button.getAttribute('data-service-title') || 'Servicio';
                     
-                    this.selectPlan(level, price, description, serviceId, serviceTitle);
+                    this.selectPlan(level, priceValue, priceLabel, description, serviceId, serviceTitle);
                 }
             });
         }
 
-        selectPlan(level: string, priceStr: string, description: string, serviceId: string, serviceTitle: string) {
+        selectPlan(level: string, priceValue: string, priceLabel: string, description: string, serviceId: string, serviceTitle: string) {
             // Reset everything when selecting a new plan
             this.reset();
             
-            // Extract numeric value from price string (e.g., "$1,950" -> 1950)
-            const parsedPrice = parseFloat(priceStr.replace(/[$,]/g, ''));
-            // If price is NaN (e.g., "A tratar"), set to 0
-            const price = isNaN(parsedPrice) ? 0 : parsedPrice;
+            const parsedPrice = parseFloat(priceValue);
+            const price = isNaN(parsedPrice) ? null : parsedPrice;
+            const normalizedPriceLabel = price === null ? priceLabel : formatSoles(price);
             this.selectedPlan = {
                 serviceId,
                 serviceTitle,
                 level,
                 price,
+                priceLabel: normalizedPriceLabel,
             };
             
             // Add new plan
             this.items.unshift({
                 type: 'plan',
                 name: `${serviceTitle} - Plan ${level}`,
-                price: price
+                price,
+                priceLabel: normalizedPriceLabel,
             });
 
             this.updateUI();
@@ -169,7 +177,8 @@ import AddServices from "./AddServices.astro";
                 this.items.push({
                     type: 'service',
                     name: name,
-                    price: price
+                    price,
+                    priceLabel: formatSoles(price),
                 });
             }
 
@@ -195,7 +204,7 @@ import AddServices from "./AddServices.astro";
                         Selecciona un plan para comenzar
                     </p>
                 `;
-                this.quoteTotalElement.textContent = '$0';
+                this.quoteTotalElement.textContent = formatSoles(0);
                 return;
             }
 
@@ -211,7 +220,7 @@ import AddServices from "./AddServices.astro";
 
                 const priceElement = document.createElement('p');
                 priceElement.className = 'font-semibold text-white text-end';
-                priceElement.textContent = `$${plan.price.toLocaleString()}`;
+                priceElement.textContent = plan.priceLabel;
 
                 this.quoteItemsContainer!.appendChild(nameElement);
                 this.quoteItemsContainer!.appendChild(priceElement);
@@ -229,14 +238,14 @@ import AddServices from "./AddServices.astro";
 
                     const priceElement = document.createElement('p');
                     priceElement.className = 'font-semibold text-white text-end';
-                    priceElement.textContent = `$${service.price.toLocaleString()}`;
+                    priceElement.textContent = service.priceLabel;
 
                     this.quoteItemsContainer!.appendChild(nameElement);
                     this.quoteItemsContainer!.appendChild(priceElement);
                 });
             } else {
                 // Show grouped services when more than 2
-                const servicesTotal = services.reduce((sum, s) => sum + s.price, 0);
+                const servicesTotal = services.reduce((sum, s) => sum + (s.price ?? 0), 0);
                 
                 const nameElement = document.createElement('p');
                 nameElement.className = 'line-clamp-2';
@@ -244,15 +253,15 @@ import AddServices from "./AddServices.astro";
 
                 const priceElement = document.createElement('p');
                 priceElement.className = 'font-semibold text-white text-end';
-                priceElement.textContent = `$${servicesTotal.toLocaleString()}`;
+                priceElement.textContent = formatSoles(servicesTotal);
 
                 this.quoteItemsContainer!.appendChild(nameElement);
                 this.quoteItemsContainer!.appendChild(priceElement);
             }
 
             // Update total
-            const total = this.items.reduce((sum, item) => sum + item.price, 0);
-            this.quoteTotalElement.textContent = `$${total.toLocaleString()}`;
+            const total = this.items.reduce((sum, item) => sum + (item.price ?? 0), 0);
+            this.quoteTotalElement.textContent = formatSoles(total);
         }
 
         getItems() {
@@ -261,13 +270,13 @@ import AddServices from "./AddServices.astro";
 
         getLeadQuote() {
             const services = this.items.filter(item => item.type === 'service');
-            const estimatedTotal = this.items.reduce((sum, item) => sum + item.price, 0);
+            const estimatedTotal = this.items.reduce((sum, item) => sum + (item.price ?? 0), 0);
 
             return {
                 selectedPlan: this.selectedPlan,
                 selectedAddOns: services.map((service) => ({
                     name: service.name,
-                    price: service.price,
+                    price: service.price ?? 0,
                 })),
                 estimatedTotal,
             };
@@ -541,7 +550,7 @@ import AddServices from "./AddServices.astro";
                 serviceId: quote.selectedPlan.serviceId,
                 serviceTitle: quote.selectedPlan.serviceTitle,
                 planLevel: quote.selectedPlan.level,
-                planPrice: quote.selectedPlan.price,
+                planPrice: quote.selectedPlan.price ?? undefined,
                 selectedAddOns: quote.selectedAddOns,
                 estimatedTotal: quote.estimatedTotal,
             },

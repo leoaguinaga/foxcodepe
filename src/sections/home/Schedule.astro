@@ -123,12 +123,15 @@ import SelectDayModal from '@/components/SelectDayModal.astro';
       <!-- Schedule -->
       <div class="relative w-full">
         <input
-            type="datetime-local"
+            type="text"
             id="meeting-schedule"
             name="scheduledAt"
             placeholder=""
             required
-            class="peer w-full border text-sm border-white/10 bg-white/5 rounded-lg px-4 pt-6.5 pb-3 placeholder-transparent hover:shadow focus:outline-none focus:ring-2 focus:ring-primary hover:bg-white/10"
+            readonly
+            data-fox-date-picker
+            data-fox-date-mode="datetime"
+            class="fox-date-input peer w-full border text-sm border-white/10 bg-white/5 rounded-lg px-4 pt-6.5 pb-3 placeholder-transparent hover:shadow focus:outline-none focus:ring-2 focus:ring-primary hover:bg-white/10"
         />
         <label
             for="meeting-schedule"
@@ -277,4 +280,3 @@ import SelectDayModal from '@/components/SelectDayModal.astro';
     }
   });
 </script>
-

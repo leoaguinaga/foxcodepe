@@ -67,5 +67,219 @@ import "@/styles/global.css";
 	<script>
 		import "preline/dist/index.js";
 	</script>
-</html>
+	<script>
+		const monthFormatter = new Intl.DateTimeFormat("es", {
+			month: "long",
+			year: "numeric",
+		});
+		const weekdays = ["Lu", "Ma", "Mi", "Ju", "Vi", "Sa", "Do"];
 
+		function padDatePart(value: number) {
+			return String(value).padStart(2, "0");
+		}
+
+		function formatDateValue(date: Date) {
+			return `${date.getFullYear()}-${padDatePart(date.getMonth() + 1)}-${padDatePart(date.getDate())}`;
+		}
+
+		function getInitialDate(input: HTMLInputElement) {
+			if (!input.value) {
+				return new Date();
+			}
+
+			const date = new Date(input.value);
+
+			return Number.isNaN(date.getTime()) ? new Date() : date;
+		}
+
+		function getTodayStart() {
+			const today = new Date();
+			today.setHours(0, 0, 0, 0);
+
+			return today;
+		}
+
+		function initFoxDatePickers() {
+			const inputs = document.querySelectorAll<HTMLInputElement>("[data-fox-date-picker]");
+
+			inputs.forEach((input) => {
+				if (input.dataset.foxDateReady === "true") {
+					return;
+				}
+
+				input.dataset.foxDateReady = "true";
+				const mode = input.dataset.foxDateMode === "datetime" ? "datetime" : "date";
+				const panel = document.createElement("div");
+				panel.className = "fox-date-picker-panel";
+				panel.hidden = true;
+				document.body.appendChild(panel);
+
+				let selectedDate = getInitialDate(input);
+				let visibleDate = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1);
+				let selectedTime = "09:00";
+
+				function commitValue(date: Date) {
+					const dateValue = formatDateValue(date);
+					input.value = mode === "datetime" ? `${dateValue}T${selectedTime}` : dateValue;
+					input.dispatchEvent(new Event("input", { bubbles: true }));
+					input.dispatchEvent(new Event("change", { bubbles: true }));
+				}
+
+				function closePanel() {
+					panel.hidden = true;
+				}
+
+				function positionPanel() {
+					const inputRect = input.getBoundingClientRect();
+					const panelWidth = Math.min(320, window.innerWidth - 32);
+					const left = Math.min(
+						Math.max(inputRect.left + window.scrollX, 16 + window.scrollX),
+						window.innerWidth - panelWidth - 16 + window.scrollX,
+					);
+					const top = inputRect.bottom + window.scrollY + 8;
+
+					panel.style.width = `${panelWidth}px`;
+					panel.style.left = `${left}px`;
+					panel.style.top = `${top}px`;
+				}
+
+				function openPanel() {
+					renderPanel();
+					positionPanel();
+					panel.hidden = false;
+				}
+
+				function renderPanel() {
+					const year = visibleDate.getFullYear();
+					const month = visibleDate.getMonth();
+					const firstDay = new Date(year, month, 1);
+					const startOffset = (firstDay.getDay() + 6) % 7;
+					const gridStart = new Date(year, month, 1 - startOffset);
+					const selectedValue = formatDateValue(selectedDate);
+					const todayStart = getTodayStart();
+
+					panel.innerHTML = `
+						<div class="fox-date-picker-header">
+							<button type="button" class="fox-date-picker-nav" data-fox-date-prev aria-label="Mes anterior">
+								<svg class="size-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+							</button>
+							<div class="fox-date-picker-title">${monthFormatter.format(visibleDate)}</div>
+							<button type="button" class="fox-date-picker-nav" data-fox-date-next aria-label="Mes siguiente">
+								<svg class="size-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+							</button>
+						</div>
+						<div class="fox-date-picker-weekdays">
+							${weekdays.map((day) => `<span>${day}</span>`).join("")}
+						</div>
+						<div class="fox-date-picker-grid">
+							${Array.from({ length: 42 }, (_, index) => {
+								const date = new Date(gridStart);
+								date.setDate(gridStart.getDate() + index);
+								const value = formatDateValue(date);
+								const isMuted = date.getMonth() !== month;
+								const isSelected = value === selectedValue;
+								const comparableDate = new Date(date);
+								comparableDate.setHours(0, 0, 0, 0);
+								const isDisabled = comparableDate < todayStart;
+
+								return `<button type="button" class="fox-date-picker-day ${isMuted ? "is-muted" : ""} ${isDisabled ? "is-disabled" : ""} ${isSelected && !isDisabled ? "is-selected" : ""}" data-fox-date-day="${value}" ${isDisabled ? "disabled" : ""}>${date.getDate()}</button>`;
+							}).join("")}
+						</div>
+						${mode === "datetime" ? `
+							<div class="fox-date-picker-time">
+								<label for="${input.id}-time">Hora</label>
+								<select id="${input.id}-time" data-fox-date-time>
+									${["09:00", "09:30", "10:00", "10:30", "11:00", "11:30", "12:00", "12:30", "15:00", "15:30", "16:00", "16:30", "17:00", "17:30", "18:00"].map((time) => `<option value="${time}" ${time === selectedTime ? "selected" : ""}>${time}</option>`).join("")}
+								</select>
+							</div>
+						` : ""}
+					`;
+				}
+
+				input.addEventListener("click", () => {
+					if (panel.hidden) {
+						openPanel();
+					} else {
+						closePanel();
+					}
+				});
+
+				input.addEventListener("keydown", (event) => {
+					if (event.key === "Enter" || event.key === " ") {
+						event.preventDefault();
+						openPanel();
+					}
+
+					if (event.key === "Escape") {
+						closePanel();
+					}
+				});
+
+				panel.addEventListener("click", (event) => {
+					event.stopPropagation();
+					const target = event.target as HTMLElement;
+					const prevButton = target.closest("[data-fox-date-prev]");
+					const nextButton = target.closest("[data-fox-date-next]");
+					const dayButton = target.closest("[data-fox-date-day]") as HTMLButtonElement | null;
+
+					if (prevButton) {
+						visibleDate = new Date(visibleDate.getFullYear(), visibleDate.getMonth() - 1, 1);
+						renderPanel();
+						positionPanel();
+						return;
+					}
+
+					if (nextButton) {
+						visibleDate = new Date(visibleDate.getFullYear(), visibleDate.getMonth() + 1, 1);
+						renderPanel();
+						positionPanel();
+						return;
+					}
+
+					if (dayButton?.dataset.foxDateDay) {
+						selectedDate = new Date(`${dayButton.dataset.foxDateDay}T00:00:00`);
+						visibleDate = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1);
+						commitValue(selectedDate);
+						renderPanel();
+
+						if (mode === "date") {
+							closePanel();
+						}
+					}
+				});
+
+				panel.addEventListener("change", (event) => {
+					const target = event.target as HTMLSelectElement;
+
+					if (target.matches("[data-fox-date-time]")) {
+						selectedTime = target.value;
+						commitValue(selectedDate);
+					}
+				});
+
+				document.addEventListener("click", (event) => {
+					const path = event.composedPath();
+
+					if (!path.includes(input) && !path.includes(panel)) {
+						closePanel();
+					}
+				});
+
+				window.addEventListener("resize", () => {
+					if (!panel.hidden) {
+						positionPanel();
+					}
+				});
+
+				window.addEventListener("scroll", () => {
+					if (!panel.hidden) {
+						positionPanel();
+					}
+				}, true);
+			});
+		}
+
+		initFoxDatePickers();
+		document.addEventListener("astro:page-load", initFoxDatePickers);
+	</script>
+</html>

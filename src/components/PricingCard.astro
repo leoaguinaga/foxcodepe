@@ -12,6 +12,10 @@ interface Props {
 const bgClass = Astro.props.isRecommended ? "bg-linear-to-b from-white/5 to-primary/20" : "bg-white/5";
 const borderClass = Astro.props.isRecommended ? "border-primary" : "border-white/10";
 const bgLevelClass = Astro.props.isRecommended ? "bg-primary" : "bg-white/10";
+const normalizedPrice = Astro.props.price.replace(/,/g, "");
+const numericPriceMatch = normalizedPrice.match(/\d+(?:\.\d+)?/);
+const numericPrice = numericPriceMatch ? Number.parseFloat(numericPriceMatch[0]) : NaN;
+const planPriceValue = Number.isNaN(numericPrice) ? "" : String(numericPrice);
 ---
 
 <div
@@ -62,7 +66,8 @@ const bgLevelClass = Astro.props.isRecommended ? "bg-primary" : "bg-white/10";
         class="pricing-select-btn bg-primary text-white font-medium px-2 py-1.5 text-sm rounded-full hover:bg-primary-dark transition cursor-pointer"
         aria-haspopup="dialog" aria-expanded="false" aria-controls="select-service-price-modal" data-hs-overlay="#select-service-price-modal"
         data-plan-level={Astro.props.level}
-        data-plan-price={Astro.props.price}
+        data-plan-price-label={Astro.props.price}
+        data-plan-price-value={planPriceValue}
         data-plan-description={Astro.props.description}
         data-service-id={Astro.props.serviceId || ""}
         data-service-title={Astro.props.serviceTitle || "Servicio"}
