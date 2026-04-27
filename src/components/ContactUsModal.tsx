@@ -1,6 +1,7 @@
-import { useCallback, useState, type MouseEventHandler } from "react";
+import { useCallback, useState, type FormEventHandler, type MouseEventHandler } from "react";
 
 type TabType = 'form' | 'channels';
+type SubmitStatus = "idle" | "success" | "error";
 
 const CONTACT_MODAL_ID = "contact-us-modal";
 
@@ -14,6 +15,9 @@ declare global {
 
 export default function ContactModal() {
     const [activeTab, setActiveTab] = useState<TabType>('form');
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [submitStatus, setSubmitStatus] = useState<SubmitStatus>("idle");
+    const [submitMessage, setSubmitMessage] = useState("");
 
     const closeModal = useCallback(() => {
         const modal = document.getElementById(CONTACT_MODAL_ID);
@@ -37,6 +41,68 @@ export default function ContactModal() {
         (event) => {
             if (event.target === event.currentTarget) {
                 closeModal();
+            }
+        },
+        [closeModal],
+    );
+
+    const handleContactSubmit = useCallback<FormEventHandler<HTMLFormElement>>(
+        async (event) => {
+            event.preventDefault();
+
+            const form = event.currentTarget;
+
+            if (!form.reportValidity()) {
+                return;
+            }
+
+            const formData = new FormData(form);
+            const payload = {
+                name: String(formData.get("name") || "").trim(),
+                email: String(formData.get("email") || "").trim(),
+                phone: String(formData.get("phone") || "").trim(),
+                message: String(formData.get("message") || "").trim(),
+                website: String(formData.get("website") || ""),
+                metadata: {
+                    pagePath: window.location.pathname,
+                    userAgent: window.navigator.userAgent,
+                },
+            };
+
+            setIsSubmitting(true);
+            setSubmitStatus("idle");
+            setSubmitMessage("");
+
+            try {
+                const response = await fetch("/api/contact", {
+                    method: "POST",
+                    headers: {
+                        "content-type": "application/json",
+                    },
+                    body: JSON.stringify(payload),
+                });
+
+                const result = await response.json().catch(() => null);
+
+                if (!response.ok || !result?.ok) {
+                    throw new Error(result?.error || "No se pudo enviar el mensaje.");
+                }
+
+                form.reset();
+                setSubmitStatus("success");
+                setSubmitMessage("Mensaje enviado. Te contactaremos pronto.");
+
+                window.setTimeout(() => {
+                    closeModal();
+                    setSubmitStatus("idle");
+                    setSubmitMessage("");
+                }, 900);
+            } catch (error) {
+                console.error("Contact form failed", error);
+                setSubmitStatus("error");
+                setSubmitMessage("No se pudo enviar el mensaje. Inténtalo nuevamente.");
+            } finally {
+                setIsSubmitting(false);
             }
         },
         [closeModal],
@@ -241,7 +307,18 @@ export default function ContactModal() {
                 {/* Contact Form */}
                 {
                     activeTab === 'form' && (
-                        <form className="space-y-3 max-sm:overflow-y-auto max-sm:p-0.5">
+                        <form
+                            className="space-y-3 max-sm:overflow-y-auto max-sm:p-0.5"
+                            onSubmit={handleContactSubmit}
+                        >
+                            <input
+                                type="text"
+                                name="website"
+                                tabIndex={-1}
+                                autoComplete="off"
+                                aria-hidden="true"
+                                className="hidden"
+                            />
                         
                             {/* Name */}
                             <div className="relative w-full">
@@ -355,10 +432,23 @@ export default function ContactModal() {
                             {/* Submit Button */}
                             <button
                                 type="submit"
-                                className="w-full bg-primary text-white py-2.5 font-medium rounded-lg hover:bg-primary-dark transition"
+                                disabled={isSubmitting}
+                                className="w-full bg-primary text-white py-2.5 font-medium rounded-lg hover:bg-primary-dark transition disabled:cursor-not-allowed disabled:opacity-60"
                             >
-                                Enviar mensaje
+                                {isSubmitting ? "Enviando..." : "Enviar mensaje"}
                             </button>
+
+                            {submitMessage && (
+                                <p
+                                    className={`text-sm ${
+                                        submitStatus === "success" ? "text-emerald-400" : "text-red-400"
+                                    }`}
+                                    role="status"
+                                    aria-live="polite"
+                                >
+                                    {submitMessage}
+                                </p>
+                            )}
                         </form>
                     )
                 }

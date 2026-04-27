@@ -76,6 +76,26 @@ enum MeetingRequestStatus {
   DONE
 }
 
+model ContactMessage {
+  id        String               @id @default(cuid())
+  name      String
+  email     String
+  phone     String?
+  message   String
+  status    ContactMessageStatus @default(NEW)
+  source    String               @default("contact_modal")
+  metadata  Json?
+  createdAt DateTime             @default(now())
+  updatedAt DateTime             @updatedAt
+}
+
+enum ContactMessageStatus {
+  NEW
+  READ
+  REPLIED
+  ARCHIVED
+}
+
 model User {
   id        String   @id @default(cuid())
   email     String   @unique
