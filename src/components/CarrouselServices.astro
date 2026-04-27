@@ -1,6 +1,17 @@
+---
+import type { ServiceImage } from "@/core/ServicesData";
+
+interface Props {
+    id: string;
+    images: ServiceImage[];
+}
+
+const { id, images } = Astro.props;
+---
+
 <!-- Carousel -->
 <div
-    id="hs-carousel"
+    id={`hs-carousel-${id}`}
     class="relative"
     data-hs-carousel='{
         "loadingClasses": "opacity-0", 
@@ -10,59 +21,23 @@
         "slidesQty": {"xs": 1,"md": 2}
         }'
     >
-    <div class="hs-carousel relative w-full min-h-96 overflow-hidden">
+    <div class="hs-carousel relative w-full min-h-85 overflow-hidden">
         <!-- Carousel Body -->
         <div
-            class="hs-carousel-body flex flex-nowrap absolute top-0 bottom-0 start-0 transition-transform duration-700 -mx-1 opacity-0"
+            class="hs-carousel-body flex flex-nowrap absolute top-0 bottom-0 start-0 transition-transform duration-700 opacity-0 gap-2"
         >
-            <div class="hs-carousel-slide px-1">
-                <div class="flex justify-center h-full bg-surface p-6">
-                    <span
-                        class="self-center text-sm text-foreground transition duration-700"
-                        >First slide</span
-                    >
-                </div>
-            </div>
-            <div class="hs-carousel-slide px-1">
-                <div class="flex justify-center h-full bg-surface-1 p-6">
-                    <span
-                        class="self-center text-sm text-foreground transition duration-700"
-                        >Second slide</span
-                    >
-                </div>
-            </div>
-            <div class="hs-carousel-slide px-1">
-                <div class="flex justify-center h-full bg-surface-2 p-6">
-                    <span
-                        class="self-center text-sm text-foreground transition duration-700"
-                        >Third slide</span
-                    >
-                </div>
-            </div>
-            <div class="hs-carousel-slide px-1">
-                <div class="flex justify-center h-full bg-surface-3 p-6">
-                    <span
-                        class="self-center text-sm text-foreground transition duration-700"
-                        >Fourth slide</span
-                    >
-                </div>
-            </div>
-            <div class="hs-carousel-slide px-1">
-                <div class="flex justify-center h-full bg-surface-4 p-6">
-                    <span
-                        class="self-center text-sm text-foreground transition duration-700"
-                        >Fifth slide</span
-                    >
-                </div>
-            </div>
-            <div class="hs-carousel-slide px-1">
-                <div class="flex justify-center h-full bg-surface-5 p-6">
-                    <span
-                        class="self-center text-sm text-foreground transition duration-700"
-                        >Sixth slide</span
-                    >
-                </div>
-            </div>
+            {
+                images.map((image) => (
+                    <div class="hs-carousel-slide h-full w-full rounded-lg overflow-hidden">
+                        <img
+                            src={image.src.src}
+                            alt={image.alt}
+                            class="h-full w-full object-contain rounded-lg"
+                            loading="lazy"
+                        />
+                    </div>
+                ))
+            }
         </div>
         <!-- End Carousel Body -->
     </div>

@@ -5,7 +5,7 @@
         <!-- Name -->
         <div class="space-y-2">
             <label
-                for="project-description"
+                for="name"
                 class="block text-sm text-neutral-300">Ingresa tu nombre</label
             >
             <input
@@ -13,6 +13,22 @@
                 name="name"
                 id="name"
                 placeholder="Nombres completos"
+                required
+                class="w-full px-5 py-2.5 bg-neutral-800 text-sm border border-neutral-700 rounded-lg text-white"
+            />
+        </div>
+
+        <!-- Company -->
+        <div class="space-y-2">
+            <label
+                for="company"
+                class="block text-sm text-neutral-300">Empresa o marca</label
+            >
+            <input
+                type="text"
+                name="company"
+                id="company"
+                placeholder="Foxcode"
                 class="w-full px-5 py-2.5 bg-neutral-800 text-sm border border-neutral-700 rounded-lg text-white"
             />
         </div>
@@ -28,6 +44,7 @@
                 name="email"
                 id="email"
                 placeholder="contacto@foxcode.com"
+                required
                 class="w-full px-5 py-2.5 bg-neutral-800 text-sm border border-neutral-700 rounded-lg text-white"
             />
         </div>
@@ -44,6 +61,17 @@
                 id="phone"
                 placeholder="+51 960 606 442"
                 class="w-full px-5 py-2.5 bg-neutral-800 text-sm border border-neutral-700 rounded-lg text-white"
+            />
+        </div>
+
+        <div class="hidden" aria-hidden="true">
+            <label for="website">Sitio web</label>
+            <input
+                type="text"
+                name="website"
+                id="website"
+                tabindex="-1"
+                autocomplete="off"
             />
         </div>
 

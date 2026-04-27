@@ -1,11 +1,13 @@
 ---
 import CarrouselServices from "./CarrouselServices.astro";
 import PricingCard from "./PricingCard.astro";
+import type { ServiceImage } from "@/core/ServicesData";
 
 interface Props {
     id: string;
     title: string;
     description: string;
+    images?: ServiceImage[];
     plans: {
         level: string;
         price: string;
@@ -15,7 +17,7 @@ interface Props {
     }[];
 }
 
-const { id, title, description, plans } = Astro.props;
+const { id, title, description, images = [], plans } = Astro.props;
 ---
 
 <div id={id} class="flex flex-col gap-y-5 hs-accordion">
@@ -27,9 +29,13 @@ const { id, title, description, plans } = Astro.props;
     </p>
 
     <!-- Carrousel -->
-    <div class="bg-white/5 backdrop-blur-2xl rounded-lg h-96">
-        <CarrouselServices />
-    </div>
+    {
+        images.length > 0 && (
+            <div class="backdrop-blur-2xl rounded-lg h-85">
+                <CarrouselServices id={id} images={images} />
+            </div>
+        )
+    }
     <!-- <div class="h-96">
     </div> -->
 
@@ -51,6 +57,7 @@ const { id, title, description, plans } = Astro.props;
                         description={plan.description}
                         features={plan.features}
                         isRecommended={plan.isRecommended}
+                        serviceId={id}
                         serviceTitle={title}
                     />
                 ))

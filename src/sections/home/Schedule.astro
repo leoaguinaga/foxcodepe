@@ -38,13 +38,13 @@ import SelectDayModal from '@/components/SelectDayModal.astro';
     </article>
 
     <!-- Form -->
-    <article class="w-full space-y-5">
+    <form id="meeting-form" class="w-full space-y-5">
       
       <!-- Name -->
       <div class="relative w-full">
         <input
             type="text"
-            id="name"
+            id="meeting-name"
             name="name"
             placeholder=""
             required
@@ -52,7 +52,7 @@ import SelectDayModal from '@/components/SelectDayModal.astro';
             class="peer w-full border text-sm border-white/10 bg-white/5 rounded-lg px-4 pt-6.5 pb-3 placeholder-transparent hover:shadow focus:outline-none focus:ring-2 focus:ring-primary hover:bg-white/10"
         />
         <label
-            for="name"
+            for="meeting-name"
             class="absolute left-4 top-1/2 -translate-y-1/2 text-white/60 transition-all duration-200
                 peer-placeholder-shown:top-1/2
                 peer-placeholder-shown:text-base
@@ -71,7 +71,7 @@ import SelectDayModal from '@/components/SelectDayModal.astro';
       <div class="relative w-full">
         <input
             type="email"
-            id="email"
+            id="meeting-email"
             name="email"
             placeholder=""
             required
@@ -79,7 +79,7 @@ import SelectDayModal from '@/components/SelectDayModal.astro';
             class="peer w-full border text-sm border-white/10 bg-white/5 rounded-lg px-4 pt-6.5 pb-3 placeholder-transparent hover:shadow focus:outline-none focus:ring-2 focus:ring-primary hover:bg-white/10"
         />
         <label
-            for="email"
+            for="meeting-email"
             class="absolute left-4 top-1/2 -translate-y-1/2 text-white/60 transition-all duration-200
                 peer-placeholder-shown:top-1/2
                 peer-placeholder-shown:text-base
@@ -93,19 +93,45 @@ import SelectDayModal from '@/components/SelectDayModal.astro';
             Correo Electrónico
         </label>
       </div>
+
+      <!-- Phone -->
+      <div class="relative w-full">
+        <input
+            type="tel"
+            id="meeting-phone"
+            name="phone"
+            placeholder=""
+            autoComplete="off"
+            class="peer w-full border text-sm border-white/10 bg-white/5 rounded-lg px-4 pt-6.5 pb-3 placeholder-transparent hover:shadow focus:outline-none focus:ring-2 focus:ring-primary hover:bg-white/10"
+        />
+        <label
+            for="meeting-phone"
+            class="absolute left-4 top-1/2 -translate-y-1/2 text-white/60 transition-all duration-200
+                peer-placeholder-shown:top-1/2
+                peer-placeholder-shown:text-base
+                peer-[:not(:placeholder-shown)]:top-4
+                peer-[:not(:placeholder-shown)]:text-xs
+                peer-[:not(:placeholder-shown)]:font-medium
+                peer-focus:top-4
+                peer-focus:font-medium
+                peer-focus:text-xs"
+        >
+            Teléfono
+        </label>
+      </div>
       
       <!-- Schedule -->
       <div class="relative w-full">
         <input
             type="datetime-local"
-            id="schedule"
-            name="schedule"
+            id="meeting-schedule"
+            name="scheduledAt"
             placeholder=""
             required
             class="peer w-full border text-sm border-white/10 bg-white/5 rounded-lg px-4 pt-6.5 pb-3 placeholder-transparent hover:shadow focus:outline-none focus:ring-2 focus:ring-primary hover:bg-white/10"
         />
         <label
-            for="schedule"
+            for="meeting-schedule"
             class="absolute left-4 top-1/2 -translate-y-1/2 text-white/60 transition-all duration-200
                 peer-placeholder-shown:top-1/2
                 peer-placeholder-shown:text-base
@@ -120,19 +146,33 @@ import SelectDayModal from '@/components/SelectDayModal.astro';
         </label>
       </div>
 
+      <div class="hidden" aria-hidden="true">
+        <label for="meeting-website">Sitio web</label>
+        <input
+          type="text"
+          id="meeting-website"
+          name="website"
+          tabindex="-1"
+          autocomplete="off"
+        />
+      </div>
+
       <!-- Submit Button -->
       <button
           type="submit"
+          id="meeting-submit-button"
           class="w-full bg-primary text-white py-3 text-sm font-medium rounded-lg hover:bg-primary-dark transition"
       >
           Agendar reunión
       </button>
 
+      <p id="meeting-submit-status" class="hidden text-sm text-center" role="status" aria-live="polite"></p>
+
       <p class="text-neutral-300 text-sm text-center">
         Respondemos normalmente en menos de 24 horas. Tus datos estarán seguros con nosotros.
       </p>
 
-    </article>
+    </form>
   </div>
 </section>
 <!-- End Schedule Section -->
@@ -145,4 +185,96 @@ import SelectDayModal from '@/components/SelectDayModal.astro';
   <SelectDayModal />
 </div>
 
+<script>
+  const meetingForm = document.getElementById('meeting-form') as HTMLFormElement | null;
+  const meetingSubmitButton = document.getElementById('meeting-submit-button') as HTMLButtonElement | null;
+  const meetingSubmitStatus = document.getElementById('meeting-submit-status');
+
+  function setMeetingSubmitStatus(message: string, type: 'neutral' | 'success' | 'error') {
+    if (!meetingSubmitStatus) {
+      return;
+    }
+
+    meetingSubmitStatus.textContent = message;
+    meetingSubmitStatus.classList.toggle('hidden', !message);
+    meetingSubmitStatus.classList.toggle('text-neutral-300', type === 'neutral');
+    meetingSubmitStatus.classList.toggle('text-green-400', type === 'success');
+    meetingSubmitStatus.classList.toggle('text-red-400', type === 'error');
+  }
+
+  function setMeetingSubmitting(isSubmitting: boolean) {
+    if (!meetingSubmitButton) {
+      return;
+    }
+
+    meetingSubmitButton.disabled = isSubmitting;
+    meetingSubmitButton.textContent = isSubmitting ? 'Agendando...' : 'Agendar reunión';
+    meetingSubmitButton.classList.toggle('opacity-60', isSubmitting);
+    meetingSubmitButton.classList.toggle('cursor-not-allowed', isSubmitting);
+  }
+
+  function getMeetingFormValue(formData: FormData, key: string) {
+    const value = formData.get(key);
+
+    return typeof value === 'string' ? value.trim() : '';
+  }
+
+  meetingForm?.addEventListener('submit', async (event) => {
+    event.preventDefault();
+
+    if (!meetingForm.reportValidity()) {
+      setMeetingSubmitStatus('Completa los campos requeridos antes de agendar.', 'error');
+      return;
+    }
+
+    const formData = new FormData(meetingForm);
+    const scheduledAt = getMeetingFormValue(formData, 'scheduledAt');
+    const scheduledDate = new Date(scheduledAt);
+
+    if (Number.isNaN(scheduledDate.getTime())) {
+      setMeetingSubmitStatus('Selecciona una fecha válida.', 'error');
+      return;
+    }
+
+    const payload = {
+      name: getMeetingFormValue(formData, 'name'),
+      email: getMeetingFormValue(formData, 'email'),
+      phone: getMeetingFormValue(formData, 'phone'),
+      scheduledAt: scheduledDate.toISOString(),
+      metadata: {
+        pagePath: window.location.pathname,
+        userAgent: navigator.userAgent,
+      },
+      website: getMeetingFormValue(formData, 'website'),
+    };
+
+    setMeetingSubmitting(true);
+    setMeetingSubmitStatus('Registrando tu reunión...', 'neutral');
+
+    try {
+      const response = await fetch('/api/meetings', {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+      const result = await response.json().catch(() => null);
+
+      if (!response.ok || !result?.ok) {
+        throw new Error(result?.error || 'No se pudo agendar la reunión.');
+      }
+
+      meetingForm.reset();
+      setMeetingSubmitStatus('Reunión solicitada. Te contactaremos pronto para confirmar.', 'success');
+    } catch (error) {
+      setMeetingSubmitStatus(
+        error instanceof Error ? error.message : 'No se pudo agendar la reunión.',
+        'error',
+      );
+    } finally {
+      setMeetingSubmitting(false);
+    }
+  });
+</script>
 

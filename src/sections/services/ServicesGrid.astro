@@ -13,6 +13,7 @@ import { services } from "@/core/ServicesData";
                 id={service.id}
                 title={service.title}
                 description={service.description}
+                images={service.images || []}
                 plans={service.plans || []}
             />
         ))

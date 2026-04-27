@@ -1,12 +1,52 @@
-import { useState } from "react";
+import { useCallback, useState, type MouseEventHandler } from "react";
 
 type TabType = 'form' | 'channels';
+
+const CONTACT_MODAL_ID = "contact-us-modal";
+
+declare global {
+    interface Window {
+        HSOverlay?: {
+            close: (target: string | HTMLElement) => void;
+        };
+    }
+}
 
 export default function ContactModal() {
     const [activeTab, setActiveTab] = useState<TabType>('form');
 
+    const closeModal = useCallback(() => {
+        const modal = document.getElementById(CONTACT_MODAL_ID);
+
+        if (!modal) {
+            return;
+        }
+
+        if (window.HSOverlay?.close) {
+            window.HSOverlay.close(modal);
+            return;
+        }
+
+        modal.classList.add("hidden");
+        modal.classList.remove("open", "opened");
+        modal.setAttribute("aria-expanded", "false");
+        document.body.classList.remove("overflow-hidden");
+    }, []);
+
+    const handleBackdropClick = useCallback<MouseEventHandler<HTMLDivElement>>(
+        (event) => {
+            if (event.target === event.currentTarget) {
+                closeModal();
+            }
+        },
+        [closeModal],
+    );
+
     return (
-        <div className="flex flex-col items-center justify-center p-3 size-full">
+        <div
+            className="flex flex-col items-center justify-center p-3 size-full"
+            onMouseDown={handleBackdropClick}
+        >
 
             <div className="flex flex-col bg-background rounded-2xl gap-y-7 w-full max-sm:max-h-full max-w-xl p-5 sm:p-8">
 
@@ -21,10 +61,8 @@ export default function ContactModal() {
 
                     <button
                         type="button"
-                        aria-haspopup="dialog"
-                        aria-expanded="false"
-                        aria-controls="contact-us-modal"
-                        data-hs-overlay="#contact-us-modal"
+                        aria-label="Cerrar modal de contacto"
+                        onClick={closeModal}
                         className="text-white/20 hover:text-white h-fit">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-x-icon lucide-x"><path d="M18 6 6 18" /><path d="m6 6 12 12" /></svg>
                     </button>

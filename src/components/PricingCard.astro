@@ -5,6 +5,7 @@ interface Props {
     description: string;
     features: string[];
     isRecommended?: boolean;
+    serviceId?: string;
     serviceTitle?: string;
 }
 
@@ -63,6 +64,7 @@ const bgLevelClass = Astro.props.isRecommended ? "bg-primary" : "bg-white/10";
         data-plan-level={Astro.props.level}
         data-plan-price={Astro.props.price}
         data-plan-description={Astro.props.description}
+        data-service-id={Astro.props.serviceId || ""}
         data-service-title={Astro.props.serviceTitle || "Servicio"}
     >
         Cotizar ahora

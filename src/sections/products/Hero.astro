@@ -1,11 +1,12 @@
 ---
+import MockupCertifox from "@/assets/images/mockup-certifox.png";
+import MockupEscapify from "@/assets/images/mockup-escapify.png";
 import MockupIphoneFront from "@/assets/images/mockup-iphone-front.png";
-import MockupIphoneLeft from "@/assets/images/mockup-iphone-left.png";
-import MockupIphoneRight from "@/assets/images/mockup-iphone-right.png";
+import MockupFoxrooms from "@/assets/images/mockup-foxrooms.png";
 ---
 
 <section
-    class="w-full grid gap-y-20 sm:gap-y-40 py-32 max-w-5xl mx-auto max-lg:px-5"
+    class="w-full grid gap-y-20 sm:gap-y-32 py-32 max-w-5xl mx-auto max-lg:px-5"
 >
     <div
         class="flex flex-col items-center justify-center gap-y-7 text-center z-20 max-md:px-5"
@@ -23,11 +24,11 @@ import MockupIphoneRight from "@/assets/images/mockup-iphone-right.png";
     <div class="relative h-120">
         
         <!-- Phone Left -->
-        <div class="hidden md:block absolute left-10 top-1/2 mt-10 -translate-y-1/2 z-10">
+        <div class="hidden md:block absolute left-25 top-1/2 mt-10 -translate-y-1/2 z-10">
             <img
-                src={MockupIphoneLeft.src}
+                src={MockupCertifox.src}
                 alt="Mockup Hand"
-                class="w-full max-w-sm mx-auto animate-float"
+                class="w-full max-w-xs mx-auto animate-float"
             />
         </div>
 
@@ -38,18 +39,18 @@ import MockupIphoneRight from "@/assets/images/mockup-iphone-right.png";
         <!-- Phone Front -->
         <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 lg:z-10">
             <img
-                src={MockupIphoneFront.src}
+                src={MockupEscapify.src}
                 alt="Mockup Hand"
-                class="w-full max-w-sm max-sm:w-56 animate-float"
+                class="w-full h-full max-w-70 max-sm:w-56 animate-float"
             />
         </div>
 
         <!-- Phone Right -->
-        <div class="hidden md:block absolute right-10 top-1/4 mt-10 -translate-y-1/2 z-10 lg:z-20">
+        <div class="hidden md:block absolute right-25 top-1/4 mt-10 -translate-y-1/2 z-10 lg:z-20">
             <img
-                src={MockupIphoneRight.src}
+                src={MockupFoxrooms.src}
                 alt="Mockup Hand"
-                class="w-full max-w-sm mx-auto animate-float"
+                class="w-full max-w-xs mx-auto animate-float"
             />
         </div>
 

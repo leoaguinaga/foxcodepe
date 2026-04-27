@@ -1,51 +1,11 @@
 ---
-const services = [
-    {
-        name: "Módulo CRM",
-        price: 300,
-        selected: false,
-    },
-    {
-        name: "E-commerce",
-        price: 200,
-        selected: false,
-    },
-    {
-        name: "Módulo de facturación",
-        price: 150,
-        selected: false,
-    },
-    {
-        name: "Integración con API de terceros",
-        price: 400,
-        selected: false,
-    },
-    {
-        name: "Soporte técnico 24/7",
-        price: 100,
-        selected: false,
-    },
-    {
-        name: "Hosting Premium",
-        price: 250,
-        selected: false,
-    },
-    {
-        name: "Mantenimiento mensual",
-        price: 350,
-        selected: false,
-    },
-    {
-        name: "Desarrollo de app móvil",
-        price: 500,
-        selected: false,
-    },
-    {
-        name: "Integración con redes sociales",
-        price: 150,
-        selected: false,
-    },
-];
+import { services } from "@/core/ServicesData";
+
+const servicesWithAddOns = services.map((service) => ({
+    id: service.id,
+    title: service.title,
+    addOns: [...(service.addOns || [])].sort((a, b) => a.name.localeCompare(b.name)),
+}));
 ---
 
 <div class="px-5 md:px-10 py-5 flex flex-col gap-y-5">
@@ -53,63 +13,74 @@ const services = [
     <div class="space-y-2">
         <h3 class="text-lg text-white font-medium">Servicios adicionales</h3>
         <p class="text-sm text-neutral-300">
-            Selecciona los servicios adicionales que deseas incluir en tu
-            cotización
+            Selecciona extras recomendados para
+            <span id="additional-services-current-service">el servicio elegido</span>.
         </p>
     </div>
 
     <!-- Add Services -->
-    <div class="flex flex-wrap items-center gap-2" id="services-container">
+    <div class="space-y-3" id="services-container">
+        <p id="additional-services-empty" class="text-sm text-neutral-400 italic">
+            Elige un plan para ver servicios adicionales relacionados.
+        </p>
         {
-            services
-                .sort((a, b) => a.name.localeCompare(b.name))
-                .map((service, index) => (
-                    <button 
-                        class="service-btn px-3 py-2 rounded-lg border border-white/10 bg-white/5 text-xs text-white hover:bg-white/10 transition-colors flex items-center gap-2"
-                        data-service-id={index}
-                        data-service-name={service.name}
-                        data-service-price={service.price}
-                    >
-                        <span>{service.name} - ${service.price}</span>
-                        
-                        {/* Icon X - shown on hover when selected */}
-                        <span class="icon-x hidden">
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="16"
-                                height="16"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                stroke-width="2"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                class="lucide lucide-x"
+            servicesWithAddOns.map((service) => (
+                <div
+                    class="add-ons-group hidden flex-wrap items-center gap-2"
+                    data-add-ons-service-id={service.id}
+                    data-add-ons-service-title={service.title}
+                >
+                    {
+                        service.addOns.map((addOn, index) => (
+                            <button
+                                class="service-btn px-3 py-2 rounded-lg border border-white/10 bg-white/5 text-xs text-white hover:bg-white/10 transition-colors flex items-center gap-2"
+                                data-service-id={`${service.id}-${index}`}
+                                data-service-name={addOn.name}
+                                data-service-price={addOn.price}
                             >
-                                <path d="M18 6 6 18" />
-                                <path d="m6 6 12 12" />
-                            </svg>
-                        </span>
-                        
-                        {/* Icon Check - shown when selected */}
-                        <span class="icon-check hidden">
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="16"
-                                height="16"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                stroke-width="2"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                class="lucide lucide-check"
-                            >
-                                <path d="M20 6 9 17l-5-5" />
-                            </svg>
-                        </span>
-                    </button>
-                ))
+                                <span>{addOn.name} - ${addOn.price}</span>
+
+                                {/* Icon X - shown on hover when selected */}
+                                <span class="icon-x hidden">
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="16"
+                                        height="16"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        class="lucide lucide-x"
+                                    >
+                                        <path d="M18 6 6 18" />
+                                        <path d="m6 6 12 12" />
+                                    </svg>
+                                </span>
+
+                                {/* Icon Check - shown when selected */}
+                                <span class="icon-check hidden">
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="16"
+                                        height="16"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        class="lucide lucide-check"
+                                    >
+                                        <path d="M20 6 9 17l-5-5" />
+                                    </svg>
+                                </span>
+                            </button>
+                        ))
+                    }
+                </div>
+            ))
         }
     </div>
 
@@ -123,12 +94,14 @@ const services = [
         </button>
         <button
             type="button"
+            id="quote-submit-button"
             class="w-full py-2.5 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary-dark transition-colors"
-            aria-haspopup="dialog" aria-expanded="false" aria-controls="select-service-price-modal" data-hs-overlay="#select-service-price-modal"
         >
             Enviar
         </button>
     </div>
+
+    <p id="quote-submit-status" class="hidden text-sm" role="status" aria-live="polite"></p>
 </div>
 
 <style>
@@ -166,9 +139,13 @@ const services = [
 <script>
     // Initialize services state
     const servicesState = new Map();
+    let activeServiceId = '';
 
     // Get all service buttons
     const serviceButtons = document.querySelectorAll('.service-btn');
+    const addOnGroups = document.querySelectorAll('.add-ons-group');
+    const emptyMessage = document.getElementById('additional-services-empty');
+    const currentServiceLabel = document.getElementById('additional-services-current-service');
 
     serviceButtons.forEach((button) => {
         const serviceId = button.getAttribute('data-service-id');
@@ -208,11 +185,6 @@ const services = [
                     (window as any).quoteManager.removeService(serviceName);
                 }
             }
-
-            // Log current selected services (for debugging)
-            console.log('Selected services:', 
-                Array.from(servicesState.values()).filter(s => s.selected)
-            );
         });
     });
 
@@ -233,7 +205,37 @@ const services = [
         serviceButtons.forEach((button) => {
             button.classList.remove('selected');
         });
+    };
 
-        console.log('Services reset');
+    (window as any).setAdditionalServicesForService = (serviceId: string) => {
+        activeServiceId = serviceId;
+        (window as any).resetServices();
+
+        let hasVisibleGroup = false;
+        let activeServiceTitle = '';
+
+        addOnGroups.forEach((group) => {
+            const groupServiceId = group.getAttribute('data-add-ons-service-id') || '';
+            const shouldShowGroup = groupServiceId === activeServiceId;
+
+            group.classList.toggle('hidden', !shouldShowGroup);
+            group.classList.toggle('flex', shouldShowGroup);
+
+            if (shouldShowGroup) {
+                hasVisibleGroup = true;
+                activeServiceTitle = group.getAttribute('data-add-ons-service-title') || '';
+            }
+        });
+
+        if (emptyMessage) {
+            emptyMessage.classList.toggle('hidden', hasVisibleGroup);
+            emptyMessage.textContent = hasVisibleGroup
+                ? ''
+                : 'Este servicio no tiene adicionales configurados por ahora.';
+        }
+
+        if (currentServiceLabel) {
+            currentServiceLabel.textContent = activeServiceTitle || 'el servicio elegido';
+        }
     };
 </script>

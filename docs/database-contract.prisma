@@ -1,0 +1,190 @@
+// Contract for the future Foxcode Panel database.
+// The landing does not run Prisma; it writes to Lead and LeadItem with SQL.
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Lead {
+  id              String      @id @default(cuid())
+  name            String
+  company         String?
+  email           String
+  phone           String?
+  serviceId       String
+  serviceTitle    String
+  planLevel       String?
+  planPrice       Decimal?    @db.Decimal(10, 2)
+  estimatedBudget Decimal?    @db.Decimal(10, 2)
+  message         String?
+  meetingDate     DateTime?
+  status          LeadStatus  @default(NEW)
+  source          String      @default("landing")
+  assignedToId    String?
+  internalNotes   String?
+  metadata        Json?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  items           LeadItem[]
+}
+
+model LeadItem {
+  id        String   @id @default(cuid())
+  leadId    String
+  type      String
+  name      String
+  price     Decimal  @db.Decimal(10, 2)
+  createdAt DateTime @default(now())
+
+  lead      Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+}
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  EVALUATING
+  PROPOSAL_SENT
+  ACCEPTED
+  REJECTED
+  CONVERTED
+}
+
+model MeetingRequest {
+  id          String               @id @default(cuid())
+  name        String
+  email       String
+  phone       String?
+  scheduledAt DateTime
+  status      MeetingRequestStatus @default(NEW)
+  source      String               @default("landing")
+  metadata    Json?
+  createdAt   DateTime             @default(now())
+  updatedAt   DateTime             @updatedAt
+}
+
+enum MeetingRequestStatus {
+  NEW
+  CONFIRMED
+  RESCHEDULED
+  CANCELED
+  DONE
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  role      UserRole
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Client {
+  id        String   @id @default(cuid())
+  name      String
+  company   String?
+  email     String
+  phone     String?
+  document  String?
+  status    String   @default("active")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Project {
+  id          String   @id @default(cuid())
+  name        String
+  clientId    String
+  service     String
+  description String?
+  status      String   @default("pending")
+  progress    Int      @default(0)
+  amount      Decimal? @db.Decimal(10, 2)
+  startDate   DateTime?
+  endDate     DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model ProjectStage {
+  id            String   @id @default(cuid())
+  projectId     String
+  name          String
+  status        String   @default("pending")
+  progress      Int      @default(0)
+  estimatedDate DateTime?
+  evidence      String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Document {
+  id         String   @id @default(cuid())
+  projectId  String
+  name       String
+  type       String
+  fileUrl    String
+  visibility String   @default("internal")
+  version    Int      @default(1)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Contract {
+  id          String   @id @default(cuid())
+  clientId    String
+  projectId   String?
+  documentId  String?
+  status      String   @default("draft")
+  signedAt    DateTime?
+  expiresAt   DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model PaymentReference {
+  id            String   @id @default(cuid())
+  projectId     String
+  totalAmount   Decimal  @db.Decimal(10, 2)
+  upfrontAmount Decimal? @db.Decimal(10, 2)
+  pendingAmount Decimal? @db.Decimal(10, 2)
+  paymentMethod String?
+  operationCode String?
+  receiptUrl    String?
+  status        String   @default("pending")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  projectId String
+  userId    String?
+  type      String
+  status    String   @default("open")
+  body      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ActivityLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  entity    String
+  entityId  String
+  action    String
+  metadata  Json?
+  createdAt DateTime @default(now())
+}
+
+enum UserRole {
+  ADMIN
+  WORKER
+  CLIENT
+}

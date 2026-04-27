@@ -1,65 +1,5 @@
 ---
-import MockupIphoneFront from "@/assets/images/mockup-iphone-front.png";
-
-interface Product {
-    id: string;
-    category: string;
-    title: string;
-    description: string;
-    mainFeature: {
-        title: string;
-        description: string;
-    };
-    secondaryFeature: {
-        title: string;
-        description: string;
-    };
-}
-
-const products: Product[] = [
-    {
-        id: "escapify",
-        category: "ECOMMERCE",
-        title: "Escapify: Tu tienda online lista en minutos",
-        description: "Crea tu tienda en línea de manera rápida y sencilla con Escapify. Diseños personalizables, gestión de inventario y pasarelas de pago integradas para que puedas empezar a vender de inmediato.",
-        mainFeature: {
-            title: "Gestión completa de tu inventario en tiempo real",
-            description: "Controla tu stock, actualiza precios y administra variantes de productos desde un único panel intuitivo. Recibe alertas automáticas cuando tus productos estén por agotarse y mantén tu tienda siempre actualizada sin complicaciones."
-        },
-        secondaryFeature: {
-            title: "Diseño responsive para todos los dispositivos",
-            description: "Tu tienda se verá perfecta en cualquier dispositivo. Nuestros diseños están optimizados para móviles, tablets y escritorio, garantizando la mejor experiencia de compra para tus clientes."
-        }
-    },
-    {
-        id: "foxrooms",
-        category: "RESERVAS",
-        title: "FoxRooms: Sistema de reservas inteligente",
-        description: "Optimiza la gestión de tu hotel, hostal o espacio de alojamiento con FoxRooms. Sistema completo de reservas, check-in digital y panel de administración centralizado para maximizar tu ocupación.",
-        mainFeature: {
-            title: "Calendario inteligente con sincronización automática",
-            description: "Visualiza todas tus reservas en un calendario interactivo que se sincroniza automáticamente con plataformas como Booking y Airbnb. Evita dobles reservas y gestiona la disponibilidad en tiempo real desde cualquier lugar."
-        },
-        secondaryFeature: {
-            title: "Check-in digital sin contacto",
-            description: "Moderniza la experiencia de tus huéspedes con check-in digital. Tus clientes pueden registrarse desde su móvil, acceder a códigos de entrada y recibir información importante sin necesidad de esperas en recepción."
-        }
-    },
-    {
-        id: "foxeats",
-        category: "RESTAURANTES",
-        title: "FoxEats: Menú digital y sistema de pedidos",
-        description: "Transforma tu restaurante con FoxEats. Menús digitales interactivos, sistema de pedidos en línea y gestión de mesas integrada para ofrecer un servicio más rápido y eficiente a tus comensales.",
-        mainFeature: {
-            title: "Menú digital con actualizaciones instantáneas",
-            description: "Actualiza tu menú en segundos sin necesidad de reimprimir cartas. Agrega fotos atractivas, ingredientes, alérgenos y promociones especiales. Tus clientes pueden ver el menú escaneando un código QR desde su mesa."
-        },
-        secondaryFeature: {
-            title: "Sistema de pedidos y pagos integrado",
-            description: "Los clientes pueden hacer pedidos directamente desde su móvil y pagar de forma segura. Reduce errores en los pedidos, acelera el servicio y mejora la experiencia gastronómica con tecnología moderna."
-        }
-    }
-];
+import { products } from "@/core/ProductsData";
 ---
 
 <section
@@ -71,14 +11,16 @@ const products: Product[] = [
             const isEven = index % 2 === 0;
             const textAlign = isEven ? "" : "md:text-end";
             const gridOrder = isEven ? "" : "md:flex-row-reverse";
+            const activeModule = product.modules[0];
 
             return (
                 <article class="grid md:grid-cols-2 gap-5 md:gap-x-5 md:gap-y-10">
                     <div
-                        id={product.id} 
-                        class={`flex flex-col gap-y-5 md:col-span-2 max-w-3xl ${isEven ? '' : 'md:ml-auto'} ${textAlign}`}>
+                        id={product.id}
+                        class={`flex flex-col gap-y-5 md:col-span-2 max-w-3xl ${isEven ? "" : "md:ml-auto"} ${textAlign}`}
+                    >
                         <div
-                            class={`px-3 py-2.5 flex items-center gap-x-1.5 text-xs rounded-full bg-primary font-semibold w-fit uppercase tracking-wider ${isEven ? '' : 'md:ml-auto'}`}
+                            class={`px-3 py-2.5 flex items-center gap-x-1.5 text-xs rounded-full bg-primary font-semibold w-fit uppercase tracking-wider ${isEven ? "" : "md:ml-auto"}`}
                         >
                             <p class="leading-none">{product.category}</p>
                         </div>
@@ -91,29 +33,53 @@ const products: Product[] = [
                     </div>
 
                     <div class={`flex flex-col md:flex-row gap-5 md:col-span-2 ${gridOrder}`}>
-                        <div class="rounded-xl overflow-hidden bg-white/5 grid flex-1">
+                        <div
+                            class="product-module-carousel rounded-xl overflow-hidden bg-white/5 grid flex-1 border border-white/10"
+                            data-product-carousel
+                        >
                             <!-- Preview -->
-                            <div class="min-h-60 bg-white/5"></div>
-
-                            <div class="flex items-center justify-center gap-x-2 mt-5">
-                                <div class="size-10 rounded-md bg-white/5"></div>
-                                <div class="size-10 rounded-md bg-white/5"></div>
-                                <div class="size-10 rounded-md bg-white/5"></div>
-                                <div class="size-10 rounded-md bg-white/5"></div>
-                                <div class="size-10 rounded-md bg-white/5"></div>
+                            <div class="h-66 bg-white/5 flex items-center justify-center p-4">
+                                <img
+                                    src={activeModule.image.src}
+                                    alt={activeModule.title}
+                                    class="rounded-lg max-h-full max-w-full object-contain transition-opacity duration-300"
+                                    data-module-preview-image
+                                />
                             </div>
 
-                            <div class="p-5 space-y-2">
-                                <h4 class="text-white text-lg">
-                                    {product.mainFeature.title}
+                            <div class="flex items-center justify-center gap-x-2 p-4 pb-0">
+                                {product.modules.map((module, moduleIndex) => (
+                                    <button
+                                        type="button"
+                                        class={`product-module-trigger size-10 rounded-md border bg-white/5 transition hover:border-primary/70 flex items-center justify-center ${moduleIndex === 0 ? "border-primary" : "border-white/10"}`}
+                                        aria-label={`Ver módulo ${module.title}`}
+                                        data-module-trigger
+                                        data-module-index={moduleIndex}
+                                        data-module-title={module.title}
+                                        data-module-description={module.description}
+                                        data-module-image={module.image.src}
+                                    >
+                                        <img
+                                            src={module.icon}
+                                            alt=""
+                                            class="size-5 object-contain opacity-80"
+                                            loading="lazy"
+                                        />
+                                    </button>
+                                ))}
+                            </div>
+
+                            <div class="p-4 space-y-2">
+                                <h4 class="product-module-title text-white text-lg" data-module-active-title>
+                                    {activeModule.title}
                                 </h4>
-                                <p class="text-neutral-300 text-sm">
-                                    {product.mainFeature.description}
+                                <p class="product-module-description text-neutral-300 text-sm" data-module-active-description>
+                                    {activeModule.description}
                                 </p>
                             </div>
                         </div>
 
-                        <div class="rounded-xl overflow-hidden bg-white/5 h-120 space-y-5 flex-1">
+                        <div class="rounded-xl overflow-hidden bg-linear-to-b from-white/1 to-white/5 h-118 flex-1 border border-white/10">
                             <div class="p-5 space-y-2">
                                 <h4 class="text-white text-lg">{product.secondaryFeature.title}</h4>
                                 <p class="text-neutral-300 text-sm">
@@ -121,12 +87,11 @@ const products: Product[] = [
                                 </p>
                             </div>
 
-                            <!-- Preview Phone -->
-                            <div class="h-full overflow-hidden">
+                            <div class="h-fit overflow-hidden flex items-center justify-center">
                                 <img
-                                    src={MockupIphoneFront.src}
-                                    alt={`Mockup ${product.title}`}
-                                    class="mx-auto h-full animate-float"
+                                    src={product.userPersona.image.src}
+                                    alt={product.userPersona.alt}
+                                    class="max-h-full max-w-full object-contain animate-float"
                                 />
                             </div>
                         </div>
@@ -136,3 +101,60 @@ const products: Product[] = [
         })
     }
 </section>
+
+<script>
+    const carousels = document.querySelectorAll('[data-product-carousel]');
+
+    carousels.forEach((carousel) => {
+        const image = carousel.querySelector('[data-module-preview-image]') as HTMLImageElement | null;
+        const title = carousel.querySelector('[data-module-active-title]') as HTMLElement | null;
+        const description = carousel.querySelector('[data-module-active-description]') as HTMLElement | null;
+        const triggers = Array.from(
+            carousel.querySelectorAll('[data-module-trigger]'),
+        ) as HTMLButtonElement[];
+        let activeIndex = 0;
+        let intervalId: number | undefined;
+
+        function setActiveModule(index: number) {
+            const trigger = triggers[index];
+
+            if (!trigger || !image || !title || !description) {
+                return;
+            }
+
+            activeIndex = index;
+            image.classList.add('opacity-0');
+
+            window.setTimeout(() => {
+                image.src = trigger.dataset.moduleImage || image.src;
+                image.alt = trigger.dataset.moduleTitle || '';
+                title.textContent = trigger.dataset.moduleTitle || '';
+                description.textContent = trigger.dataset.moduleDescription || '';
+                image.classList.remove('opacity-0');
+            }, 150);
+
+            triggers.forEach((button, buttonIndex) => {
+                button.classList.toggle('border-primary', buttonIndex === activeIndex);
+                button.classList.toggle('border-white/10', buttonIndex !== activeIndex);
+            });
+        }
+
+        function startAutoPlay() {
+            window.clearInterval(intervalId);
+            intervalId = window.setInterval(() => {
+                setActiveModule((activeIndex + 1) % triggers.length);
+            }, 4500);
+        }
+
+        triggers.forEach((trigger, index) => {
+            trigger.addEventListener('click', () => {
+                setActiveModule(index);
+                startAutoPlay();
+            });
+        });
+
+        if (triggers.length > 1) {
+            startAutoPlay();
+        }
+    });
+</script>

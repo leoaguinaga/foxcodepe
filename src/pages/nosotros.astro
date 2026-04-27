@@ -5,15 +5,17 @@ import History from "@/sections/about/History.astro";
 import HowWorks from "@/sections/about/HowWorks.astro";
 import Team from "@/sections/about/Team.astro";
 import Trust from "@/sections/about/Trust.astro";
+import Testimonials from "@/sections/about/Testimonials.astro";
 ---
 
 <Layout>
-    <Hero />
-    
-    <div class="flex flex-col gap-y-10">
-        <History />
-        <HowWorks />
-        <Team />
-        <Trust />
-    </div>
+  <!-- <Hero /> -->
+  <Trust />
+
+  <div class="flex flex-col gap-y-10">
+    <History />
+    <HowWorks />
+    <Team />
+    <Testimonials />
+  </div>
 </Layout>

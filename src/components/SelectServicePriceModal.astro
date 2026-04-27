@@ -67,8 +67,16 @@ import AddServices from "./AddServices.astro";
         price: number;
     }
 
+    interface SelectedPlan {
+        serviceId: string;
+        serviceTitle: string;
+        level: string;
+        price: number;
+    }
+
     class QuoteManager {
         private items: QuoteItem[] = [];
+        private selectedPlan: SelectedPlan | null = null;
         private quoteItemsContainer: HTMLElement | null;
         private quoteTotalElement: HTMLElement | null;
 
@@ -88,14 +96,15 @@ import AddServices from "./AddServices.astro";
                     const level = button.getAttribute('data-plan-level') || '';
                     const price = button.getAttribute('data-plan-price') || '$0';
                     const description = button.getAttribute('data-plan-description') || '';
+                    const serviceId = button.getAttribute('data-service-id') || '';
                     const serviceTitle = button.getAttribute('data-service-title') || 'Servicio';
                     
-                    this.selectPlan(level, price, description, serviceTitle);
+                    this.selectPlan(level, price, description, serviceId, serviceTitle);
                 }
             });
         }
 
-        selectPlan(level: string, priceStr: string, description: string, serviceTitle: string) {
+        selectPlan(level: string, priceStr: string, description: string, serviceId: string, serviceTitle: string) {
             // Reset everything when selecting a new plan
             this.reset();
             
@@ -103,6 +112,12 @@ import AddServices from "./AddServices.astro";
             const parsedPrice = parseFloat(priceStr.replace(/[$,]/g, ''));
             // If price is NaN (e.g., "A tratar"), set to 0
             const price = isNaN(parsedPrice) ? 0 : parsedPrice;
+            this.selectedPlan = {
+                serviceId,
+                serviceTitle,
+                level,
+                price,
+            };
             
             // Add new plan
             this.items.unshift({
@@ -112,14 +127,17 @@ import AddServices from "./AddServices.astro";
             });
 
             this.updateUI();
+            setSubmitStatus('', 'neutral');
             
             // Reset step to 1
             if ((window as any).stepManager) {
                 (window as any).stepManager.reset();
             }
             
-            // Reset services selection
-            if ((window as any).resetServices) {
+            // Load additional services for the selected quote type
+            if ((window as any).setAdditionalServicesForService) {
+                (window as any).setAdditionalServicesForService(serviceId);
+            } else if ((window as any).resetServices) {
                 (window as any).resetServices();
             }
 
@@ -241,8 +259,23 @@ import AddServices from "./AddServices.astro";
             return this.items;
         }
 
+        getLeadQuote() {
+            const services = this.items.filter(item => item.type === 'service');
+            const estimatedTotal = this.items.reduce((sum, item) => sum + item.price, 0);
+
+            return {
+                selectedPlan: this.selectedPlan,
+                selectedAddOns: services.map((service) => ({
+                    name: service.name,
+                    price: service.price,
+                })),
+                estimatedTotal,
+            };
+        }
+
         reset() {
             this.items = [];
+            this.selectedPlan = null;
             this.updateUI();
         }
     }
@@ -294,8 +327,42 @@ import AddServices from "./AddServices.astro";
             });
         }
 
+        getCurrentStepForm() {
+            if (this.currentStep === 1) {
+                return document.getElementById('contact-form') as HTMLFormElement | null;
+            }
+
+            if (this.currentStep === 2) {
+                return document.getElementById('project-form') as HTMLFormElement | null;
+            }
+
+            return null;
+        }
+
+        validateCurrentStep() {
+            const currentForm = this.getCurrentStepForm();
+
+            if (!currentForm) {
+                return true;
+            }
+
+            const isValid = currentForm.reportValidity();
+
+            if (!isValid) {
+                const message = this.currentStep === 1
+                    ? 'Completa tu nombre y correo antes de continuar.'
+                    : 'Completa los detalles del proyecto antes de continuar.';
+
+                setSubmitStatus(message, 'error');
+                return false;
+            }
+
+            setSubmitStatus('', 'neutral');
+            return true;
+        }
+
         nextStep() {
-            if (this.currentStep < this.totalSteps) {
+            if (this.currentStep < this.totalSteps && this.validateCurrentStep()) {
                 this.currentStep++;
                 this.updateUI();
             }
@@ -303,6 +370,7 @@ import AddServices from "./AddServices.astro";
 
         previousStep() {
             if (this.currentStep > 1) {
+                setSubmitStatus('', 'neutral');
                 this.currentStep--;
                 this.updateUI();
             }
@@ -368,4 +436,162 @@ import AddServices from "./AddServices.astro";
 
     // Export to window for access from other components
     (window as any).stepManager = stepManager;
+
+    const QUOTE_MODAL_ID = 'select-service-price-modal';
+
+    function closeQuoteModal() {
+        const modal = document.getElementById(QUOTE_MODAL_ID);
+
+        if (!modal) {
+            return;
+        }
+
+        if ((window as any).HSOverlay?.close) {
+            (window as any).HSOverlay.close(modal);
+            return;
+        }
+
+        modal.classList.add('hidden');
+        modal.classList.remove('open', 'opened');
+        modal.setAttribute('aria-expanded', 'false');
+        document.body.classList.remove('overflow-hidden');
+    }
+
+    const quoteModalContainer = document.getElementById('quote-modal-container');
+
+    quoteModalContainer?.addEventListener('mousedown', (event) => {
+        if (event.target === event.currentTarget) {
+            closeQuoteModal();
+        }
+    });
+
+    const submitButton = document.getElementById('quote-submit-button') as HTMLButtonElement | null;
+    const submitStatus = document.getElementById('quote-submit-status');
+
+    function setSubmitStatus(message: string, type: 'neutral' | 'success' | 'error') {
+        if (!submitStatus) {
+            return;
+        }
+
+        submitStatus.textContent = message;
+        submitStatus.classList.toggle('hidden', !message);
+        submitStatus.classList.toggle('text-neutral-300', type === 'neutral');
+        submitStatus.classList.toggle('text-green-400', type === 'success');
+        submitStatus.classList.toggle('text-red-400', type === 'error');
+    }
+
+    function setSubmitting(isSubmitting: boolean) {
+        if (!submitButton) {
+            return;
+        }
+
+        submitButton.disabled = isSubmitting;
+        submitButton.textContent = isSubmitting ? 'Enviando...' : 'Enviar';
+        submitButton.classList.toggle('opacity-60', isSubmitting);
+        submitButton.classList.toggle('cursor-not-allowed', isSubmitting);
+    }
+
+    function getFormValue(formData: FormData, key: string) {
+        const value = formData.get(key);
+
+        return typeof value === 'string' ? value.trim() : '';
+    }
+
+    function resetQuoteModal() {
+        quoteManager.reset();
+        stepManager.reset();
+        quoteManager.resetForms();
+
+        if ((window as any).resetServices) {
+            (window as any).resetServices();
+        }
+    }
+
+    async function submitLead() {
+        const contactForm = document.getElementById('contact-form') as HTMLFormElement | null;
+        const projectForm = document.getElementById('project-form') as HTMLFormElement | null;
+
+        if (!contactForm || !projectForm) {
+            setSubmitStatus('No se pudo leer el formulario. Inténtalo nuevamente.', 'error');
+            return;
+        }
+
+        if (!contactForm.reportValidity() || !projectForm.reportValidity()) {
+            setSubmitStatus('Completa los campos requeridos antes de enviar.', 'error');
+            return;
+        }
+
+        const quote = quoteManager.getLeadQuote();
+
+        if (!quote.selectedPlan) {
+            setSubmitStatus('Selecciona un plan antes de enviar la cotización.', 'error');
+            return;
+        }
+
+        const contactFormData = new FormData(contactForm);
+        const projectFormData = new FormData(projectForm);
+        const payload = {
+            contact: {
+                name: getFormValue(contactFormData, 'name'),
+                company: getFormValue(contactFormData, 'company'),
+                email: getFormValue(contactFormData, 'email'),
+                phone: getFormValue(contactFormData, 'phone'),
+            },
+            quote: {
+                serviceId: quote.selectedPlan.serviceId,
+                serviceTitle: quote.selectedPlan.serviceTitle,
+                planLevel: quote.selectedPlan.level,
+                planPrice: quote.selectedPlan.price,
+                selectedAddOns: quote.selectedAddOns,
+                estimatedTotal: quote.estimatedTotal,
+            },
+            project: {
+                description: getFormValue(projectFormData, 'project-description'),
+                meetingDate: getFormValue(projectFormData, 'date'),
+            },
+            metadata: {
+                pagePath: window.location.pathname,
+                userAgent: navigator.userAgent,
+            },
+            website: getFormValue(contactFormData, 'website'),
+        };
+
+        setSubmitting(true);
+        setSubmitStatus('Registrando tu solicitud...', 'neutral');
+
+        try {
+            const response = await fetch('/api/leads', {
+                method: 'POST',
+                headers: {
+                    'content-type': 'application/json',
+                },
+                body: JSON.stringify(payload),
+            });
+            const result = await response.json().catch(() => null);
+
+            if (!response.ok || !result?.ok) {
+                throw new Error(result?.error || 'No se pudo registrar la solicitud.');
+            }
+
+            setSubmitStatus('Solicitud enviada. Te contactaremos pronto.', 'success');
+
+            window.setTimeout(() => {
+                resetQuoteModal();
+                setSubmitStatus('', 'neutral');
+                closeQuoteModal();
+            }, 900);
+        } catch (error) {
+            setSubmitStatus(
+                error instanceof Error ? error.message : 'No se pudo registrar la solicitud.',
+                'error',
+            );
+        } finally {
+            setSubmitting(false);
+        }
+    }
+
+    submitButton?.addEventListener('click', (event) => {
+        event.preventDefault();
+        submitLead();
+    });
 </script>

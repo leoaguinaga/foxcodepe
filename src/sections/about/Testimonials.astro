@@ -1,0 +1,52 @@
+---
+import LogoPressig from "@/assets/logos/LogoPressig.png";
+import LogoAyapalleckMuchik from "@/assets/logos/LogoAyapalleckMuchik.webp";
+import LogoCorporacionAym from "@/assets/logos/LogoAYM.svg";
+---
+
+<!-- Testimonials Section -->
+<section class="max-w-5xl mx-auto py-20 max-lg:px-5">
+
+  <div class="grid lg:grid-cols-[1.5fr_1fr] items-center gap-x-20 gap-y-10">
+
+    <!-- Testimonials -->
+    <article class="grid gap-y-5 max-lg:order-2">
+      
+      <blockquote class="bg-background/50 p-5 lg:w-[90%] border-r-4 border-white/10 flex gap-x-5">
+        <div class="size-20 min-w-20 bg-white/10 rounded-full flex items-center justify-center">
+          <img src={LogoPressig.src} alt="Logo Pressig" class="size-13 ml-1.5 object-contain">
+        </div>
+        <div class="space-y-2">
+          <p class="text-white text-sm line-clamp-4">"Con Certifox digitalizamos la emisión y validación de certificados de forma rápida y segura. FoxCode entendió nuestro proceso y lo convirtió en una solución clara."</p>
+          <footer class="text-xs text-white/60">Fernando Pérez, CEO de Pressig</footer>
+        </div>
+      </blockquote>
+
+      <blockquote class="bg-background/50 p-5 lg:w-[90%] ml-auto border-r-4 border-primary flex gap-x-5">
+        <div class="size-20 min-w-20 bg-white/10 rounded-full flex items-center justify-center">
+          <img src={LogoAyapalleckMuchik.src} alt="Logo Ayapalleck Muchik" class="size-13 object-contain">
+        </div>
+        <div class="space-y-4">
+          <p class="text-white text-sm line-clamp-4">"Foxrooms nos ayudó a organizar reservas, habitaciones y atención diaria. Ahora gestionamos Ayapalleck Muchik con más orden y mejor experiencia para los huéspedes."</p>
+          <footer class="text-xs text-white/60">Maria Flores, Dueña del Hotel Ayapalleck Muchik</footer>
+        </div>
+      </blockquote>
+
+      <blockquote class="bg-background/50 p-5 lg:w-[90%] border-r-4 border-white/10 flex gap-x-5">
+        <div class="size-20 min-w-20 bg-white/10 rounded-full flex items-center justify-center">
+          <img src={LogoCorporacionAym.src} alt="Logo Corporacion Aym" class="size-13 object-contain">
+        </div>
+        <div class="space-y-4">
+          <p class="text-white text-sm line-clamp-4">"FoxCode diseñó e implementó una solución alineada a nuestras operaciones. El equipo fue cercano, propositivo y enfocado en resolver necesidades reales del negocio."</p>
+          <footer class="text-xs text-white/60">José Acedo, Dueño de Corporación AYM</footer>
+        </div>
+      </blockquote>
+    </article>
+
+    <!-- Title -->
+    <article class="space-y-5 text-center lg:text-end lg:order-2">
+      <h3 class="text-2xl lg:text-4xl font-bold lg:text-balance">¿Qué dicen nuestros clientes?</h3>
+      <p class="text-white/60 max-lg:text-sm text-balance">Nos enorgullece compartir las experiencias de nuestros clientes satisfechos. Sus testimonios reflejan nuestro compromiso con la calidad y el servicio excepcional.</p>
+    </article>
+  </div>  
+</section>
