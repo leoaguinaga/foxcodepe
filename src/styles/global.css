@@ -28,6 +28,35 @@ body {
 
   --color-background: #18181a;
   --color-text: #fffff1;
+
+  --font-display: "Bricolage Grotesque", "Inter Variable", sans-serif;
+}
+
+/* Transiciones entre páginas (MPA nativo). Los elementos con el mismo
+   view-transition-name, como el teléfono de cada producto, vuelan entre
+   el home y /productos; el resto hace un fundido corto. */
+@view-transition {
+  navigation: auto;
+}
+
+::view-transition-group(*) {
+  animation-duration: 450ms;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+::view-transition-old(root) {
+  animation-duration: 180ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  @view-transition {
+    navigation: none;
+  }
+}
+
+::selection {
+  background: var(--color-primary);
+  color: #fff;
 }
 
 /* Hide scrollbars while keeping scroll functionality */
@@ -200,4 +229,60 @@ html {
 .fox-date-picker-time select:focus {
   border-color: var(--color-primary);
   outline: none;
+}
+
+/* Reveal al hacer scroll. Solo oculta si el script marcó <html> con
+   .reveal-ready, así sin JS (o con movimiento reducido) todo se ve. */
+@theme {
+  --animate-spin-slow: spin-slow 18s linear infinite;
+
+  @keyframes spin-slow {
+    to { transform: rotate(360deg); }
+  }
+}
+
+/* clip (no hidden) para no romper el sticky del navbar. */
+.reveal-ready body { overflow-x: clip; }
+
+.reveal-ready [data-reveal] {
+  --reveal-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  opacity: 0;
+  transition:
+    opacity 0.7s var(--reveal-ease),
+    transform 0.9s var(--reveal-ease),
+    clip-path 1s var(--reveal-ease),
+    filter 0.7s var(--reveal-ease);
+  transition-delay: calc(var(--i, 0) * 90ms);
+}
+
+.reveal-ready [data-reveal="up"] { transform: translateY(28px); }
+.reveal-ready [data-reveal="left"] { transform: translateX(-36px); }
+.reveal-ready [data-reveal="right"] { transform: translateX(36px); }
+.reveal-ready [data-reveal="scale"] { transform: scale(0.94) translateY(16px); filter: blur(6px); }
+.reveal-ready [data-reveal="mask"] { opacity: 1; clip-path: inset(0 0 100% 0); transform: translateY(18px); }
+
+.reveal-ready [data-reveal].is-in {
+  opacity: 1;
+  transform: none;
+  filter: none;
+  clip-path: inset(0 0 0 0);
+}
+
+/* Palabra resaltada: subrayado que se dibuja al entrar. */
+.reveal-ready [data-reveal] .ink {
+  background: linear-gradient(currentColor, currentColor) no-repeat 0 100% / 0% 2px;
+  transition: background-size 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.45s;
+}
+.reveal-ready [data-reveal].is-in .ink { background-size: 100% 2px; }
+
+/* Íconos de trazo que se dibujan. */
+.reveal-ready [data-draw] path {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  transition: stroke-dashoffset 1.4s cubic-bezier(0.65, 0, 0.35, 1) 0.35s;
+}
+.reveal-ready .is-in [data-draw] path { stroke-dashoffset: 0; }
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-spin-slow { animation: none; }
 }

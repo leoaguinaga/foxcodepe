@@ -1,0 +1,553 @@
+---
+import Logo from "@/assets/logos/logo.webp";
+import MockupFoxRooms from "@/assets/images/mockup-foxrooms.png";
+import { Image } from "astro:assets";
+
+const steps = [
+    { title: "Validar", text: "Aterrizamos el problema, quién lo sufre y qué debe probar la primera versión." },
+    { title: "Diseñar", text: "Flujos y wireframes que se prueban con usuarios antes de escribir código." },
+    { title: "Desarrollar", text: "Entregas semanales en un staging que puedes usar desde el día uno." },
+    { title: "Lanzar", text: "Despliegue, monitoreo y acompañamiento mientras tu negocio escala." },
+];
+
+const postits = [
+    { text: "¿Quién reserva y cómo paga?", r: -5, x: 6, y: 8 },
+    { text: "Check-in en menos de 1 min", r: 3, x: 37, y: 4, alt: true },
+    { text: "Cobros con Yape y tarjeta", r: -2, x: 66, y: 12 },
+    { text: "Reporte diario para el dueño", r: 4, x: 18, y: 52, alt: true },
+    { text: "Varias sedes, una cuenta", r: -3, x: 52, y: 50 },
+];
+
+const code = [
+    '<span class="c">// check-in en un paso</span>',
+    '<span class="k">export async function</span> checkIn(reserva) {',
+    '&nbsp;&nbsp;<span class="k">const</span> hab = <span class="k">await</span> habitaciones.asignar(reserva)',
+    '&nbsp;&nbsp;<span class="k">await</span> huespedes.registrar(reserva.huespedes)',
+    '&nbsp;&nbsp;<span class="k">await</span> eventos.log(<span class="s">\'check_in\'</span>, hab)',
+    '&nbsp;&nbsp;<span class="k">return</span> { hab, estado: <span class="s">\'ocupada\'</span> }',
+    "}",
+];
+---
+
+<!-- Start Process Section: una maqueta que cambia de estado con el scroll -->
+<section class="process" id="proceso" data-process>
+    <div class="process-track" data-process-track>
+        <div class="process-stick max-xl:px-5">
+            <div class="w-full max-w-6xl mx-auto grid lg:grid-cols-[1fr_1.15fr] gap-16 items-center">
+                <div>
+                    <h2 class="font-display text-[clamp(2rem,3.8vw,3.25rem)] font-semibold leading-[1.02] tracking-[-0.035em] text-balance">
+                        De un post-it a un sistema en producción.
+                    </h2>
+
+                    <ol class="process-steps mt-7" data-process-steps>
+                        {
+                            steps.map((step, i) => (
+                                <li class={i === 0 ? "is-on" : ""}>
+                                    <span class="n">{String(i + 1).padStart(2, "0")}</span>
+                                    <div>
+                                        <b>{step.title}</b>
+                                        <p>{step.text}</p>
+                                    </div>
+                                </li>
+                            ))
+                        }
+                    </ol>
+                    <div class="process-progress" aria-hidden="true"><i data-process-progress></i></div>
+                </div>
+
+                <div class="process-mock" aria-hidden="true">
+                    <div class="dots"></div>
+
+                    <!-- 1 · Validar -->
+                    <div class="scene is-on" data-scene>
+                        <div class="postits">
+                            {
+                                postits.map((p, i) => (
+                                    <span class={p.alt ? "alt" : ""} style={`--r:${p.r}deg;--i:${i};left:${p.x}%;top:${p.y}%`}>{p.text}</span>
+                                ))
+                            }
+                        </div>
+                    </div>
+
+                    <!-- 2 · Diseñar -->
+                    <div class="scene" data-scene>
+                        <svg class="wf" viewBox="0 0 400 300">
+                            <rect class="s" pathLength="1" x="10" y="10" width="380" height="280" rx="10" />
+                            <line class="s" pathLength="1" x1="92" y1="10" x2="92" y2="290" style="--d:100" />
+                            <rect class="s" pathLength="1" x="108" y="28" width="82" height="44" rx="6" style="--d:200" />
+                            <rect class="s" pathLength="1" x="200" y="28" width="82" height="44" rx="6" style="--d:260" />
+                            <rect class="s" pathLength="1" x="292" y="28" width="82" height="44" rx="6" style="--d:320" />
+                            <rect class="s" pathLength="1" x="108" y="86" width="266" height="118" rx="6" style="--d:380" />
+                            <line class="s" pathLength="1" x1="108" y1="226" x2="374" y2="226" style="--d:440" />
+                            <line class="s" pathLength="1" x1="108" y1="250" x2="330" y2="250" style="--d:480" />
+                            <line class="s" pathLength="1" x1="108" y1="274" x2="350" y2="274" style="--d:520" />
+                            <text x="114" y="44">Ocupación</text><text x="206" y="44">Llegadas</text><text x="298" y="44">Ingresos</text>
+                        </svg>
+                    </div>
+
+                    <!-- 3 · Desarrollar -->
+                    <div class="scene" data-scene>
+                        <div class="code">
+                            {code.map((line, i) => <span class="cl" style={`--i:${i}`} set:html={line} />)}
+                            <div class="term">✓ 128 tests · deploy a staging en 42 s</div>
+                        </div>
+                    </div>
+
+                    <!-- 4 · Lanzar -->
+                    <div class="scene" data-scene>
+                        <div class="app">
+                            <aside>
+                                <span class="lg"><img src={Logo.src} alt="" />FoxRooms</span>
+                                <i class="on"><b></b>Inicio</i><i><b></b>Reservas</i><i><b></b>Calendario</i>
+                            </aside>
+                            <div class="main">
+                                <div class="kpis">
+                                    <div><small>Ocupación</small><b>87%</b></div>
+                                    <div><small>Hoy</small><b>34</b></div>
+                                    <div><small>Uptime</small><b>99.9%</b></div>
+                                </div>
+                                <div class="chart">
+                                    <svg viewBox="0 0 300 100" preserveAspectRatio="none"><path d="M0 85 L45 70 L90 76 L140 45 L190 52 L240 22 L300 12" fill="none" stroke="#ee4d31" stroke-width="2" vector-effect="non-scaling-stroke" /></svg>
+                                </div>
+                            </div>
+                        </div>
+                        <Image src={MockupFoxRooms} alt="" width={420} class="phone" loading="lazy" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- End Process Section -->
+
+<style>
+    .process {
+        --ease: cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* Escritorio: la sección queda fija ~3 pantallas y el scroll avanza los pasos. */
+    .process-track {
+        height: 340vh;
+        position: relative;
+    }
+
+    .process-stick {
+        position: sticky;
+        top: 0;
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        padding-top: 4rem;
+    }
+
+    .process-steps {
+        list-style: none;
+    }
+
+    .process-steps li {
+        display: grid;
+        grid-template-columns: 2.25rem 1fr;
+        padding: 0.75rem 0;
+        border-top: 1px solid rgb(255 255 255 / 0.09);
+        color: rgb(255 255 241 / 0.32);
+        transition: color 0.35s var(--ease);
+    }
+
+    .process-steps .n {
+        font-size: 0.75rem;
+        padding-top: 0.55rem;
+        font-variant-numeric: tabular-nums;
+        transition: color 0.35s;
+    }
+
+    .process-steps b {
+        display: block;
+        font-family: var(--font-display);
+        font-size: 1.75rem;
+        font-weight: 600;
+        letter-spacing: -0.025em;
+    }
+
+    .process-steps p {
+        font-size: 0.95rem;
+        max-height: 0;
+        overflow: hidden;
+        opacity: 0;
+        transition: max-height 0.45s var(--ease), opacity 0.3s, margin 0.45s var(--ease);
+    }
+
+    .process-steps li.is-on {
+        color: var(--color-text);
+    }
+
+    .process-steps li.is-on .n {
+        color: var(--color-primary);
+    }
+
+    .process-steps li.is-on p {
+        max-height: 4.5rem;
+        opacity: 1;
+        margin-top: 0.25rem;
+        color: rgb(212 212 212);
+    }
+
+    .process-progress {
+        height: 2px;
+        background: rgb(255 255 255 / 0.09);
+        border-radius: 2px;
+        overflow: hidden;
+    }
+
+    .process-progress i {
+        display: block;
+        height: 100%;
+        background: var(--color-primary);
+        transform-origin: left;
+        transform: scaleX(0);
+    }
+
+    .process-mock {
+        position: relative;
+        aspect-ratio: 4 / 3.1;
+        border: 1px solid rgb(255 255 255 / 0.15);
+        border-radius: 1rem;
+        background: #1c1c1f;
+    }
+
+    .dots {
+        position: absolute;
+        inset: 0;
+        border-radius: 1rem;
+        background-image: radial-gradient(rgb(255 255 241 / 0.08) 1px, transparent 1px);
+        background-size: 18px 18px;
+        opacity: 0.6;
+    }
+
+    .scene {
+        position: absolute;
+        inset: 0;
+        padding: 1.75rem;
+        opacity: 0;
+        filter: blur(8px);
+        transform: scale(0.97);
+        transition: opacity 0.5s var(--ease), transform 0.6s var(--ease), filter 0.5s var(--ease);
+        pointer-events: none;
+    }
+
+    .scene.is-on {
+        opacity: 1;
+        filter: none;
+        transform: none;
+    }
+
+    /* Validar */
+    .postits {
+        position: relative;
+        height: 100%;
+    }
+
+    .postits span {
+        position: absolute;
+        width: 30%;
+        aspect-ratio: 1;
+        padding: 0.875rem;
+        border-radius: 3px;
+        background: #f6d860;
+        color: #2a2a2a;
+        font-family: var(--font-display);
+        font-size: clamp(0.8rem, 1.2vw, 1rem);
+        font-weight: 600;
+        line-height: 1.15;
+        box-shadow: 0 14px 24px -10px rgb(0 0 0 / 0.55), 0 2px 4px rgb(0 0 0 / 0.2);
+        opacity: 0;
+        transform: translateY(30px) rotate(var(--r));
+        transition: transform 0.6s var(--ease), opacity 0.4s;
+        transition-delay: calc(var(--i) * 70ms);
+    }
+
+    .postits span.alt {
+        background: #fbe7dc;
+    }
+
+    .scene.is-on .postits span {
+        opacity: 1;
+        transform: rotate(var(--r));
+    }
+
+    /* Diseñar */
+    .wf {
+        width: 100%;
+        height: 100%;
+    }
+
+    .wf .s {
+        fill: none;
+        stroke: rgb(255 255 241 / 0.42);
+        stroke-width: 1.2;
+        stroke-dasharray: 1;
+        stroke-dashoffset: 1;
+        transition: stroke-dashoffset 0.9s var(--ease);
+        transition-delay: calc(var(--d, 0) * 1ms);
+    }
+
+    .scene.is-on .wf .s {
+        stroke-dashoffset: 0;
+    }
+
+    .wf text {
+        fill: rgb(255 255 241 / 0.32);
+        font: 11px "Inter Variable", sans-serif;
+    }
+
+    /* Desarrollar */
+    .code {
+        padding-top: 0.5rem;
+        font-family: ui-monospace, "SFMono-Regular", Menlo, monospace;
+        font-size: clamp(0.72rem, 1.05vw, 0.85rem);
+        line-height: 1.9;
+        color: rgb(255 255 241 / 0.64);
+    }
+
+    .code :global(.k) { color: #ff8a70; }
+    .code :global(.s) { color: #9fd8a8; }
+    .code :global(.c) { color: rgb(255 255 241 / 0.32); }
+
+    .code .cl {
+        display: block;
+        width: 0;
+        overflow: hidden;
+        white-space: nowrap;
+    }
+
+    .scene.is-on .code .cl {
+        animation: process-type 0.55s steps(32) forwards;
+        animation-delay: calc(var(--i) * 190ms + 150ms);
+    }
+
+    .term {
+        margin-top: 1.1rem;
+        padding: 0.6rem 0.9rem;
+        border-radius: 0.5rem;
+        background: #0c0c0d;
+        color: #34d399;
+        font-size: 0.75rem;
+        opacity: 0;
+        transition: opacity 0.4s;
+    }
+
+    .scene.is-on .term {
+        opacity: 1;
+        transition-delay: 1.5s;
+    }
+
+    /* Lanzar */
+    .app {
+        position: absolute;
+        inset: 1.4rem;
+        display: grid;
+        grid-template-columns: 22% 1fr;
+        overflow: hidden;
+        border: 1px solid rgb(255 255 255 / 0.15);
+        border-radius: 0.75rem;
+        background: #18181a;
+        font-size: 10.5px;
+    }
+
+    .app aside {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        padding: 1rem 0.75rem;
+        border-right: 1px solid rgb(255 255 255 / 0.09);
+        color: rgb(255 255 241 / 0.35);
+    }
+
+    .app .lg {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        margin-bottom: 0.4rem;
+        font-weight: 600;
+        color: var(--color-text);
+    }
+
+    .app .lg img {
+        width: 12px;
+        filter: invert(1);
+    }
+
+    .app i {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.3rem 0.4rem;
+        border-radius: 0.375rem;
+        font-style: normal;
+    }
+
+    .app i.on {
+        background: rgb(238 77 49 / 0.15);
+        color: var(--color-text);
+    }
+
+    .app i b {
+        width: 6px;
+        height: 6px;
+        border-radius: 2px;
+        background: currentColor;
+        opacity: 0.7;
+    }
+
+    .app .main {
+        display: grid;
+        grid-template-rows: auto 1fr;
+        gap: 0.75rem;
+        padding: 1rem;
+        min-width: 0;
+    }
+
+    .app .kpis {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.6rem;
+    }
+
+    .app .kpis div,
+    .app .chart {
+        border: 1px solid rgb(255 255 255 / 0.09);
+        border-radius: 0.6rem;
+        padding: 0.6rem 0.75rem;
+    }
+
+    .app .kpis small {
+        display: block;
+        font-size: 10px;
+        color: rgb(255 255 241 / 0.6);
+    }
+
+    .app .kpis b {
+        font-family: var(--font-display);
+        font-size: clamp(14px, 1.6vw, 20px);
+        font-weight: 600;
+        font-variant-numeric: tabular-nums;
+        color: var(--color-text);
+    }
+
+    .app .chart svg {
+        display: block;
+        width: 100%;
+        height: 100%;
+    }
+
+    .phone {
+        position: absolute;
+        right: -1.75rem;
+        bottom: -2.5rem;
+        width: 34%;
+        height: auto;
+        opacity: 0;
+        transform: translateY(40px) rotate(6deg);
+        filter: drop-shadow(0 30px 40px rgb(0 0 0 / 0.6));
+        transition: transform 0.8s var(--ease) 0.25s, opacity 0.5s 0.25s;
+    }
+
+    .scene.is-on .phone {
+        opacity: 1;
+        transform: rotate(-4deg);
+    }
+
+    @keyframes process-type {
+        to { width: 100%; }
+    }
+
+    /* Móvil y tablet: sin sticky; los pasos se leen como lista. */
+    @media (max-width: 1023px) {
+        .process-track {
+            height: auto;
+        }
+
+        .process-stick {
+            position: static;
+            height: auto;
+            padding-block: 5rem 2.5rem;
+        }
+
+        .process-mock,
+        .process-progress {
+            display: none;
+        }
+
+        .process-steps li {
+            color: var(--color-text);
+        }
+
+        .process-steps .n {
+            color: var(--color-primary);
+        }
+
+        .process-steps p {
+            max-height: none;
+            opacity: 1;
+            margin-top: 0.25rem;
+            color: rgb(212 212 212);
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .scene,
+        .scene * {
+            transition-duration: 1ms !important;
+            transition-delay: 0ms !important;
+            animation-duration: 1ms !important;
+            animation-delay: 0ms !important;
+        }
+
+        .scene {
+            filter: none;
+            transform: none;
+            transition: opacity 0.2s !important;
+        }
+    }
+</style>
+
+<script>
+    function initProcess() {
+        const root = document.querySelector<HTMLElement>("[data-process]");
+        if (!root || root.dataset.ready) return;
+        root.dataset.ready = "true";
+
+        const track = root.querySelector<HTMLElement>("[data-process-track]")!;
+        const steps = [...root.querySelectorAll<HTMLElement>("[data-process-steps] li")];
+        const scenes = [...root.querySelectorAll<HTMLElement>("[data-scene]")];
+        const progress = root.querySelector<HTMLElement>("[data-process-progress]")!;
+        const desktop = matchMedia("(min-width: 1024px)");
+        let current = 0;
+        let ticking = false;
+
+        const update = () => {
+            ticking = false;
+            if (!desktop.matches) return;
+            const rect = track.getBoundingClientRect();
+            const p = Math.min(1, Math.max(0, -rect.top / (rect.height - innerHeight)));
+            progress.style.transform = `scaleX(${p})`;
+            const step = Math.min(steps.length - 1, Math.floor(p * steps.length * 1.0001));
+            if (step === current) return;
+            current = step;
+            steps.forEach((el, i) => el.classList.toggle("is-on", i === step));
+            scenes.forEach((el, i) => el.classList.toggle("is-on", i === step));
+        };
+
+        const onScroll = () => {
+            if (ticking) return;
+            ticking = true;
+            requestAnimationFrame(update);
+        };
+
+        addEventListener("scroll", onScroll, { passive: true });
+        addEventListener("resize", onScroll);
+        update();
+    }
+
+    initProcess();
+    document.addEventListener("astro:page-load", initProcess);
+</script>

@@ -1,144 +1,16 @@
----
-import MockupImage from "@/assets/images/mockup-hand.png";
----
-
-<section class="w-full grid gap-y-40 py-32 max-w-5xl mx-auto max-lg:px-5">
-    <div
-        class="flex flex-col items-center justify-center gap-y-7 text-center z-20 max-md:px-5"
-    >
-        <h3 class="text-4xl md:text-5xl font-semibold text-white max-w-2xl">
-            Impulsamos tu crecimiento con servicios a la medida
-        </h3>
-        <p class="text-neutral-300 text-balance max-w-3xl">
-            Servicios personalizados en diseño, desarrollo y estrategia digital
-            para llevar tu empresa al siguiente nivel.
+<section class="w-full max-w-6xl mx-auto pt-24 pb-12 md:pt-32 md:pb-16 max-xl:px-5">
+    <p class="text-xs font-semibold uppercase tracking-[0.2em] text-primary">
+        Servicios
+    </p>
+    <div class="mt-5 grid gap-6 lg:grid-cols-[1fr_auto] lg:items-end">
+        <h1
+            class="font-display max-w-3xl text-[clamp(2.25rem,5vw,4rem)] font-semibold leading-[0.98] tracking-[-0.035em] text-balance"
+        >
+            Servicios a la medida, con precios claros.
+        </h1>
+        <p class="max-w-md text-neutral-300">
+            Diseño, desarrollo y estrategia digital. Elige un plan, súmale los
+            extras que necesites y cotiza en minutos.
         </p>
-        <a href="#servicios">
-            <button
-                type="button"
-                class="bg-primary text-white font-medium px-4 py-2.5 rounded-full hover:bg-primary-dark transition cursor-pointer"
-            >
-                Ver más
-            </button>
-        </a>
-    </div>
-
-    <!-- Apps -->
-    <div class="relative">
-        <a
-            class="bg-white/5 border border-white/10 backdrop-blur-lg flex items-center p-4
-                rounded-xl w-fit absolute -top-20 left-0 translate-x-1/2 translate-y-1/2 z-10
-                hover:border-primary hover:bg-linear-to-tl hover:bg-from-primary/5 transition hover:to-primary/10
-                cursor-pointer group"
-            href="#desarrollo-software"
-        >
-            <div class="px-2 flex flex-col gap-y-2 w-fit">
-                <p
-                    class="text-xs text-white font-semibold uppercase tracking-wide group-hover:text-[#ee6d31] transition-colors"
-                >
-                    Desarrollo de software
-                </p>
-                <p
-                    class="text-xs text-neutral-300 leading-tight font-light hidden lg:block"
-                >
-                    Desarrollo de software a medida que <br /> optimiza los procesos
-                    de negocio
-                </p>
-            </div>
-        </a>
-
-        <a
-            class="bg-white/5 border border-white/10 backdrop-blur-lg flex items-center p-4
-                rounded-xl w-fit absolute top-40 left-0 -translate-y-1/2 z-10
-                hover:border-primary hover:bg-linear-to-tl hover:bg-from-primary/5 transition hover:to-primary/10
-                cursor-pointer group"
-            href="#desarrollo-movil"
-        >
-            <div class="px-2 flex flex-col gap-y-2 w-fit">
-                <p
-                    class="text-xs text-white font-semibold uppercase tracking-wide group-hover:text-[#ee6d31] transition-colors"
-                >
-                    Desarrollo móvil
-                </p>
-                <p
-                    class="text-xs text-neutral-300 leading-tight font-light hidden lg:block"
-                >
-                    Aplicaciones móviles nativas y <br /> multiplataforma para iOS
-                    y Android
-                </p>
-            </div>
-        </a>
-
-        <a
-            class="bg-white/5 border border-white/10 backdrop-blur-lg flex items-center p-4
-                rounded-lg w-fit absolute bottom-10 left-40 -translate-y-1/2 z-10
-                hover:border-primary hover:bg-linear-to-tl hover:bg-from-primary/5 transition hover:to-primary/10
-                cursor-pointer group"
-            href="#consultoria-tech"
-        >
-            <div class="px-2 flex flex-col gap-y-2 w-fit">
-                <p
-                    class="text-xs text-white font-semibold uppercase tracking-wide group-hover:text-[#ee6d31] transition-colors"
-                >
-                    Consultoría Tech
-                </p>
-                <p
-                    class="text-xs text-neutral-300 leading-tight font-light hidden lg:block"
-                >
-                    Asesoramiento experto para <br /> optimizar tu infraestructura
-                    tecnológica
-                </p>
-            </div>
-        </a>
-
-        <a
-            class="bg-white/5 border border-white/10 backdrop-blur-lg flex items-center p-4
-      rounded-lg w-fit absolute bottom-0 right-0 -translate-y-2 md:-translate-y-6/3 z-10
-      hover:border-primary hover:bg-linear-to-tl hover:bg-from-primary/5 transition hover:to-primary/10
-      cursor-pointer group"
-            href="#branding"
-        >
-            <div class="px-2 flex flex-col gap-y-2 w-fit">
-                <p
-                    class="text-xs text-white font-semibold uppercase tracking-wide group-hover:text-[#ee6d31] transition-colors"
-                >
-                    Branding e identidad visual
-                </p>
-                <p
-                    class="text-xs text-neutral-300 leading-tight font-light hidden lg:block"
-                >
-                    Construcción de marcas sólidas <br /> y coherentes que destacan
-                    en el mercado
-                </p>
-            </div>
-        </a>
-
-        <a
-            class="bg-white/5 border border-white/10 backdrop-blur-lg flex items-center p-4
-            rounded-lg w-fit absolute top-15 right-20 z-10
-            hover:border-primary hover:bg-linear-to-tl hover:bg-from-primary/5 transition hover:to-primary/10
-            cursor-pointer group"
-            href="#diseno-ui-ux"
-        >
-            <div class="px-2 flex flex-col gap-y-2 max-w-3xs w-fit">
-                <p
-                    class="text-xs text-white font-semibold uppercase tracking-wide group-hover:text-[#ee6d31] transition-colors"
-                >
-                    Diseño UX/UI
-                </p>
-                <p
-                    class="text-xs text-neutral-300 leading-tight font-light hidden lg:block"
-                >
-                    Experiencias digitales intuitivas <br /> y atractivas para tus
-                    usuarios
-                </p>
-            </div>
-        </a>
-
-        <img
-            src={MockupImage.src}
-            alt="Mockup hand"
-            class="max-h-128 mask-b-from-50% mask-b-to-100% mask-b-linear mx-auto select-none pointer-events-none"
-        />
     </div>
 </section>

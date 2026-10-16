@@ -1,62 +1,45 @@
 ---
-import MockupCertifox from "@/assets/images/mockup-certifox.png";
-import MockupEscapify from "@/assets/images/mockup-escapify.png";
-import MockupIphoneFront from "@/assets/images/mockup-iphone-front.png";
-import MockupFoxrooms from "@/assets/images/mockup-foxrooms.png";
+import { products } from "@/core/ProductsData";
+
+// "Escapify: Tu tienda online…" → "Escapify"
+const names = products.map((product) => ({
+    id: product.id,
+    name: product.title.split(":")[0],
+    category: product.category,
+}));
 ---
 
-<section
-    class="w-full grid gap-y-20 sm:gap-y-32 py-32 max-w-5xl mx-auto max-lg:px-5"
->
-    <div
-        class="flex flex-col items-center justify-center gap-y-7 text-center z-20 max-md:px-5"
-    >
-        <h3 class="text-4xl sm:text-5xl font-semibold text-white">
-            Las <span class="text-primary">herramientas</span> <br /> que tu empresa necesita
-        </h3>
-        <p class="text-neutral-300 max-w-3xl">
-            Impulsa tu negocio con soluciones pensadas para optimizar procesos,
-            mejorar la experiencia de tus clientes y escalar sin complicaciones.
+<section class="w-full max-w-6xl mx-auto pt-24 pb-12 md:pt-32 md:pb-16 max-xl:px-5">
+    <p class="text-xs font-semibold uppercase tracking-[0.2em] text-primary">
+        Productos
+    </p>
+    <div class="mt-5 grid gap-6 lg:grid-cols-[1fr_auto] lg:items-end">
+        <h1
+            class="font-display max-w-3xl text-[clamp(2.25rem,5vw,4rem)] font-semibold leading-[0.98] tracking-[-0.035em] text-balance"
+        >
+            Las <span class="text-primary">herramientas</span> que tu empresa necesita.
+        </h1>
+        <p class="max-w-md text-neutral-300">
+            Soluciones listas para usar que optimizan procesos, mejoran la
+            experiencia de tus clientes y escalan contigo.
         </p>
     </div>
 
-    <!-- Carrousel Apps -->
-    <div class="relative h-120">
-        
-        <!-- Phone Left -->
-        <div class="hidden md:block absolute left-25 top-1/2 mt-10 -translate-y-1/2 z-10">
-            <img
-                src={MockupCertifox.src}
-                alt="Mockup Hand"
-                class="w-full max-w-xs mx-auto animate-float"
-            />
-        </div>
-
-        <!-- Image Right -->
-        <div class="md:hidden size-60 sm:size-80 bg-white/10 rounded-lg absolute">
-        </div>
-
-        <!-- Phone Front -->
-        <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 lg:z-10">
-            <img
-                src={MockupEscapify.src}
-                alt="Mockup Hand"
-                class="w-full h-full max-w-70 max-sm:w-56 animate-float"
-            />
-        </div>
-
-        <!-- Phone Right -->
-        <div class="hidden md:block absolute right-25 top-1/4 mt-10 -translate-y-1/2 z-10 lg:z-20">
-            <img
-                src={MockupFoxrooms.src}
-                alt="Mockup Hand"
-                class="w-full max-w-xs mx-auto animate-float"
-            />
-        </div>
-
-        <!-- Image Left -->
-        <div class="md:hidden size-60 sm:size-80 bg-white/10 rounded-lg absolute right-0 bottom-0">
-        </div>
-
-    </div>
+    <ul class="mt-10 flex flex-wrap gap-2">
+        {
+            names.map((product) => (
+                <li>
+                    <a
+                        href={`#${product.id}`}
+                        class="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3.5 py-2 text-sm text-neutral-300 transition hover:border-white/25 hover:text-white"
+                    >
+                        {product.name}
+                        <span class="text-[10px] uppercase tracking-wider text-neutral-500">
+                            {product.category}
+                        </span>
+                    </a>
+                </li>
+            ))
+        }
+    </ul>
 </section>

@@ -49,6 +49,8 @@ export interface ServiceAddOn {
 export interface Service {
     id: string;
     title: string;
+    /** Una línea para el listado de /servicios. */
+    summary: string;
     description: string;
     images?: ServiceImage[];
     addOns?: ServiceAddOn[];
@@ -59,6 +61,7 @@ export const services: Service[] = [
     {
         id: "desarrollo-software",
         title: "Desarrollo Software",
+        summary: "Sistemas web, SaaS y landing pages hechos a la medida de tu operación.",
         description: "En nuestra empresa, ofrecemos servicios integrales de desarrollo de software a medida para satisfacer las necesidades específicas de tu negocio. Nuestro equipo de expertos trabaja en estrecha colaboración contigo para diseñar, desarrollar e implementar soluciones tecnológicas innovadoras que impulsen la eficiencia y el crecimiento de tu empresa.",
         images: [
             {
@@ -175,6 +178,7 @@ export const services: Service[] = [
     {
         id: "diseno-ui-ux",
         title: "Diseño UI/UX",
+        summary: "Interfaces claras, basadas en investigación, que convierten y retienen.",
         description: "Creamos experiencias digitales intuitivas y atractivas que cautivan a tus usuarios. Nuestro equipo de diseñadores expertos combina la investigación de usuarios con las mejores prácticas de diseño para crear interfaces que no solo se ven bien, sino que funcionan perfectamente.",
         images: [
             {
@@ -271,6 +275,7 @@ export const services: Service[] = [
     {
         id: "branding",
         title: "Branding e identidad visual",
+        summary: "Identidades visuales sólidas y coherentes que comunican lo que vale tu marca.",
         description: "Construimos marcas memorables que conectan emocionalmente con tu audiencia. Desde el concepto hasta la implementación, creamos identidades visuales coherentes y poderosas que distinguen tu negocio de la competencia.",
         images: [
             {
@@ -381,6 +386,7 @@ export const services: Service[] = [
     {
         id: "desarrollo-movil",
         title: "Desarrollo móvil",
+        summary: "Apps para iOS y Android, rápidas y listas para publicarse en las tiendas.",
         description: "Desarrollamos aplicaciones móviles nativas y multiplataforma que ofrecen experiencias fluidas y de alto rendimiento. Ya sea para iOS, Android o ambos, creamos apps que tus usuarios adorarán usar.",
         images: [
             {
@@ -470,6 +476,7 @@ export const services: Service[] = [
     {
         id: "consultoria-tech",
         title: "Consultoría Tech",
+        summary: "Decisiones técnicas alineadas a tu negocio: arquitectura, costos y hoja de ruta.",
         description: "Asesoramiento experto para guiar tus decisiones tecnológicas. Analizamos tu infraestructura actual, identificamos oportunidades de mejora y te ayudamos a diseñar una estrategia tecnológica que impulse tus objetivos de negocio.",
         images: [
             {

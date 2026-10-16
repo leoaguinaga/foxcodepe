@@ -1,134 +1,133 @@
 ---
-import EscapifyLogo from "@/assets/logos/LogoEscapify.svg";
-import FoxRoomsLogo from "@/assets/logos/LogoFoxrooms.png";
-import CertifoxLogo from "@/assets/logos/LogoCertifox.png";
+import { Image } from "astro:assets";
+import { productMockups, productTransitionName } from "@/core/ProductMockups";
+
+const items = [
+    {
+        id: "foxrooms",
+        name: "FoxRooms",
+        text: "Sistema para hoteles: reservas, huéspedes, calendario y caja en un solo lugar.",
+        tint: "#ee4d31",
+        rot: -6,
+    },
+    {
+        id: "escapify",
+        name: "Escapify",
+        text: "Backoffice multitienda: inventario, pedidos y clientes desde un panel.",
+        tint: "#4caf6a",
+        rot: 0,
+    },
+    {
+        id: "certifox",
+        name: "Certifox",
+        text: "Certificaciones del personal con alertas de vencimiento y reportes.",
+        tint: "#4a7dff",
+        rot: 5,
+    },
+];
 ---
 
-<section class="py-20 flex flex-col items-center justify-center gap-y-20 sm:gap-y-10 px-5">
-    <!-- Title -->
-    <div class="space-y-3 w-full max-w-5xl max-sm:text-center">
-        <h3 class="text-3xl lg:text-4xl font-medium text-white">
-            Productos que <span class="text-primary">escalan</span> con tu negocio
-        </h3>
-        <p class="max-w-3xl max-sm:text-sm text-neutral-300">
-            Creamos productos digitales pensados para crecer contigo: desde la
-            primera versión funcional hasta soluciones sólidas que acompañan tu
-            operación día a día.
-        </p>
+<section class="py-20 lg:py-28 max-xl:px-5">
+    <div class="w-full max-w-6xl mx-auto">
+        <h2 class="font-display text-[clamp(2.25rem,5vw,4rem)] font-semibold leading-[0.98] tracking-[-0.035em]">
+            Software nuestro,<br />en uso real.
+        </h2>
+
+        <div class="products-grid mt-14 grid gap-10 md:grid-cols-3 md:gap-7">
+            {
+                items.map((p) => (
+                    <a href={`/productos#${p.id}`} class="product group block" style={`--tint:${p.tint};--rot:${p.rot}deg`}>
+                        <div class="pic relative grid aspect-[4/5] place-items-center overflow-hidden rounded-[20px] border border-white/10 bg-[#1c1c1f]">
+                            <Image
+                                src={productMockups[p.id]}
+                                alt={`${p.name} en un teléfono`}
+                                width={480}
+                                class="phone relative h-auto w-[62%]"
+                                style={`view-transition-name:${productTransitionName(p.id)}`}
+                                loading="lazy"
+                            />
+                        </div>
+                        <div class="flex items-start justify-between gap-4 px-1 pt-5">
+                            <div>
+                                <h3 class="font-display text-[1.65rem] font-semibold tracking-[-0.025em]">{p.name}</h3>
+                                <p class="mt-1 max-w-[30ch] text-[0.95rem] text-neutral-300">{p.text}</p>
+                            </div>
+                            <span class="go grid size-10 flex-none place-items-center rounded-full border border-white/15" aria-hidden="true">
+                                <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+                            </span>
+                        </div>
+                    </a>
+                ))
+            }
+        </div>
     </div>
-    <!-- End Title -->
-
-    <!-- Products Grid -->
-    <div
-        class="contain-content max-w-5xl mx-auto grid lg:grid-cols-3 items-center justify-center w-full rounded-xl border border-white/10 bg-background divide-x divide-white/10 divide-y"
-    >
-        <!-- FoxRooms Card -->
-        <a
-            href="/productos#foxrooms"
-            class="py-7 px-5 sm:px-7 w-full h-full space-y-7 group hover:bg-linear-to-b from-background via-background to-primary/10"
-        >
-            <div class="size-10 md:size-14 rounded-full mb-10">
-                <img
-                    src={FoxRoomsLogo.src}
-                    alt="FoxRooms Logo"
-                    class="size-10 md:size-14 object-contain mx-auto invert"
-                />
-            </div>
-
-            <div class="space-y-2">
-                <h4 class="text-2xl sm:text-3xl font-semibold text-white">
-                    FoxRooms
-                </h4>
-                <p class="text-neutral-300 text-sm">
-                    Plataforma integral para hoteles que necesitan gestionar
-                    reservas, huéspedes y operaciones diarias en un solo lugar.
-                    FoxRomms te ayuda a optimizar la ocupación, automatizar
-                    procesos y mejorar la experiencia de tus clientes sin
-                    complicaciones.
-                </p>
-            </div>
-
-            <div class="w-fit space-y-0.5">
-                <p
-                    class="text-primary font-semibold text-sm uppercase tracking-wider"
-                >
-                    Ver más
-                </p>
-                <div class="h-0.5 w-full bg-white/20 group-hover:bg-primary">
-                </div>
-            </div>
-        </a>
-
-        <!-- TODO: Cambiar logo y descripcion -->
-        <!-- Escapify Card -->
-        <a
-            href="/productos#escapify"
-            class="py-5 sm:py-7 px-5 sm:px-7 w-full h-full space-y-7 group hover:bg-linear-to-b from-background via-background to-primary/10"
-        >
-            <div class="size-10 md:size-14 mb-10">
-                <img
-                    src={EscapifyLogo.src}
-                    alt="Escapify Logo"
-                    class="size-10 md:size-14 object-contain mx-auto"
-                />
-            </div>
-
-            <div class="space-y-2">
-                <h4 class="text-2xl sm:text-3xl font-semibold text-white">
-                    Escapify
-                </h4>
-                <p class="text-neutral-300 text-sm">
-                    Plataforma multiempresa para gestionar tu ecommerce desde un
-                    único backoffice. Escapify te permite controlar inventario,
-                    pedidos, clientes y operaciones de múltiples tiendas en un
-                    solo lugar, optimizando tu flujo de trabajo y escalando tu
-                    negocio sin límites.
-                </p>
-            </div>
-
-            <div class="w-fit space-y-0.5">
-                <p
-                    class="text-primary font-semibold text-sm uppercase tracking-wider"
-                >
-                    Ver más
-                </p>
-                <div class="h-0.5 w-full bg-white/20 group-hover:bg-primary">
-                </div>
-            </div>
-        </a>
-
-        <!-- Certifox Card -->
-        <a
-            href="/productos#foxeats"
-            class="py-5 sm:py-7 px-5 sm:px-7 w-full h-full space-y-7 group hover:bg-linear-to-b from-background via-background to-primary/10"
-        >
-            <div class="size-10 md:size-14 rounded-full mb-10">
-                <img
-                    src={CertifoxLogo.src}
-                    alt="FoxEats Logo"
-                    class="size-10 md:size-14 object-contain mx-auto"
-                />
-            </div>
-
-            <div class="space-y-2">
-                <h4 class="text-2xl sm:text-3xl font-semibold text-white">
-                    Certifox
-                </h4>
-                <p class="text-neutral-300 text-sm">
-                    Sistema de gestión de certificaciones diseñado para empresas que necesitan administrar y rastrear las certificaciones de sus empleados. Ofrece una solución integral para la administración de certificaciones, recordatorios de vencimiento y generación de informes.
-                </p>
-            </div>
-
-            <div class="w-fit space-y-0.5">
-                <p
-                    class="text-primary font-semibold text-sm uppercase tracking-wider"
-                >
-                    Ver más
-                </p>
-                <div class="h-0.5 w-full bg-white/20 group-hover:bg-primary">
-                </div>
-            </div>
-        </a>
-    </div>
-    <!-- End Products Grid -->
 </section>
+
+<style>
+    .product {
+        --ease: cubic-bezier(0.16, 1, 0.3, 1);
+        border-radius: 20px;
+    }
+
+    .pic {
+        transition: border-color 0.3s;
+    }
+
+    /* Halo con el color de cada producto. */
+    .pic::before {
+        content: "";
+        position: absolute;
+        inset: auto 10% -30% 10%;
+        height: 60%;
+        background: radial-gradient(closest-side, var(--tint), transparent);
+        opacity: 0.35;
+        transition: opacity 0.4s, transform 0.6s var(--ease);
+    }
+
+    .phone {
+        transform: translateY(14%) rotate(var(--rot));
+        filter: drop-shadow(0 30px 30px rgb(0 0 0 / 0.5));
+        transition: transform 0.7s var(--ease);
+    }
+
+    .go {
+        transition: background-color 0.25s, border-color 0.25s, transform 0.35s var(--ease);
+    }
+
+    .product:hover .pic,
+    .product:focus-visible .pic {
+        border-color: rgb(255 255 255 / 0.2);
+    }
+
+    .product:hover .pic::before,
+    .product:focus-visible .pic::before {
+        opacity: 0.7;
+        transform: scale(1.15);
+    }
+
+    /* El teléfono se endereza y sube, como si lo tomaras. */
+    .product:hover .phone,
+    .product:focus-visible .phone {
+        transform: translateY(3%) rotate(0deg) scale(1.04);
+    }
+
+    .product:hover .go,
+    .product:focus-visible .go {
+        background: var(--color-primary);
+        border-color: var(--color-primary);
+        transform: rotate(-45deg);
+    }
+
+    .product:focus-visible {
+        outline: 2px solid var(--color-primary);
+        outline-offset: 4px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .phone,
+        .pic::before,
+        .go {
+            transition-duration: 1ms;
+        }
+    }
+</style>

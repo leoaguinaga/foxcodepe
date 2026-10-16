@@ -3,13 +3,13 @@ import SelectDayModal from '@/components/SelectDayModal.astro';
 ---
 
 <!-- Start Schedule Section -->
-<section class="py-20 max-xl:px-5 gr">
-  <div class="max-w-5xl mx-auto grid lg:grid-cols-2 gap-10">
+<section class="py-20 lg:py-28 max-xl:px-5">
+  <div class="max-w-6xl mx-auto grid lg:grid-cols-2 gap-10 lg:gap-16">
     <!-- Title and Description -->
     <article class="space-y-7 w-full">
-      <h3 class="text-3xl lg:text-4xl font-medium text-white">
-        Agenda una reunión
-      </h3>
+      <h2 class="font-display text-[clamp(2.25rem,5vw,4rem)] font-semibold leading-[0.98] tracking-[-0.035em] text-white text-balance">
+        30 minutos para aterrizar tu idea.
+      </h2>
       <p class="max-w-3xl max-sm:text-sm text-neutral-300">
         Cuéntanos sobre tu idea o proyecto y te ayudamos a definir el alcance,
         costos y siguientes pasos para llevar tu software a producción.
@@ -33,12 +33,12 @@ import SelectDayModal from '@/components/SelectDayModal.astro';
       <p
         class="w-fit text-sm px-4 py-2 rounded-full border border-white/10 bg-white/5 font-medium text-white"
       >
-        Reunión estratégica gratuita de 30 minutos
+        Reunión estratégica gratuita
       </p>
     </article>
 
     <!-- Form -->
-    <form id="meeting-form" class="w-full space-y-5">
+    <form id="meeting-form" class="w-full space-y-5" novalidate>
       
       <!-- Name -->
       <div class="relative w-full">
@@ -46,7 +46,7 @@ import SelectDayModal from '@/components/SelectDayModal.astro';
             type="text"
             id="meeting-name"
             name="name"
-            placeholder=""
+            placeholder=" "
             required
             autocomplete="off"
             class="peer w-full border text-sm border-white/10 bg-white/5 rounded-lg px-4 pt-6.5 pb-3 placeholder-transparent hover:shadow focus:outline-none focus:ring-2 focus:ring-primary hover:bg-white/10"
@@ -73,7 +73,7 @@ import SelectDayModal from '@/components/SelectDayModal.astro';
             type="email"
             id="meeting-email"
             name="email"
-            placeholder=""
+            placeholder=" "
             required
             autocomplete="off"
             class="peer w-full border text-sm border-white/10 bg-white/5 rounded-lg px-4 pt-6.5 pb-3 placeholder-transparent hover:shadow focus:outline-none focus:ring-2 focus:ring-primary hover:bg-white/10"
@@ -100,7 +100,7 @@ import SelectDayModal from '@/components/SelectDayModal.astro';
             type="tel"
             id="meeting-phone"
             name="phone"
-            placeholder=""
+            placeholder=" "
             autocomplete="off"
             class="peer w-full border text-sm border-white/10 bg-white/5 rounded-lg px-4 pt-6.5 pb-3 placeholder-transparent hover:shadow focus:outline-none focus:ring-2 focus:ring-primary hover:bg-white/10"
         />
@@ -126,7 +126,7 @@ import SelectDayModal from '@/components/SelectDayModal.astro';
             type="text"
             id="meeting-schedule"
             name="scheduledAt"
-            placeholder=""
+            placeholder=" "
             required
             readonly
             data-fox-date-picker
@@ -164,9 +164,12 @@ import SelectDayModal from '@/components/SelectDayModal.astro';
       <button
           type="submit"
           id="meeting-submit-button"
-          class="w-full bg-primary text-white py-3 text-sm font-medium rounded-lg hover:bg-primary-dark transition"
+          class="meeting-submit relative flex h-12 w-full items-center justify-center bg-primary text-white text-sm font-medium rounded-lg hover:bg-primary-dark active:scale-[0.98] transition"
+          data-state="idle"
       >
-          Agendar reunión
+          <span class="label">Agendar reunión</span>
+          <span class="spinner" aria-hidden="true"></span>
+          <svg class="check" viewBox="0 0 24 24" aria-hidden="true"><path pathLength="1" d="M5 12.5 10 17 19 7" /></svg>
       </button>
 
       <p id="meeting-submit-status" class="hidden text-sm text-center" role="status" aria-live="polite"></p>
@@ -211,10 +214,19 @@ import SelectDayModal from '@/components/SelectDayModal.astro';
     }
 
     meetingSubmitButton.disabled = isSubmitting;
-    meetingSubmitButton.textContent = isSubmitting ? 'Agendando...' : 'Agendar reunión';
-    meetingSubmitButton.classList.toggle('opacity-60', isSubmitting);
-    meetingSubmitButton.classList.toggle('cursor-not-allowed', isSubmitting);
+    meetingSubmitButton.setAttribute('aria-busy', String(isSubmitting));
+    if (isSubmitting) {
+      meetingSubmitButton.dataset.state = 'loading';
+    } else if (meetingSubmitButton.dataset.state === 'loading') {
+      meetingSubmitButton.dataset.state = 'idle';
+    }
   }
+
+  const meetingFieldMessages: Record<string, string> = {
+    name: 'Falta tu nombre para agendar la reunión.',
+    email: 'Escribe un correo válido para enviarte la invitación.',
+    scheduledAt: 'Elige una fecha y hora para la reunión.',
+  };
 
   function getMeetingFormValue(formData: FormData, key: string) {
     const value = formData.get(key);
@@ -225,8 +237,17 @@ import SelectDayModal from '@/components/SelectDayModal.astro';
   meetingForm?.addEventListener('submit', async (event) => {
     event.preventDefault();
 
-    if (!meetingForm.reportValidity()) {
-      setMeetingSubmitStatus('Completa los campos requeridos antes de agendar.', 'error');
+    const invalidField = Array.from(
+      meetingForm.querySelectorAll<HTMLInputElement>('input[required]'),
+    ).find((input) => !input.checkValidity());
+
+    if (invalidField) {
+      const fieldWrapper = invalidField.parentElement;
+      fieldWrapper?.classList.remove('field-shake');
+      void fieldWrapper?.offsetWidth;
+      fieldWrapper?.classList.add('field-shake');
+      invalidField.focus();
+      setMeetingSubmitStatus(meetingFieldMessages[invalidField.name] ?? 'Completa los campos requeridos.', 'error');
       return;
     }
 
@@ -269,6 +290,12 @@ import SelectDayModal from '@/components/SelectDayModal.astro';
       }
 
       meetingForm.reset();
+      if (meetingSubmitButton) {
+        meetingSubmitButton.dataset.state = 'success';
+        window.setTimeout(() => {
+          if (meetingSubmitButton.dataset.state === 'success') meetingSubmitButton.dataset.state = 'idle';
+        }, 2600);
+      }
       setMeetingSubmitStatus('Reunión solicitada. Te contactaremos pronto para confirmar.', 'success');
     } catch (error) {
       setMeetingSubmitStatus(
@@ -280,3 +307,84 @@ import SelectDayModal from '@/components/SelectDayModal.astro';
     }
   });
 </script>
+
+<style>
+  .meeting-submit .spinner,
+  .meeting-submit .check {
+    display: none;
+  }
+
+  .meeting-submit .spinner {
+    width: 18px;
+    height: 18px;
+    border: 2px solid rgb(255 255 255 / 0.4);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: meeting-spin 0.7s linear infinite;
+  }
+
+  .meeting-submit[data-state="loading"] {
+    cursor: progress;
+  }
+
+  .meeting-submit[data-state="loading"] .label,
+  .meeting-submit[data-state="success"] .label {
+    display: none;
+  }
+
+  .meeting-submit[data-state="loading"] .spinner {
+    display: block;
+  }
+
+  /* Éxito: el check se dibuja con trazo, el mismo gesto del hero. */
+  .meeting-submit[data-state="success"] {
+    background: #1f8a4c;
+  }
+
+  .meeting-submit[data-state="success"] .check {
+    display: block;
+    width: 22px;
+    height: 22px;
+  }
+
+  .meeting-submit .check path {
+    fill: none;
+    stroke: #fff;
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+  }
+
+  .meeting-submit[data-state="success"] .check path {
+    animation: meeting-draw 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.05s;
+  }
+
+  :global(.field-shake) {
+    animation: meeting-shake 0.32s ease;
+  }
+
+  @keyframes meeting-spin {
+    to { transform: rotate(360deg); }
+  }
+
+  @keyframes meeting-draw {
+    to { stroke-dashoffset: 0; }
+  }
+
+  @keyframes meeting-shake {
+    20%, 60% { transform: translateX(-5px); }
+    40%, 80% { transform: translateX(5px); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :global(.field-shake) {
+      animation: none;
+    }
+
+    .meeting-submit[data-state="success"] .check path {
+      animation-duration: 1ms;
+    }
+  }
+</style>

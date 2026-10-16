@@ -1,16 +1,23 @@
 ---
 import type { StaffMember } from "@/core/StaffData";
 
-interface Props extends StaffMember {}
+interface Props extends StaffMember {
+    index?: number;
+}
 
-const { name, role, role2, imageUrl, href } = Astro.props;
+const { name, role, role2, imageUrl, href, index = 0 } = Astro.props;
 ---
 
 <!-- Staff Card -->
-<a href={href} class="relative flex flex-col items-center hover:scale-105 transition-transform duration-300">
+<a
+    href={href}
+    data-reveal="scale"
+    style={`--i: ${index + 1}`}
+    class="staff-card group relative flex flex-col items-center"
+>
     <div class="relative w-68 h-68 flex items-center justify-center">
         <svg
-            class="absolute w-full h-full animate-spin-slow"
+            class="staff-ring absolute w-full h-full animate-spin-slow"
             viewBox="0 0 200 200"
         >
             <path
@@ -22,7 +29,6 @@ const { name, role, role2, imageUrl, href } = Astro.props;
             >
                 <textPath
                     xlink:href={`#circlePath-${name.replace(/\s+/g, '-')}`}
-                    startOffset=""
                     text-anchor="center"
                 >
                     {role} 
@@ -31,12 +37,12 @@ const { name, role, role2, imageUrl, href } = Astro.props;
         </svg>
 
         <div
-            class="w-48 h-48 rounded-full overflow-hidden bg-white/5"
+            class="w-48 h-48 rounded-full overflow-hidden bg-white/5 ring-1 ring-white/10 transition-[box-shadow] duration-500 group-hover:ring-primary/60"
         >
             <img
                 src={imageUrl}
                 alt={name}
-                class="w-full h-full object-cover"
+                class="w-full h-full object-cover grayscale-[35%] transition-[filter,scale] duration-700 group-hover:grayscale-0 group-hover:scale-108"
             />
         </div>
     </div>

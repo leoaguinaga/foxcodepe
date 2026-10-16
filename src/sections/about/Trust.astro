@@ -8,9 +8,10 @@ import PhoneMockup from "@/assets/images/mockup-iphone-front.png";
     <!-- Title -->
     <div class="flex flex-col items-center gap-y-3">
         <h3
+            data-reveal="mask"
             class="text-4xl md:text-5xl font-semibold text-white max-w-2xl text-center"
         >
-            Confía en quienes <span class="text-primary">comparten</span> tu
+            Confía en quienes <span class="text-primary ink">comparten</span> tu
             visión
         </h3>
     </div>
@@ -20,10 +21,11 @@ import PhoneMockup from "@/assets/images/mockup-iphone-front.png";
         class="grid md:grid-cols-3 lg:grid-cols-6 gap-2 overflow-hidden relative"
     >
         <div
+            data-reveal="scale"
             class="md:h-96 md:col-span-2 lg:col-span-4 relative rounded-2xl overflow-hidden group bg-linear-to-r from-black/50 via-black/10 to-black/50 flex flex-col justify-end p-12 sm:px-10 md:px-12"
         >
             <div
-                class="absolute inset-0 opacity-20 dark:opacity-30 pointer-events-none transition-transform group-hover:scale-110 duration-700"
+                class="trust-grid absolute inset-0 opacity-20 dark:opacity-30 pointer-events-none transition-transform group-hover:scale-110 duration-700"
             >
                 <svg
                     height="100%"
@@ -50,7 +52,7 @@ import PhoneMockup from "@/assets/images/mockup-iphone-front.png";
             </div>
             <div class="relative z-10 lg:mb-5">
                 <h2 class="text-4xl text-balance md:text-5xl font-medium mb-4">
-                    2 Años
+                    <span data-count="2">2</span> Años
                     <span class="text-primary">transformando</span> ideas
                 </h2>
                 <p class="text-neutral-300 text-sm sm:text-base max-w-md">
@@ -62,6 +64,8 @@ import PhoneMockup from "@/assets/images/mockup-iphone-front.png";
         </div>
 
         <div
+            data-reveal="scale"
+            style="--i: 1"
             class="bg-linear-to-r from-black/50 via-black/10 to-black/50 overflow-hidden h-96 lg:col-span-2 rounded-2xl group"
         >
             <div class="py-7 pt-10 px-10">
@@ -77,12 +81,14 @@ import PhoneMockup from "@/assets/images/mockup-iphone-front.png";
             <img
                 src={PhoneMockup.src}
                 alt="Mockup de teléfono"
-                class="max-w-85% mx-auto h-full object-cover rounded-2xl group-hover:scale-104 transition-transform duration-700"
+                class="trust-phone max-w-85% mx-auto h-full object-cover rounded-2xl group-hover:scale-104 transition-transform duration-700"
             />
         </div>
 
         <div class="grid md:grid-cols-2 md:col-span-3 lg:col-span-6 gap-2">
             <div
+                data-reveal="up"
+                style="--i: 2"
                 class="bg-linear-to-r from-black/50 via-black/10 to-black/50 min-h-48 rounded-2xl relative overflow-hidden group"
             >
                 <div class="p-12 space-y-3 text-balance flex flex-col justify-center h-full">
@@ -112,7 +118,7 @@ import PhoneMockup from "@/assets/images/mockup-iphone-front.png";
                         stroke-width="2"
                         stroke-linecap="round"
                         stroke-linejoin="round"
-                        class="lucide lucide-code-xml-icon lucide-code-xml size-26 text-white/20"
+                        class="lucide lucide-code-xml-icon lucide-code-xml size-26 text-white/20" data-draw
                         ><path d="m18 16 4-4-4-4"></path><path d="m6 8-4 4 4 4"
                         ></path><path d="m14.5 4-5 16"></path></svg
                     >
@@ -120,11 +126,13 @@ import PhoneMockup from "@/assets/images/mockup-iphone-front.png";
             </div>
 
             <div
+                data-reveal="up"
+                style="--i: 3"
                 class="bg-linear-to-r from-black/50 via-black/10 to-black/50 min-h-48 rounded-2xl relative overflow-hidden group"
             >
                 <div class="p-12 flex items-center h-full">
                     <div class="space-y-4">
-                        <h4 class="text-4xl md:text-5xl font-medium">100%</h4>
+                        <h4 class="text-4xl md:text-5xl font-medium"><span data-count="100">100</span>%</h4>
                         <p class="text-neutral-300 text-sm">
                             de satisfacción del cliente
                         </p>
@@ -135,7 +143,7 @@ import PhoneMockup from "@/assets/images/mockup-iphone-front.png";
                                 <div class="bg-white/20 rounded-full size-8"></div>
                             </div> -->
                             <p class="text-sm text-neutral-300 uppercase">
-                                6 Clientes recurrentes
+                                <span data-count="6">6</span> Clientes recurrentes
                             </p>
                         </div>
                     </div>  
@@ -155,7 +163,7 @@ import PhoneMockup from "@/assets/images/mockup-iphone-front.png";
                         stroke-width="2"
                         stroke-linecap="round"
                         stroke-linejoin="round"
-                        class="lucide lucide-badge-check-icon lucide-badge-check size-26 text-white/20"
+                        class="lucide lucide-badge-check-icon lucide-badge-check size-26 text-white/20" data-draw
                         ><path
                             d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z"
                         ></path><path d="m9 12 2 2 4-4"></path></svg

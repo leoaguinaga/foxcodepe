@@ -1,9 +1,8 @@
 ---
 import Layout from "@/layouts/Layout.astro";
-import Hero from "@/sections/home/Hero.astro";
 import HeroSection from "@/sections/home/HeroSection.astro";
-import GridGalery from "@/sections/home/GridGalery.astro";
-import Features from "@/sections/home/Features.astro";
+import StatsLine from "@/sections/home/StatsLine.astro";
+import ProcessSection from "@/sections/home/ProcessSection.astro";
 import Products from "@/sections/home/Products.astro";
 import Services from "@/sections/home/Services.astro";
 import Schedule from "@/sections/home/Schedule.astro";
@@ -13,9 +12,9 @@ import { seoPages } from "@/core/SeoData";
 <Layout {...seoPages.home}>
 
     <div class="flex flex-col md:gap-y-10">
-        <!-- <Hero /> -->
         <HeroSection />
-        <Features />
+        <ProcessSection />
+        <StatsLine />
         <Products />
         <Services />
         <div id="agendar">

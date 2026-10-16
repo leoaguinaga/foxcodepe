@@ -27,11 +27,11 @@ export const siteSeo = {
     language: "es-PE",
     author: "FoxCode",
     email: "contacto@foxcode.com",
-    phone: "+51936245721",
+    phone: "+51907280391",
     socialLinks: [
         "https://www.instagram.com/foxcode.pe/",
-        "https://www.tiktok.com/@foxcodepe",
-        "https://www.linkedin.com/company/foxcode",
+        "https://www.tiktok.com/@foxcode.pe",
+        "https://www.linkedin.com/company/foxcodepe",
     ],
 };
 

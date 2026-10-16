@@ -18,7 +18,10 @@ const isActive = (href: string) => {
 };
 ---
 
-<section class="bg-white/10 backdrop-blur max-w-5xl mx-auto rounded-full w-full px-3 md:px-3 py-2 md:py-1.5 relative z-20">
+<section
+    data-navbar
+    class="navbar bg-white/10 backdrop-blur max-w-6xl mx-auto rounded-full w-full px-3 md:px-3 py-2 md:py-1.5 relative z-20"
+>
 
     <nav class="flex items-center justify-between gap-x-5">
 
@@ -35,12 +38,12 @@ const isActive = (href: string) => {
         <div class="flex items-center text-sm text-white gap-x-2 md:gap-x-7">
             
             <!-- Links -->
-            <div class="hidden md:flex items-center gap-x-7">
+            <div class="hidden md:flex items-center gap-x-7 relative" data-nav-links>
                 {
                     navLinks.map(({ href, label }) => {
                         const active = isActive(href);
                         return (
-                            <a href={href} class="group">
+                            <a href={href} class="group" data-active={active ? "true" : undefined} aria-current={active ? "page" : undefined}>
                                 <p
                                     class={
                                         `py-3  group-hover:text-white transition-colors
@@ -53,6 +56,7 @@ const isActive = (href: string) => {
                         );
                     })
                 }
+                <span class="nav-ink" data-nav-ink aria-hidden="true"></span>
             </div>
 
             <!-- Btn Primary -->
@@ -95,4 +99,96 @@ const isActive = (href: string) => {
 
 </section>
 
+<style>
+    .navbar {
+        transition:
+            background-color 300ms cubic-bezier(0.16, 1, 0.3, 1),
+            box-shadow 300ms cubic-bezier(0.16, 1, 0.3, 1),
+            padding 300ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
 
+    /* Al bajar de 80 px la barra se densifica y se compacta. */
+    .navbar.is-compact {
+        background-color: rgb(24 24 26 / 0.82);
+        box-shadow:
+            0 0 0 1px rgb(255 255 255 / 0.08),
+            0 12px 32px -12px rgb(0 0 0 / 0.6);
+    }
+
+    @media (min-width: 768px) {
+        .navbar.is-compact {
+            padding-top: 0.125rem;
+            padding-bottom: 0.125rem;
+        }
+    }
+
+    .nav-ink {
+        position: absolute;
+        left: 0;
+        bottom: 6px;
+        height: 2px;
+        width: 0;
+        border-radius: 2px;
+        background: var(--color-primary);
+        opacity: 0;
+        transition:
+            transform 350ms cubic-bezier(0.16, 1, 0.3, 1),
+            width 350ms cubic-bezier(0.16, 1, 0.3, 1),
+            opacity 200ms ease;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .navbar,
+        .nav-ink {
+            transition-duration: 1ms;
+        }
+    }
+</style>
+
+<script>
+    function initNavbar() {
+        const navbar = document.querySelector<HTMLElement>("[data-navbar]");
+        const links = document.querySelector<HTMLElement>("[data-nav-links]");
+        const ink = document.querySelector<HTMLElement>("[data-nav-ink]");
+        if (!navbar || !links || !ink || navbar.dataset.ready) return;
+        navbar.dataset.ready = "true";
+
+        const active = links.querySelector<HTMLElement>("a[data-active]");
+
+        // La tinta descansa en el enlace activo y sigue al hover.
+        const moveInk = (target: HTMLElement | null) => {
+            if (!target) {
+                ink.style.opacity = "0";
+                return;
+            }
+            ink.style.opacity = "1";
+            ink.style.width = `${target.offsetWidth}px`;
+            ink.style.transform = `translateX(${target.offsetLeft}px)`;
+        };
+
+        links.querySelectorAll<HTMLElement>("a").forEach((link) => {
+            link.addEventListener("mouseenter", () => moveInk(link));
+            link.addEventListener("focus", () => moveInk(link));
+        });
+        links.addEventListener("mouseleave", () => moveInk(active));
+        moveInk(active);
+        // Las fuentes web cambian el ancho de los enlaces: re-medir al cargar.
+        document.fonts?.ready.then(() => moveInk(active));
+        window.addEventListener("resize", () => moveInk(active));
+
+        let ticking = false;
+        const onScroll = () => {
+            if (ticking) return;
+            ticking = true;
+            requestAnimationFrame(() => {
+                navbar.classList.toggle("is-compact", window.scrollY > 80);
+                ticking = false;
+            });
+        };
+        window.addEventListener("scroll", onScroll, { passive: true });
+        onScroll();
+    }
+
+    initNavbar();
+    document.addEventListener("astro:page-load", initNavbar);
+</script>

@@ -1,57 +1,72 @@
 ---
+import { Image } from "astro:assets";
 import { products } from "@/core/ProductsData";
+import { productMockups, productTransitionName } from "@/core/ProductMockups";
 ---
 
-<section
-    id="productos"
-    class="w-full grid gap-y-20 md:gap-y-40 py-10 max-w-5xl mx-auto max-lg:px-5"
->
+<section id="productos" class="w-full max-w-6xl mx-auto pb-24 max-xl:px-5">
     {
-        products.map((product, index) => {
-            const isEven = index % 2 === 0;
-            const textAlign = isEven ? "" : "md:text-end";
-            const gridOrder = isEven ? "" : "md:flex-row-reverse";
+        products.map((product) => {
             const activeModule = product.modules[0];
 
             return (
-                <article class="grid md:grid-cols-2 gap-5 md:gap-x-5 md:gap-y-10">
-                    <div
-                        id={product.id}
-                        class={`flex flex-col gap-y-5 md:col-span-2 max-w-3xl ${isEven ? "" : "md:ml-auto"} ${textAlign}`}
-                    >
-                        <div
-                            class={`px-3 py-2.5 flex items-center gap-x-1.5 text-xs rounded-full bg-primary font-semibold w-fit uppercase tracking-wider ${isEven ? "" : "md:ml-auto"}`}
-                        >
-                            <p class="leading-none">{product.category}</p>
+                <article class="grid gap-8 border-t border-white/10 py-12 md:py-14 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-14 lg:items-start">
+                    <div id={product.id} class="scroll-mt-28 flex flex-col gap-4">
+                        <div class="flex items-end gap-4">
+                            {productMockups[product.id] && (
+                                <Image
+                                    src={productMockups[product.id]}
+                                    alt=""
+                                    width={160}
+                                    class="h-auto w-16 md:w-20 drop-shadow-[0_16px_20px_rgb(0_0_0/0.5)]"
+                                    style={`view-transition-name:${productTransitionName(product.id)}`}
+                                />
+                            )}
+                            <span class="mb-1 rounded-full bg-primary px-3 py-2 text-xs font-semibold uppercase leading-none tracking-wider">
+                                {product.category}
+                            </span>
                         </div>
-                        <h3 class="text-3xl md:text-4xl font-medium">
+                        <h2 class="font-display text-3xl md:text-4xl font-semibold leading-[1.05] tracking-[-0.03em] text-balance">
                             {product.title}
-                        </h3>
-                        <p class="text-neutral-300 max-md:text-sm">
-                            {product.description}
-                        </p>
+                        </h2>
+                        <p class="text-neutral-300 max-md:text-sm">{product.description}</p>
+
+                        <!-- Para quién: antes era una tarjeta con foto; ahora es texto -->
+                        <div class="mt-2 border-l-2 border-primary/60 pl-4">
+                            <p class="text-sm font-semibold text-white">{product.secondaryFeature.title}</p>
+                            <p class="mt-1 text-sm text-neutral-400">{product.secondaryFeature.description}</p>
+                        </div>
                     </div>
 
-                    <div class={`flex flex-col md:flex-row gap-5 md:col-span-2 ${gridOrder}`}>
-                        <div
-                            class="product-module-carousel rounded-xl overflow-hidden bg-white/5 grid flex-1 border border-white/10"
-                            data-product-carousel
-                        >
-                            <!-- Preview -->
-                            <div class="h-66 bg-white/5 flex items-center justify-center p-4">
-                                <img
-                                    src={activeModule.image.src}
-                                    alt={activeModule.title}
-                                    class="rounded-lg max-h-full max-w-full object-contain transition-opacity duration-300"
-                                    data-module-preview-image
-                                />
+                    <div
+                        class="product-module-carousel overflow-hidden rounded-2xl border border-white/10 bg-white/5"
+                        data-product-carousel
+                    >
+                        <!-- Preview -->
+                        <div class="flex h-64 md:h-80 items-center justify-center bg-white/5 p-4">
+                            <img
+                                src={activeModule.image.src}
+                                alt={activeModule.title}
+                                class="max-h-full max-w-full rounded-lg object-contain transition-opacity duration-300"
+                                data-module-preview-image
+                            />
+                        </div>
+
+                        <div class="flex flex-col gap-4 p-5 sm:flex-row sm:items-start sm:justify-between">
+                            <div class="space-y-1.5 sm:max-w-sm">
+                                <h3 class="product-module-title text-lg text-white" data-module-active-title>
+                                    {activeModule.title}
+                                </h3>
+                                <p class="product-module-description text-sm text-neutral-300" data-module-active-description>
+                                    {activeModule.description}
+                                </p>
                             </div>
 
-                            <div class="flex items-center justify-center gap-x-2 p-4 pb-0">
+                            <div class="flex shrink-0 gap-2">
                                 {product.modules.map((module, moduleIndex) => (
                                     <button
                                         type="button"
-                                        class={`product-module-trigger size-10 rounded-md border bg-white/5 transition hover:border-primary/70 flex items-center justify-center ${moduleIndex === 0 ? "border-primary" : "border-white/10"}`}
+                                        class={`product-module-trigger flex size-10 items-center justify-center rounded-md border bg-white/5 transition hover:border-primary/70 ${moduleIndex === 0 ? "border-primary" : "border-white/10"}`}
                                         aria-label={`Ver módulo ${module.title}`}
                                         data-module-trigger
                                         data-module-index={moduleIndex}
@@ -59,40 +74,9 @@ import { products } from "@/core/ProductsData";
                                         data-module-description={module.description}
                                         data-module-image={module.image.src}
                                     >
-                                        <img
-                                            src={module.icon}
-                                            alt=""
-                                            class="size-5 object-contain opacity-80"
-                                            loading="lazy"
-                                        />
+                                        <img src={module.icon} alt="" class="size-5 object-contain opacity-80" loading="lazy" />
                                     </button>
                                 ))}
-                            </div>
-
-                            <div class="p-4 space-y-2">
-                                <h4 class="product-module-title text-white text-lg" data-module-active-title>
-                                    {activeModule.title}
-                                </h4>
-                                <p class="product-module-description text-neutral-300 text-sm" data-module-active-description>
-                                    {activeModule.description}
-                                </p>
-                            </div>
-                        </div>
-
-                        <div class="rounded-xl overflow-hidden bg-linear-to-b from-white/1 to-white/5 h-118 flex-1 border border-white/10">
-                            <div class="p-5 space-y-2">
-                                <h4 class="text-white text-lg">{product.secondaryFeature.title}</h4>
-                                <p class="text-neutral-300 text-sm">
-                                    {product.secondaryFeature.description}
-                                </p>
-                            </div>
-
-                            <div class="h-fit overflow-hidden flex items-center justify-center">
-                                <img
-                                    src={product.userPersona.image.src}
-                                    alt={product.userPersona.alt}
-                                    class="max-h-full max-w-full object-contain animate-float"
-                                />
                             </div>
                         </div>
                     </div>

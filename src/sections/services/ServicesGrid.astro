@@ -1,21 +1,454 @@
 ---
-import ServicesContainer from "@/components/ServicesContainer.astro";
+import { Image } from "astro:assets";
 import { services } from "@/core/ServicesData";
+
+// Funciones que se ven por plan; el resto queda plegado.
+const VISIBLE_FEATURES = 4;
+
+// "S/.200" y "S/200" conviven en los datos; en pantalla se muestran igual.
+const formatPrice = (price: string) => price.replace("S/.", "S/");
+const numericPrice = (price: string) => {
+    const match = price.replace(/,/g, "").match(/\d+(?:\.\d+)?/);
+    return match ? Number.parseFloat(match[0]) : NaN;
+};
+
+const rows = services.map((service, index) => {
+    const plans = service.plans ?? [];
+    const prices = plans.map((plan) => numericPrice(plan.price)).filter((n) => !Number.isNaN(n));
+    const addOns = [...(service.addOns ?? [])].sort((a, b) => a.price - b.price);
+
+    return {
+        ...service,
+        number: String(index + 1).padStart(2, "0"),
+        plans,
+        addOns,
+        images: service.images ?? [],
+        fromPrice: prices.length ? `S/${Math.min(...prices)}` : null,
+    };
+});
 ---
 
-<section 
-    data-hs-accordion-always-open
-    class="hs-accordion-group py-20 flex flex-col gap-y-30 max-w-5xl max-xl:px-5 mx-auto"
->
-    {
-        services.map((service) => (
-            <ServicesContainer
-                id={service.id}
-                title={service.title}
-                description={service.description}
-                images={service.images || []}
-                plans={service.plans || []}
-            />
-        ))
-    }
+<section id="servicios" class="w-full max-w-6xl mx-auto pb-24 max-xl:px-5">
+    <!-- Índice: al fijarse, su banda cubre desde el borde superior hasta los chips,
+         así el contenido no asoma entre el navbar y el índice. -->
+    <div data-index-sentinel aria-hidden="true"></div>
+    <nav
+        aria-label="Servicios"
+        class="services-index pointer-events-none sticky top-0 z-20 -mt-[5.75rem] pt-[5.75rem]"
+    >
+        <ul class="index-list pointer-events-auto flex gap-2 overflow-x-auto py-3 [scrollbar-width:none] -mx-5 px-5">
+            {
+                rows.map((service) => (
+                    <li class="shrink-0">
+                        <a
+                            href={`#${service.id}`}
+                            data-index-link={service.id}
+                            class="index-link flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3.5 py-2 text-sm text-neutral-300 transition hover:border-white/25 hover:text-white"
+                        >
+                            {service.title}
+                            {service.fromPrice && (
+                                <span class="text-xs text-neutral-500 tabular-nums">
+                                    desde {service.fromPrice}
+                                </span>
+                            )}
+                        </a>
+                    </li>
+                ))
+            }
+        </ul>
+    </nav>
+
+    <div class="mt-6">
+        {
+            rows.map((service) => (
+                <article
+                    id={service.id}
+                    data-service-row
+                    class="scroll-mt-44 grid gap-8 border-t border-white/10 py-12 md:py-14 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-14"
+                >
+                    <header class="flex flex-col gap-4 lg:sticky lg:top-44 lg:self-start">
+                        <span class="font-display text-sm font-semibold text-primary tabular-nums">
+                            {service.number}
+                        </span>
+                        <h2 class="font-display text-3xl md:text-4xl font-semibold leading-none tracking-[-0.03em]">
+                            {service.title}
+                        </h2>
+                        <p class="text-neutral-300 max-w-md">{service.summary}</p>
+
+                        <div class="flex flex-wrap items-center gap-x-5 gap-y-2 pt-1 text-sm">
+                            {service.fromPrice && (
+                                <p class="text-neutral-400">
+                                    Desde{" "}
+                                    <span class="font-semibold text-white tabular-nums">
+                                        {service.fromPrice}
+                                    </span>
+                                </p>
+                            )}
+                            {service.images.length > 0 && (
+                                <button
+                                    type="button"
+                                    data-gallery-open={service.id}
+                                    data-gallery-title={service.title}
+                                    class="inline-flex items-center gap-1.5 text-primary underline underline-offset-4 decoration-primary/40 hover:decoration-primary transition cursor-pointer"
+                                >
+                                    Ver trabajos ({service.images.length})
+                                </button>
+                            )}
+                        </div>
+
+                        {service.addOns.length > 0 && (
+                            <details class="addons group text-sm">
+                                <summary class="flex w-fit cursor-pointer list-none items-center gap-1.5 text-neutral-400 hover:text-white transition">
+                                    <svg class="size-3.5 transition-transform group-open:rotate-45" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>
+                                    {service.addOns.length} extras desde S/{service.addOns[0].price}
+                                </summary>
+                                <ul class="mt-3 flex flex-wrap gap-1.5">
+                                    {service.addOns.map((addOn) => (
+                                        <li class="rounded-full border border-white/10 px-2.5 py-1 text-xs text-neutral-300">
+                                            {addOn.name}{" "}
+                                            <span class="text-neutral-500 tabular-nums">S/{addOn.price}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </details>
+                        )}
+                    </header>
+
+                    <!-- Planes: visibles de entrada, una fila por plan -->
+                    <ul class="overflow-hidden rounded-2xl border border-white/10 divide-y divide-white/10">
+                        {service.plans.map((plan) => {
+                            const price = formatPrice(plan.price);
+                            const value = numericPrice(plan.price);
+                            return (
+                                <li
+                                    class:list={[
+                                        "relative grid gap-4 p-5 sm:grid-cols-[1fr_auto] sm:items-center sm:gap-6",
+                                        plan.isRecommended ? "bg-linear-to-r from-primary/12 to-transparent" : "bg-white/[0.02]",
+                                    ]}
+                                >
+                                    {plan.isRecommended && (
+                                        <span class="absolute inset-y-0 left-0 w-0.5 bg-primary" aria-hidden="true" />
+                                    )}
+                                    <div class="flex flex-col gap-1.5">
+                                        <div class="flex items-center gap-2">
+                                            <h3 class="font-semibold">{plan.level}</h3>
+                                            {plan.isRecommended && (
+                                                <span class="rounded-full bg-primary px-2 py-1 text-[10px] font-semibold uppercase tracking-wider leading-none">
+                                                    Recomendado
+                                                </span>
+                                            )}
+                                        </div>
+                                        <p class="text-sm text-neutral-400">{plan.description}</p>
+                                        <ul class="features mt-1 text-[13px] text-neutral-300">
+                                            {plan.features.slice(0, VISIBLE_FEATURES).map((feature) => (
+                                                <li>{feature}</li>
+                                            ))}
+                                        </ul>
+                                        {plan.features.length > VISIBLE_FEATURES && (
+                                            <details class="more group text-[13px] text-neutral-300">
+                                                <summary class="w-fit cursor-pointer list-none text-neutral-400 hover:text-white transition">
+                                                    <span class="group-open:hidden">+{plan.features.length - VISIBLE_FEATURES} incluidos más</span>
+                                                    <span class="hidden group-open:inline">Ver menos</span>
+                                                </summary>
+                                                <ul class="features mt-1">
+                                                    {plan.features.slice(VISIBLE_FEATURES).map((feature) => (
+                                                        <li>{feature}</li>
+                                                    ))}
+                                                </ul>
+                                            </details>
+                                        )}
+                                    </div>
+
+                                    <div class="flex items-center justify-between gap-4 sm:flex-col sm:items-end sm:justify-center">
+                                        <p class="font-display text-2xl font-semibold tabular-nums whitespace-nowrap">
+                                            {price}
+                                        </p>
+                                        <button
+                                            type="button"
+                                            class:list={[
+                                                "pricing-select-btn rounded-full px-4 py-2 text-sm font-medium transition cursor-pointer whitespace-nowrap",
+                                                plan.isRecommended
+                                                    ? "bg-primary text-white hover:bg-primary-dark"
+                                                    : "bg-white/10 text-white hover:bg-white/15",
+                                            ]}
+                                            aria-haspopup="dialog"
+                                            aria-expanded="false"
+                                            aria-controls="select-service-price-modal"
+                                            data-hs-overlay="#select-service-price-modal"
+                                            data-plan-level={plan.level}
+                                            data-plan-price-label={price}
+                                            data-plan-price-value={Number.isNaN(value) ? "" : String(value)}
+                                            data-plan-description={plan.description}
+                                            data-service-id={service.id}
+                                            data-service-title={service.title}
+                                        >
+                                            Cotizar
+                                        </button>
+                                    </div>
+                                </li>
+                            );
+                        })}
+                    </ul>
+
+                    <!-- Galería: el <template> no descarga nada hasta abrirse -->
+                    {service.images.length > 0 && (
+                        <template data-gallery-template={service.id}>
+                            {service.images.map((image) => (
+                                <figure class="gallery-slide">
+                                    <Image
+                                        src={image.src}
+                                        alt={image.alt}
+                                        widths={[640, 1200]}
+                                        sizes="(min-width: 1024px) 900px, 92vw"
+                                        format="webp"
+                                        quality={80}
+                                        class="max-h-[70vh] w-auto max-w-full rounded-lg object-contain"
+                                    />
+                                </figure>
+                            ))}
+                        </template>
+                    )}
+                </article>
+            ))
+        }
+    </div>
 </section>
+
+<dialog
+    id="services-gallery"
+    aria-labelledby="services-gallery-title"
+    class="services-gallery m-auto w-[min(64rem,calc(100vw-2rem))] max-h-[calc(100dvh-2rem)] rounded-2xl border border-white/10 bg-background p-0 text-white backdrop:bg-black/70 backdrop:backdrop-blur-md"
+>
+    <div class="flex items-center justify-between gap-4 border-b border-white/10 px-5 py-3.5">
+        <p id="services-gallery-title" class="font-display font-semibold"></p>
+        <div class="flex items-center gap-1.5">
+            <span data-gallery-counter class="mr-2 text-sm text-neutral-400 tabular-nums"></span>
+            <button type="button" data-gallery-prev class="gallery-btn" aria-label="Imagen anterior">
+                <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6" /></svg>
+            </button>
+            <button type="button" data-gallery-next class="gallery-btn" aria-label="Imagen siguiente">
+                <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6" /></svg>
+            </button>
+            <button type="button" data-gallery-close class="gallery-btn ml-1" aria-label="Cerrar galería">
+                <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" /></svg>
+            </button>
+        </div>
+    </div>
+    <div data-gallery-track class="gallery-track flex snap-x snap-mandatory overflow-x-auto"></div>
+</dialog>
+
+<style>
+    /* Banda a todo el ancho; aparece solo cuando el índice está fijado. */
+    .services-index::before {
+        content: "";
+        position: absolute;
+        inset: 0 auto 0 50%;
+        width: 100vw;
+        translate: -50% 0;
+        z-index: -1;
+        background: color-mix(in oklab, var(--color-background) 88%, transparent);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-bottom: 1px solid rgb(255 255 255 / 0.08);
+        box-shadow: 0 12px 24px -12px rgb(0 0 0 / 0.6);
+        opacity: 0;
+        transition: opacity 0.25s ease;
+    }
+
+    .services-index[data-stuck]::before {
+        opacity: 1;
+    }
+
+    /* Desvanece los bordes para insinuar que hay más chips a los lados. */
+    .index-list {
+        mask-image: linear-gradient(to right, transparent, #000 1.25rem, #000 calc(100% - 1.25rem), transparent);
+    }
+
+    .index-link[aria-current="true"] {
+        border-color: var(--color-primary);
+        color: white;
+        background: color-mix(in oklab, var(--color-primary) 14%, transparent);
+    }
+
+    .index-link[aria-current="true"] span {
+        color: rgb(255 255 255 / 0.6);
+    }
+
+    .addons summary::-webkit-details-marker,
+    .more summary::-webkit-details-marker {
+        display: none;
+    }
+
+    .features {
+        display: grid;
+        gap: 0.25rem 1rem;
+    }
+
+    @media (min-width: 640px) {
+        .features {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+
+    .features li {
+        position: relative;
+        padding-left: 1.25rem;
+        line-height: 1.4;
+    }
+
+    /* Check naranja dibujado con CSS para no repetir el SVG en cada ítem. */
+    .features li::before {
+        content: "";
+        position: absolute;
+        left: 0.15rem;
+        top: 0.3em;
+        width: 0.6rem;
+        height: 0.35rem;
+        border-left: 2px solid var(--color-primary);
+        border-bottom: 2px solid var(--color-primary);
+        transform: rotate(-45deg);
+    }
+
+    .services-gallery[open] {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .gallery-track {
+        scrollbar-width: none;
+    }
+
+    .gallery-track :global(.gallery-slide) {
+        flex: 0 0 100%;
+        display: grid;
+        place-items: center;
+        padding: 1.25rem;
+        scroll-snap-align: center;
+    }
+
+    .gallery-btn {
+        display: inline-grid;
+        place-items: center;
+        width: 2.25rem;
+        height: 2.25rem;
+        border-radius: 9999px;
+        background: rgb(255 255 255 / 0.06);
+        transition: background-color 0.2s;
+        cursor: pointer;
+    }
+
+    .gallery-btn:hover {
+        background: rgb(255 255 255 / 0.14);
+    }
+
+    .gallery-btn:disabled {
+        opacity: 0.35;
+        cursor: default;
+    }
+</style>
+
+<script>
+    // Índice: marca el servicio que está en pantalla.
+    const links = new Map(
+        Array.from(document.querySelectorAll<HTMLAnchorElement>("[data-index-link]")).map((link) => [
+            link.dataset.indexLink!,
+            link,
+        ]),
+    );
+
+    // Mientras el índice está fijado, el servicio activo es el último cuya fila
+    // ya cruzó el 40% superior de la pantalla. En el hero no hay ninguno activo.
+    const indexNav = document.querySelector<HTMLElement>(".services-index");
+    const indexList = indexNav?.querySelector("ul");
+    const sentinel = document.querySelector("[data-index-sentinel]");
+    const rows = Array.from(document.querySelectorAll<HTMLElement>("[data-service-row]"));
+    let activeId: string | null = null;
+    let ticking = false;
+
+    function syncIndex() {
+        ticking = false;
+        if (!indexNav || !sentinel) return;
+
+        // El índice se fija cuando su marcador pasa bajo el navbar (5.75rem = 92px).
+        const stuck = sentinel.getBoundingClientRect().top < 92;
+        indexNav.toggleAttribute("data-stuck", stuck);
+
+        const line = window.innerHeight * 0.4;
+        const current = stuck
+            ? rows.filter((row) => row.getBoundingClientRect().top <= line).at(-1)?.id ?? rows[0]?.id ?? null
+            : null;
+        if (current === activeId) return;
+        activeId = current;
+
+        links.forEach((link, id) => link.setAttribute("aria-current", String(id === current)));
+        if (current) links.get(current)?.scrollIntoView({ block: "nearest", inline: "nearest" });
+        else indexList?.scrollTo({ left: 0 });
+    }
+
+    window.addEventListener(
+        "scroll",
+        () => {
+            if (ticking) return;
+            ticking = true;
+            requestAnimationFrame(syncIndex);
+        },
+        { passive: true },
+    );
+    window.addEventListener("resize", syncIndex);
+    syncIndex();
+
+    // Galería de trabajos en un <dialog>.
+    const dialog = document.getElementById("services-gallery") as HTMLDialogElement | null;
+    const track = dialog?.querySelector<HTMLElement>("[data-gallery-track]");
+    const title = dialog?.querySelector<HTMLElement>("#services-gallery-title");
+    const counter = dialog?.querySelector<HTMLElement>("[data-gallery-counter]");
+    const prev = dialog?.querySelector<HTMLButtonElement>("[data-gallery-prev]");
+    const next = dialog?.querySelector<HTMLButtonElement>("[data-gallery-next]");
+
+    const currentIndex = () => (track ? Math.round(track.scrollLeft / track.clientWidth) : 0);
+
+    function update() {
+        if (!track || !counter || !prev || !next) return;
+        const total = track.children.length;
+        const index = currentIndex();
+        counter.textContent = `${index + 1} / ${total}`;
+        prev.disabled = index === 0;
+        next.disabled = index >= total - 1;
+    }
+
+    function go(delta: number) {
+        if (!track) return;
+        track.scrollTo({ left: (currentIndex() + delta) * track.clientWidth, behavior: "smooth" });
+    }
+
+    document.querySelectorAll<HTMLButtonElement>("[data-gallery-open]").forEach((button) => {
+        button.addEventListener("click", () => {
+            const id = button.dataset.galleryOpen;
+            const template = document.querySelector<HTMLTemplateElement>(`[data-gallery-template="${id}"]`);
+            if (!dialog || !track || !title || !template) return;
+
+            track.replaceChildren(template.content.cloneNode(true));
+            track.scrollLeft = 0;
+            title.textContent = button.dataset.galleryTitle ?? "";
+            dialog.showModal();
+            dialog.querySelector<HTMLButtonElement>("[data-gallery-close]")?.focus();
+            update();
+        });
+    });
+
+    track?.addEventListener("scroll", () => requestAnimationFrame(update), { passive: true });
+    prev?.addEventListener("click", () => go(-1));
+    next?.addEventListener("click", () => go(1));
+    dialog?.querySelector("[data-gallery-close]")?.addEventListener("click", () => dialog.close());
+
+    document.addEventListener("keydown", (event) => {
+        if (!dialog?.open) return;
+        if (event.key === "ArrowLeft") go(-1);
+        if (event.key === "ArrowRight") go(1);
+    });
+
+    // Clic fuera del contenido (en el backdrop) cierra.
+    dialog?.addEventListener("click", (event) => {
+        if (event.target === dialog) dialog.close();
+    });
+</script>

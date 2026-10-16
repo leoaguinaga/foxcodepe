@@ -10,6 +10,13 @@ import { seoPages } from "@/core/SeoData";
 ---
 
 <Layout {...seoPages.about}>
+  <!-- Marca <html> antes de pintar para que los [data-reveal] no parpadeen. -->
+  <script is:inline>
+    if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      document.documentElement.classList.add("reveal-ready");
+    }
+  </script>
+
   <!-- <Hero /> -->
   <Trust />
 
@@ -20,3 +27,127 @@ import { seoPages } from "@/core/SeoData";
     <Testimonials />
   </div>
 </Layout>
+
+<style is:global>
+  /* Trust: el teléfono sube dentro de su tarjeta. */
+  .reveal-ready .is-in .trust-phone {
+    animation: trust-phone-in 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.25s both;
+  }
+  @keyframes trust-phone-in {
+    from { transform: translateY(18%); }
+  }
+
+  /* History: un brillo cruza la tarjeta al entrar. */
+  .history-card {
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.4s;
+  }
+  .history-card:hover { border-color: rgb(238 77 49 / 0.35); }
+  .reveal-ready .history-card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(105deg, transparent 35%, rgb(255 255 255 / 0.07) 50%, transparent 65%);
+    transform: translateX(-100%);
+    pointer-events: none;
+  }
+  .reveal-ready .history-card.is-in::after {
+    transition: transform 1.3s cubic-bezier(0.65, 0, 0.35, 1) 0.4s;
+    transform: translateX(100%);
+  }
+
+  /* HowWorks: la línea se dibuja y cada ícono hace pop en orden. */
+  .steps-line > span {
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+  .reveal-ready .is-in > .steps-line > span,
+  html:not(.reveal-ready) .steps-line > span {
+    transform: scaleX(1);
+  }
+  .reveal-ready .steps-line > span {
+    transition: transform 1.6s cubic-bezier(0.65, 0, 0.35, 1) 0.3s;
+  }
+  .reveal-ready .step-card .step-icon {
+    transform: scale(0.4);
+    opacity: 0;
+    transition:
+      transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1),
+      opacity 0.3s;
+    transition-delay: calc(0.35s + var(--i, 0) * 0.32s);
+  }
+  .reveal-ready .step-card.is-in .step-icon {
+    transform: none;
+    opacity: 1;
+  }
+
+  /* Team: el anillo de texto aparece girando y acelera al pasar el mouse. */
+  .reveal-ready .staff-card .staff-ring {
+    opacity: 0;
+    transition: opacity 0.9s 0.4s;
+  }
+  .reveal-ready .staff-card.is-in .staff-ring { opacity: 1; }
+  .staff-card:hover .staff-ring { animation-duration: 6s; }
+
+  /* Testimonials: barra de acento que crece. */
+  .quote::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: -4px;
+    width: 4px;
+    background: var(--color-primary);
+    transform: scaleY(0);
+    transform-origin: top;
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .quote:hover::after,
+  .quote.is-featured::after { transform: scaleY(1); }
+  .reveal-ready .quote.is-featured:not(.is-in)::after { transform: scaleY(0); }
+  .reveal-ready .quote.is-featured.is-in::after { transition-delay: 0.6s; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .staff-card:hover .staff-ring { animation: none; }
+  }
+</style>
+
+<script>
+  function countUp(el: HTMLElement) {
+    const to = Number(el.dataset.count);
+    const start = performance.now();
+    const tick = (now: number) => {
+      const k = Math.min(1, (now - start) / 1100);
+      el.textContent = String(Math.round(to * (1 - Math.pow(1 - k, 3))));
+      if (k < 1) requestAnimationFrame(tick);
+    };
+    el.textContent = "0";
+    requestAnimationFrame(tick);
+  }
+
+  function initReveal() {
+    const root = document.documentElement;
+    if (!root.classList.contains("reveal-ready")) return;
+
+    // pathLength=1 deja que stroke-dasharray: 1 sirva para cualquier trazo.
+    document.querySelectorAll("[data-draw] path").forEach((p) => p.setAttribute("pathLength", "1"));
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          const el = entry.target as HTMLElement;
+          io.unobserve(el);
+          el.classList.add("is-in");
+          el.querySelectorAll<HTMLElement>("[data-count]").forEach(countUp);
+        }
+      },
+      { threshold: 0.2, rootMargin: "0px 0px -8% 0px" },
+    );
+
+    document.querySelectorAll("[data-reveal], [data-reveal-group]").forEach((el) => io.observe(el));
+  }
+
+  initReveal();
+</script>
