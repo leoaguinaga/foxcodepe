@@ -1,0 +1,186 @@
+---
+import AccessChip from "./AccessChip.astro";
+import ProjectVisual from "./ProjectVisual.astro";
+import { kindLabel, projectFilters, projectTitleTransition, type Project } from "@/core/ProjectsData";
+
+interface Props { projects: Project[] }
+const { projects } = Astro.props;
+const count = (id: string) => projects.filter(projectFilters.find((f) => f.id === id)!.test).length;
+const filterAttr = (p: Project) => projectFilters.filter((f) => f.test(p)).map((f) => f.id).join(" ");
+---
+
+<section class="max-xl:px-5" data-pj-index>
+    <div class="w-full max-w-6xl mx-auto">
+        <div class="pj-filters" role="group" aria-label="Filtrar proyectos">
+            {projectFilters.map((f, i) => (
+                <button type="button" data-f={f.id} aria-pressed={i === 0 ? "true" : "false"}>
+                    {f.label}<span>{count(f.id)}</span>
+                </button>
+            ))}
+        </div>
+
+        <ul class="pj-ledger" data-ledger data-reveal-group>
+            {projects.map((p, i) => (
+                <li class="pj-row" style={`--i:${i};view-transition-name:pj-row-${p.id}`} data-slug={p.id} data-filters={filterAttr(p)}>
+                    <a href={`/proyectos/${p.id}`}>
+                        <span>
+                            <span class="pj-name" style={`view-transition-name:${projectTitleTransition(p.id)}`}>{p.data.nombre}</span>
+                            <span class="pj-kind">{kindLabel(p)} · {p.data.que}</span>
+                        </span>
+                        <span class="pj-sum">{p.data.resumen}</span>
+                        <span class="pj-sector">{p.data.sector}</span>
+                        <span class="pj-acc"><AccessChip acceso={p.data.acceso} /></span>
+                        <span class="pj-thumb"><ProjectVisual project={p} rows={3} redacted sizes="100vw" /></span>
+                    </a>
+                </li>
+            ))}
+        </ul>
+        <p class="pj-empty" data-empty hidden>No hay proyectos con este filtro.</p>
+    </div>
+
+    <!-- Vista previa que sigue al cursor: una capa por proyecto, prerenderizada. -->
+    <div class="pj-peek" data-peek aria-hidden="true">
+        {projects.map((p) => (
+            <div class="pj-layer" data-layer={p.id}><ProjectVisual project={p} redacted sizes="400px" /></div>
+        ))}
+    </div>
+</section>
+
+<style>
+
+
+    .pj-filters { display: flex; gap: 6px; flex-wrap: wrap; padding-block: 18px; border-top: 1px solid rgb(255 255 241 / .09); }
+    .pj-filters button { border: 1px solid rgb(255 255 241 / .18); border-radius: 999px; padding: 8px 14px; font-size: 14px; color: rgb(255 255 241 / .68); display: inline-flex; gap: 8px; align-items: center; transition: color .2s, border-color .2s, background-color .2s; }
+    .pj-filters button span { font-size: 12px; color: rgb(255 255 241 / .42); font-variant-numeric: tabular-nums; }
+    .pj-filters button:hover { color: var(--color-text); border-color: var(--color-text); }
+    .pj-filters button[aria-pressed="true"] { background: var(--color-text); color: #18181a; border-color: var(--color-text); }
+    .pj-filters button[aria-pressed="true"] span { color: rgb(24 24 26 / .55); }
+    .pj-filters button:focus-visible, .pj-row > a:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 3px; }
+    @media (max-width: 700px) {
+        .pj-filters { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin-inline: -20px; padding-inline: 20px; }
+        .pj-filters button { flex: none; }
+    }
+
+    .pj-ledger { padding-bottom: 24px; }
+    .pj-row { border-top: 1px solid rgb(255 255 241 / .09); }
+    .pj-row:last-child { border-bottom: 1px solid rgb(255 255 241 / .09); }
+    .pj-row[hidden] { display: none; }
+    .pj-row > a { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1.7fr) minmax(0, .8fr) minmax(0, 1fr); gap: 24px; align-items: center; padding: 26px 0; transition: opacity .35s cubic-bezier(0.16, 1, 0.3, 1); }
+    .pj-name { display: block; font-family: var(--font-display); font-weight: 400; font-size: clamp(30px, 3.2vw, 44px); line-height: .95; letter-spacing: .01em; width: fit-content; transition: transform .5s cubic-bezier(0.16, 1, 0.3, 1), color .3s; }
+    .pj-kind { display: block; font-size: 13px; font-weight: 500; color: rgb(255 255 241 / .45); margin-top: 8px; }
+    .pj-sum { color: rgb(255 255 241 / .68); font-size: 15.5px; line-height: 1.5; max-width: 44ch; }
+    .pj-sector { font-size: 14px; color: rgb(255 255 241 / .45); }
+    .pj-acc { justify-self: end; }
+    .pj-thumb { display: none; }
+    .pj-empty { padding: 48px 0; color: rgb(255 255 241 / .55); }
+
+    @media (hover: hover) and (min-width: 861px) {
+        .pj-ledger:hover .pj-row > a { opacity: .38; }
+        .pj-ledger .pj-row > a:hover, .pj-ledger .pj-row > a:focus-visible { opacity: 1; }
+        .pj-row > a:hover .pj-name { transform: translateX(10px); color: var(--color-primary); }
+    }
+    @media (max-width: 860px) {
+        .pj-row > a { grid-template-columns: minmax(0, 1fr) auto; gap: 14px 16px; padding: 24px 0; }
+        .pj-sum { grid-column: 1 / -1; grid-row: 3; }
+        .pj-sector { display: none; }
+        .pj-thumb { display: block; grid-column: 1 / -1; grid-row: 2; border-radius: 12px; overflow: hidden; aspect-ratio: 16 / 9; border: 1px solid rgb(255 255 241 / .09); }
+        .pj-thumb :global(img) { width: 100%; height: 100%; object-fit: cover; object-position: top left; }
+    }
+
+    :global(.reveal-ready) .pj-row { opacity: 0; transform: translateY(16px); }
+    :global(.reveal-ready) .pj-ledger.is-in .pj-row { opacity: 1; transform: none; transition: opacity .7s cubic-bezier(0.16, 1, 0.3, 1), transform .7s cubic-bezier(0.16, 1, 0.3, 1); transition-delay: calc(var(--i) * 55ms + 150ms); }
+
+    .pj-peek { position: fixed; left: 0; top: 0; z-index: 40; width: 400px; aspect-ratio: 16 / 10; pointer-events: none; border-radius: 14px; overflow: hidden; box-shadow: 0 30px 60px -12px rgb(0 0 0 / .55), 0 0 0 1px rgb(255 255 241 / .16); opacity: 0; background: #1f1f22; transition: opacity .3s cubic-bezier(0.16, 1, 0.3, 1); will-change: transform; }
+    .pj-peek.on { opacity: 1; }
+    .pj-layer { position: absolute; inset: 0; clip-path: inset(100% 0 0 0); transition: clip-path .55s cubic-bezier(0.16, 1, 0.3, 1); }
+    .pj-layer.show { clip-path: inset(0 0 0 0); z-index: 1; }
+    .pj-layer.prev { clip-path: inset(0 0 0 0); }
+    .pj-layer :global(img) { width: 100%; height: 100%; object-fit: cover; object-position: top left; }
+    @media (hover: none), (max-width: 860px) { .pj-peek { display: none; } }
+    @media (prefers-reduced-motion: reduce) {
+        .pj-layer, .pj-row > a, .pj-name { transition: none; }
+    }
+</style>
+
+<script>
+    import { initProjectsMotion } from "@/core/projectsMotion";
+
+    function initIndex() {
+        const section = document.querySelector<HTMLElement>("[data-pj-index]");
+        if (!section || section.dataset.ready) return;
+        section.dataset.ready = "true";
+        initProjectsMotion();
+
+        const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+        const buttons = [...section.querySelectorAll<HTMLButtonElement>("[data-f]")];
+        const rows = [...section.querySelectorAll<HTMLElement>("[data-slug]")];
+        const empty = section.querySelector<HTMLElement>("[data-empty]")!;
+
+        const applyFilter = (id: string, updateUrl: boolean) => {
+            const run = () => {
+                buttons.forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.f === id)));
+                let shown = 0;
+                rows.forEach((r) => {
+                    const on = (r.dataset.filters ?? "").split(" ").includes(id);
+                    r.hidden = !on;
+                    if (on) shown++;
+                });
+                empty.hidden = shown > 0;
+            };
+            if (updateUrl) {
+                const url = new URL(location.href);
+                if (id === "todos") url.searchParams.delete("f");
+                else url.searchParams.set("f", id);
+                history.replaceState(null, "", url);
+            }
+            if (document.startViewTransition && !reduced && updateUrl) document.startViewTransition(run);
+            else run();
+        };
+        buttons.forEach((b) => b.addEventListener("click", () => applyFilter(b.dataset.f!, true)));
+        const initial = new URL(location.href).searchParams.get("f");
+        if (initial && buttons.some((b) => b.dataset.f === initial)) applyFilter(initial, false);
+
+        // Vista previa con inercia, solo con puntero fino.
+        const peek = section.querySelector<HTMLElement>("[data-peek]")!;
+        const ledger = section.querySelector<HTMLElement>("[data-ledger]")!;
+        if (!matchMedia("(hover: hover) and (min-width: 861px)").matches) return;
+        const layers = new Map([...peek.querySelectorAll<HTMLElement>("[data-layer]")].map((l) => [l.dataset.layer!, l]));
+        let tx = 0, ty = 0, x = 0, y = 0, raf = 0, active = "";
+
+        const loop = () => {
+            const nx = reduced ? tx : x + (tx - x) * 0.14;
+            const ny = reduced ? ty : y + (ty - y) * 0.14;
+            const rot = reduced ? 0 : Math.max(-6, Math.min(6, (nx - x) * 0.35));
+            x = nx; y = ny;
+            const scale = peek.classList.contains("on") ? 1 : 0.86;
+            peek.style.transform = `translate3d(${x}px, ${y}px, 0) translate(-50%, -50%) rotate(${rot}deg) scale(${scale})`;
+            raf = requestAnimationFrame(loop);
+        };
+        const show = (slug: string) => {
+            if (slug === active) return;
+            layers.get(active)?.classList.replace("show", "prev");
+            layers.forEach((l, k) => { if (k !== active && k !== slug) l.classList.remove("prev", "show"); });
+            active = slug;
+            const layer = layers.get(slug);
+            if (!layer) return;
+            layer.classList.remove("prev");
+            requestAnimationFrame(() => layer.classList.add("show"));
+        };
+        ledger.addEventListener("pointermove", (e) => {
+            tx = e.clientX + 230; ty = e.clientY;
+            if (!raf) { x = tx; y = ty; loop(); }
+        });
+        rows.forEach((r) => r.querySelector("a")!.addEventListener("pointerenter", () => {
+            peek.classList.add("on");
+            show(r.dataset.slug!);
+        }));
+        ledger.addEventListener("pointerleave", () => {
+            peek.classList.remove("on");
+            cancelAnimationFrame(raf); raf = 0;
+            layers.forEach((l) => l.classList.remove("show", "prev"));
+            active = "";
+        });
+    }
+
+    initIndex();
+</script>

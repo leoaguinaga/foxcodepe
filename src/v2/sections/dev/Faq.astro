@@ -1,0 +1,34 @@
+---
+import { faqs } from "@/v2/core/OfferData";
+---
+
+<section id="preguntas" class="py-20 lg:py-28 max-xl:px-5 scroll-mt-28">
+    <div class="w-full max-w-6xl mx-auto grid gap-10 lg:grid-cols-[0.8fr_1.2fr]">
+        <h2 class="font-display text-[clamp(2.25rem,5vw,4rem)] font-semibold leading-[0.98] tracking-[-0.035em] text-balance">
+            Preguntas frecuentes.
+        </h2>
+        <div class="border-b border-white/10">
+            {faqs.map((f) => (
+                <details class="faq group border-t border-white/10">
+                    <summary class="flex cursor-pointer list-none items-center justify-between gap-6 py-6 font-display text-[1.3rem] font-semibold tracking-[-0.02em]">
+                        {f.q}
+                        <svg class="size-5 flex-none text-neutral-400 transition-transform duration-300 group-open:rotate-45" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>
+                    </summary>
+                    <p class="max-w-[60ch] pb-6 leading-relaxed text-neutral-300">{f.a}</p>
+                </details>
+            ))}
+        </div>
+    </div>
+</section>
+
+<style>
+    .faq summary::-webkit-details-marker {
+        display: none;
+    }
+
+    .faq summary:focus-visible {
+        outline: 2px solid var(--color-primary);
+        outline-offset: 4px;
+        border-radius: 6px;
+    }
+</style>

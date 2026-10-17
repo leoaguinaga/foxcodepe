@@ -1,0 +1,63 @@
+{
+  "orden": 8,
+  "nombre": "Contralio",
+  "tipo": "producto",
+  "que": "CRM para contratistas",
+  "sector": "Servicios técnicos",
+  "resumen": "Del lead al cliente y del trabajo al siguiente mantenimiento: cada servicio registrado agenda solo el próximo contacto.",
+  "frase": "Cada trabajo registrado agenda solo el siguiente mantenimiento.",
+  "acceso": {
+    "tipo": "enlace",
+    "url": "https://contralio.foxcodepe.com",
+    "etiqueta": "contralio.foxcodepe.com"
+  },
+  "captura": "../../assets/images/proyectos/contralio.webp",
+  "rol": "Producto, diseño, frontend y backend",
+  "stack": [
+    "Next.js",
+    "Prisma",
+    "PostgreSQL",
+    "Google Ads"
+  ],
+  "encargo": [
+    "Las empresas de climatización y oficios similares pierden ingresos recurrentes porque el mantenimiento depende de que alguien se acuerde.",
+    "Contralio <strong>agenda el seguimiento automáticamente</strong> y une la inversión en anuncios con los clientes que realmente cerraron."
+  ],
+  "modulos": [
+    {
+      "titulo": "Seguimientos automáticos",
+      "texto": "Registrar una instalación programa el recordatorio del próximo mantenimiento."
+    },
+    {
+      "titulo": "Costo por cliente",
+      "texto": "Gasto en anuncios comparado con trabajos cerrados, no con clics."
+    },
+    {
+      "titulo": "Portafolio del cliente",
+      "texto": "Lo que suben al panel se publica en su propia web."
+    }
+  ],
+  "declaracion": "Un trabajo se convierte en <strong>una relación recurrente</strong>.",
+  "arquitectura": {
+    "a": [
+      "Panel",
+      "Next.js"
+    ],
+    "b": [
+      "API",
+      "Route handlers"
+    ],
+    "c": [
+      "Base de datos",
+      "PostgreSQL"
+    ],
+    "x": [
+      "Leads",
+      "webhook por cliente"
+    ],
+    "y": [
+      "Anuncios",
+      "Google Ads"
+    ]
+  }
+}

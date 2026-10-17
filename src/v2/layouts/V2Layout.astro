@@ -1,0 +1,390 @@
+---
+import Navbar from "@/v2/sections/shared/Navbar.astro";
+import Footer from "@/v2/sections/shared/Footer.astro";
+import CTA from "@/v2/sections/shared/CTA.astro";
+import ContactUsModal from "@/components/ContactUsModal";
+import LinksSidebar from "@/v2/components/LinksSidebar.astro";
+import { type SeoPage } from "@/core/SeoData";
+import { siteSeo } from "@/v2/core/SeoData";
+import "@/styles/global.css";
+
+interface Props extends Partial<SeoPage> {
+	image?: string;
+}
+
+const {
+	title,
+	description,
+	path,
+	keywords = [],
+	type = "website",
+	noindex = false,
+	image = "/og.png",
+} = Astro.props;
+
+const rawSiteUrl = import.meta.env.PUBLIC_SITE_URL || Astro.site?.toString() || "https://foxcode.pe";
+const siteUrl = rawSiteUrl.endsWith("/") ? rawSiteUrl : `${rawSiteUrl}/`;
+const canonicalPath = path || Astro.url.pathname;
+const canonicalUrl = new URL(canonicalPath, siteUrl).toString();
+const pageTitle = title ? siteSeo.titleTemplate.replace("%s", title) : siteSeo.defaultTitle;
+const pageDescription = description || siteSeo.defaultDescription;
+const pageKeywords = Array.from(new Set([...siteSeo.defaultKeywords, ...keywords])).join(", ");
+const ogImageUrl = new URL(image, siteUrl).toString();
+const robotsContent = noindex
+	? "noindex, nofollow"
+	: "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1";
+
+const structuredData = [
+	{
+		"@context": "https://schema.org",
+		"@type": "Organization",
+		name: siteSeo.name,
+		url: siteUrl,
+		logo: new URL("/favicon-dark.webp", siteUrl).toString(),
+		email: siteSeo.email,
+		telephone: siteSeo.phone,
+		sameAs: siteSeo.socialLinks,
+	},
+	{
+		"@context": "https://schema.org",
+		"@type": "ProfessionalService",
+		name: siteSeo.name,
+		url: siteUrl,
+		areaServed: "PE",
+		serviceType: ["Desarrollo de software a medida", "Desarrollo web", "Desarrollo backend y APIs", "Desarrollo de apps móviles"],
+	},
+	{
+		"@context": "https://schema.org",
+		"@type": "WebSite",
+		name: siteSeo.name,
+		url: siteUrl,
+		inLanguage: siteSeo.language,
+	},
+	{
+		"@context": "https://schema.org",
+		"@type": "WebPage",
+		name: pageTitle,
+		description: pageDescription,
+		url: canonicalUrl,
+		isPartOf: {
+			"@type": "WebSite",
+			name: siteSeo.name,
+			url: siteUrl,
+		},
+		inLanguage: siteSeo.language,
+	},
+];
+
+const structuredDataJson = JSON.stringify(structuredData).replace(/</g, "\\u003c");
+---
+
+<!doctype html>
+<html lang={siteSeo.language}>
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<link
+			rel="icon"
+			type="image/icon-x"
+			href="/favicon-dark.webp"
+			media="(prefers-color-scheme: light)"
+		/>
+		<link
+			rel="icon"
+			type="image/icon-x"
+			href="/favicon-light.webp"
+			media="(prefers-color-scheme: dark)"
+		/>
+		<meta name="generator" content={Astro.generator} />
+		<meta name="description" content={pageDescription} />
+		<meta name="keywords" content={pageKeywords} />
+		<meta name="author" content={siteSeo.author} />
+		<meta name="robots" content={robotsContent} />
+		<meta name="theme-color" content="#ee4d31" />
+		<meta name="application-name" content={siteSeo.name} />
+		<meta name="apple-mobile-web-app-title" content={siteSeo.name} />
+		<link rel="canonical" href={canonicalUrl} />
+		<link rel="alternate" hreflang="es-PE" href={canonicalUrl} />
+		<link rel="alternate" hreflang="x-default" href={canonicalUrl} />
+
+		<meta property="og:site_name" content={siteSeo.name} />
+		<meta property="og:type" content={type} />
+		<meta property="og:title" content={pageTitle} />
+		<meta property="og:description" content={pageDescription} />
+		<meta property="og:url" content={canonicalUrl} />
+		<meta property="og:image" content={ogImageUrl} />
+		<meta property="og:locale" content={siteSeo.locale} />
+
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:title" content={pageTitle} />
+		<meta name="twitter:description" content={pageDescription} />
+		<meta name="twitter:image" content={ogImageUrl} />
+
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Raleway:ital,wght@0,100..900;1,100..900&display=swap"
+			rel="stylesheet"
+		/>
+
+		<script is:inline type="application/ld+json" set:html={structuredDataJson} />
+
+		<title>{pageTitle}</title>
+	</head>
+	<body class="bg-background text-text scroll-smooth w-full">
+		<div class="top-5 z-30 sticky max-xl:px-5">
+			<Navbar />
+		</div>
+		<main class="w-full">
+			<slot />
+		</main>
+		<CTA />
+		<Footer />
+
+		<div id="contact-us-modal" 
+			class="size-full hs-overlay hidden fixed top-0 start-0 z-80 overflow-x-hidden overflow-y-auto hs-overlay hs-overlay-backdrop-open:bg-black/50 hs-overlay hs-overlay-backdrop-open:backdrop-blur-2xl"
+			role="dialog" tabindex="-1" aria-labelledby="contact-us-modal-label">
+			<ContactUsModal client:only="react" />
+		</div>
+
+		<!-- Solo mientras /v2 convive con el sitio actual. -->
+		<a
+			href="/"
+			class="fixed z-40 right-[max(1rem,env(safe-area-inset-right))] bottom-[calc(1rem+env(safe-area-inset-bottom))] inline-flex items-center gap-2 rounded-full border border-white/15 bg-[#1c1c1f]/90 px-3.5 py-2 text-xs text-white/75 backdrop-blur hover:text-white transition-colors"
+		>
+			<span class="size-1.5 rounded-full bg-primary" aria-hidden="true"></span>
+			Vista previa del nuevo enfoque · Ver sitio actual
+		</a>
+
+		<div 
+			id="hs-links-sidebar" 
+			class="hs-overlay hs-overlay-open:translate-x-0 hidden -translate-x-full fixed top-0 start-0 hs-overlay-backdrop-open:backdrop-blur-2xl hs-overlay-backdrop-open:bg-black/50 transition-all duration-300 transform h-full w-full z-80" 
+			role="dialog" 
+			tabindex="-1" 
+			aria-labelledby="hs-links-sidebar-label"
+		>
+			<LinksSidebar />
+		</div>
+
+	</body>
+
+	<!-- Preline UI -->
+	<script>
+		import "preline/dist/index.js";
+	</script>
+	<script>
+		const monthFormatter = new Intl.DateTimeFormat("es", {
+			month: "long",
+			year: "numeric",
+		});
+		const weekdays = ["Lu", "Ma", "Mi", "Ju", "Vi", "Sa", "Do"];
+
+		function padDatePart(value: number) {
+			return String(value).padStart(2, "0");
+		}
+
+		function formatDateValue(date: Date) {
+			return `${date.getFullYear()}-${padDatePart(date.getMonth() + 1)}-${padDatePart(date.getDate())}`;
+		}
+
+		function getInitialDate(input: HTMLInputElement) {
+			if (!input.value) {
+				return new Date();
+			}
+
+			const date = new Date(input.value);
+
+			return Number.isNaN(date.getTime()) ? new Date() : date;
+		}
+
+		function getTodayStart() {
+			const today = new Date();
+			today.setHours(0, 0, 0, 0);
+
+			return today;
+		}
+
+		function initFoxDatePickers() {
+			const inputs = document.querySelectorAll<HTMLInputElement>("[data-fox-date-picker]");
+
+			inputs.forEach((input) => {
+				if (input.dataset.foxDateReady === "true") {
+					return;
+				}
+
+				input.dataset.foxDateReady = "true";
+				const mode = input.dataset.foxDateMode === "datetime" ? "datetime" : "date";
+				const panel = document.createElement("div");
+				panel.className = "fox-date-picker-panel";
+				panel.hidden = true;
+				document.body.appendChild(panel);
+
+				let selectedDate = getInitialDate(input);
+				let visibleDate = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1);
+				let selectedTime = "09:00";
+
+				function commitValue(date: Date) {
+					const dateValue = formatDateValue(date);
+					input.value = mode === "datetime" ? `${dateValue}T${selectedTime}` : dateValue;
+					input.dispatchEvent(new Event("input", { bubbles: true }));
+					input.dispatchEvent(new Event("change", { bubbles: true }));
+				}
+
+				function closePanel() {
+					panel.hidden = true;
+				}
+
+				function positionPanel() {
+					const inputRect = input.getBoundingClientRect();
+					const panelWidth = Math.min(320, window.innerWidth - 32);
+					const left = Math.min(
+						Math.max(inputRect.left + window.scrollX, 16 + window.scrollX),
+						window.innerWidth - panelWidth - 16 + window.scrollX,
+					);
+					const top = inputRect.bottom + window.scrollY + 8;
+
+					panel.style.width = `${panelWidth}px`;
+					panel.style.left = `${left}px`;
+					panel.style.top = `${top}px`;
+				}
+
+				function openPanel() {
+					renderPanel();
+					positionPanel();
+					panel.hidden = false;
+				}
+
+				function renderPanel() {
+					const year = visibleDate.getFullYear();
+					const month = visibleDate.getMonth();
+					const firstDay = new Date(year, month, 1);
+					const startOffset = (firstDay.getDay() + 6) % 7;
+					const gridStart = new Date(year, month, 1 - startOffset);
+					const selectedValue = formatDateValue(selectedDate);
+					const todayStart = getTodayStart();
+
+					panel.innerHTML = `
+						<div class="fox-date-picker-header">
+							<button type="button" class="fox-date-picker-nav" data-fox-date-prev aria-label="Mes anterior">
+								<svg class="size-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+							</button>
+							<div class="fox-date-picker-title">${monthFormatter.format(visibleDate)}</div>
+							<button type="button" class="fox-date-picker-nav" data-fox-date-next aria-label="Mes siguiente">
+								<svg class="size-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+							</button>
+						</div>
+						<div class="fox-date-picker-weekdays">
+							${weekdays.map((day) => `<span>${day}</span>`).join("")}
+						</div>
+						<div class="fox-date-picker-grid">
+							${Array.from({ length: 42 }, (_, index) => {
+								const date = new Date(gridStart);
+								date.setDate(gridStart.getDate() + index);
+								const value = formatDateValue(date);
+								const isMuted = date.getMonth() !== month;
+								const isSelected = value === selectedValue;
+								const comparableDate = new Date(date);
+								comparableDate.setHours(0, 0, 0, 0);
+								const isDisabled = comparableDate < todayStart;
+
+								return `<button type="button" class="fox-date-picker-day ${isMuted ? "is-muted" : ""} ${isDisabled ? "is-disabled" : ""} ${isSelected && !isDisabled ? "is-selected" : ""}" data-fox-date-day="${value}" ${isDisabled ? "disabled" : ""}>${date.getDate()}</button>`;
+							}).join("")}
+						</div>
+						${mode === "datetime" ? `
+							<div class="fox-date-picker-time">
+								<label for="${input.id}-time">Hora</label>
+								<select id="${input.id}-time" data-fox-date-time>
+									${["09:00", "09:30", "10:00", "10:30", "11:00", "11:30", "12:00", "12:30", "15:00", "15:30", "16:00", "16:30", "17:00", "17:30", "18:00"].map((time) => `<option value="${time}" ${time === selectedTime ? "selected" : ""}>${time}</option>`).join("")}
+								</select>
+							</div>
+						` : ""}
+					`;
+				}
+
+				input.addEventListener("click", () => {
+					if (panel.hidden) {
+						openPanel();
+					} else {
+						closePanel();
+					}
+				});
+
+				input.addEventListener("keydown", (event) => {
+					if (event.key === "Enter" || event.key === " ") {
+						event.preventDefault();
+						openPanel();
+					}
+
+					if (event.key === "Escape") {
+						closePanel();
+					}
+				});
+
+				panel.addEventListener("click", (event) => {
+					event.stopPropagation();
+					const target = event.target as HTMLElement;
+					const prevButton = target.closest("[data-fox-date-prev]");
+					const nextButton = target.closest("[data-fox-date-next]");
+					const dayButton = target.closest("[data-fox-date-day]") as HTMLButtonElement | null;
+
+					if (prevButton) {
+						visibleDate = new Date(visibleDate.getFullYear(), visibleDate.getMonth() - 1, 1);
+						renderPanel();
+						positionPanel();
+						return;
+					}
+
+					if (nextButton) {
+						visibleDate = new Date(visibleDate.getFullYear(), visibleDate.getMonth() + 1, 1);
+						renderPanel();
+						positionPanel();
+						return;
+					}
+
+					if (dayButton?.dataset.foxDateDay) {
+						selectedDate = new Date(`${dayButton.dataset.foxDateDay}T00:00:00`);
+						visibleDate = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1);
+						commitValue(selectedDate);
+						renderPanel();
+
+						if (mode === "date") {
+							closePanel();
+						}
+					}
+				});
+
+				panel.addEventListener("change", (event) => {
+					const target = event.target as HTMLSelectElement;
+
+					if (target.matches("[data-fox-date-time]")) {
+						selectedTime = target.value;
+						commitValue(selectedDate);
+					}
+				});
+
+				document.addEventListener("click", (event) => {
+					const path = event.composedPath();
+
+					if (!path.includes(input) && !path.includes(panel)) {
+						closePanel();
+					}
+				});
+
+				window.addEventListener("resize", () => {
+					if (!panel.hidden) {
+						positionPanel();
+					}
+				});
+
+				window.addEventListener("scroll", () => {
+					if (!panel.hidden) {
+						positionPanel();
+					}
+				}, true);
+			});
+		}
+
+		initFoxDatePickers();
+		document.addEventListener("astro:page-load", initFoxDatePickers);
+	</script>
+</html>

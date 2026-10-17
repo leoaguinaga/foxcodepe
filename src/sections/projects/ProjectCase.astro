@@ -1,0 +1,220 @@
+---
+import AccessChip from "./AccessChip.astro";
+import BrowserFrame from "./BrowserFrame.astro";
+import ProjectVisual from "./ProjectVisual.astro";
+import RedactedUI from "./RedactedUI.astro";
+import Architecture from "./Architecture.astro";
+import Icon from "./Icon.astro";
+import { kindLabel, projectTitleTransition, type Project } from "@/core/ProjectsData";
+
+interface Props { project: Project; next: Project }
+const { project, next } = Astro.props;
+const d = project.data;
+const a = d.acceso;
+const isPublic = a.tipo === "enlace";
+const url = isPublic ? a.etiqueta : a.tipo === "demo" ? `${d.nombre.toLowerCase().replace(/\s+/g, "")} · demo` : "intranet · acceso restringido";
+const drawn = !d.captura && !!d.ui;
+const firstScreen = d.modulos.find((m) => typeof m.pantalla === "number")?.pantalla ?? 0;
+---
+
+<article data-pj-case data-drawn={drawn ? "true" : undefined}>
+    <header class="pc-head max-xl:px-5">
+        <div class="w-full max-w-6xl mx-auto">
+            <a class="pc-back" href="/proyectos"><Icon name="left" />Todos los proyectos</a>
+            <h1 class="pc-title" style={`view-transition-name:${projectTitleTransition(project.id)}`}>{d.nombre}</h1>
+            <p class="pc-sub" data-reveal="up">{d.frase}</p>
+            <dl class="pc-meta" data-reveal="up" style="--i:1">
+                <div><dt>Tipo</dt><dd>{kindLabel(project)} · {d.sector}</dd></div>
+                <div><dt>Qué hicimos</dt><dd>{d.rol}</dd></div>
+                <div><dt>Tecnología</dt><dd>{d.stack.slice(0, 3).join(", ")}</dd></div>
+                <div><dt>Acceso</dt><dd><AccessChip acceso={a} link /></dd></div>
+            </dl>
+        </div>
+    </header>
+
+    <div class="max-xl:px-5">
+        <div class="w-full max-w-6xl mx-auto">
+            <BrowserFrame url={url} class="pc-shot" data-reveal="scale" data-redact={drawn ? "" : undefined}>
+                <ProjectVisual project={project} screen={firstScreen} eager />
+            </BrowserFrame>
+        </div>
+    </div>
+
+    <section class="pc-sec max-xl:px-5">
+        <div class="pc-split w-full max-w-6xl mx-auto">
+            <h2 class="pc-h2" data-reveal="up">El encargo</h2>
+            <div class="pc-body" data-reveal="up" style="--i:1">
+                {d.encargo.map((p) => <p set:html={p} />)}
+            </div>
+        </div>
+    </section>
+
+    <section class="pc-sec pc-sec-tight max-xl:px-5">
+        <div class="pc-built w-full max-w-6xl mx-auto">
+            <div class="pc-stick">
+                <BrowserFrame url={url} data-modframe data-redact={drawn ? "" : undefined}>
+                    {drawn && d.ui
+                        ? d.ui.pantallas.map((_, i) => <RedactedUI ui={d.ui!} screen={i} hidden={i !== firstScreen} />)
+                        : <ProjectVisual project={project} />}
+                </BrowserFrame>
+            </div>
+            <div>
+                <h2 class="pc-h2 pc-h2-built" data-reveal="up">Lo que construimos</h2>
+                <ul class:list={["pc-mods", { live: drawn }]} data-mods>
+                    {d.modulos.map((m, i) => (
+                        <li class:list={["pc-mod", { on: i === 0 }]} data-screen={m.pantalla ?? ""}>
+                            <h3>{m.titulo}</h3>
+                            <p>{m.texto}</p>
+                        </li>
+                    ))}
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <section class="pc-sec pc-sec-tight max-xl:px-5">
+        <div class="w-full max-w-6xl mx-auto">
+            <p class="pc-statement" data-reveal="up" set:html={d.declaracion} />
+            <Architecture arch={d.arquitectura} />
+            <ul class="pc-stack" aria-label="Tecnologías">{d.stack.map((s) => <li>{s}</li>)}</ul>
+        </div>
+    </section>
+
+    <section class="pc-access-wrap max-xl:px-5">
+        <div class="w-full max-w-6xl mx-auto">
+            {isPublic ? (
+                <div class="pc-access" data-reveal="up">
+                    <div>
+                        <h2>Está en línea. Ábrelo.</h2>
+                        <p>Lo que ves en esta página funciona hoy en {a.etiqueta}.</p>
+                    </div>
+                    <a class="pc-access-btn" href={a.url} target="_blank" rel="noopener">Visitar {a.etiqueta}<Icon name="ne" /></a>
+                </div>
+            ) : (
+                <div class="pc-access is-locked" data-reveal="up">
+                    <div>
+                        <h2>{a.tipo === "demo" ? `Te mostramos ${d.nombre} en vivo.` : `Este sistema vive detrás del login de ${d.nombre}.`}</h2>
+                        <p>
+                            {a.tipo === "demo"
+                                ? "Agenda una demo guiada de 20 minutos y recorre con nosotros los módulos que te interesan para tu propio proyecto."
+                                : "Te lo mostramos en una demo guiada de 20 minutos, con datos de prueba, recorriendo los módulos que te interesan para tu propio proyecto."}
+                        </p>
+                    </div>
+                    <button type="button" class="pc-access-btn" aria-haspopup="dialog" aria-expanded="false" aria-controls="contact-us-modal" data-hs-overlay="#contact-us-modal">
+                        Agendar demo guiada<Icon name="right" />
+                    </button>
+                </div>
+            )}
+        </div>
+    </section>
+
+    <nav class="max-xl:px-5" aria-label="Siguiente proyecto">
+        <div class="w-full max-w-6xl mx-auto">
+            <a class="pc-next" href={`/proyectos/${next.id}`}>
+                <small>Siguiente proyecto</small>
+                <span class="pc-next-name"><span style={`view-transition-name:${projectTitleTransition(next.id)}`}>{next.data.nombre}</span><Icon name="right" /></span>
+            </a>
+        </div>
+    </nav>
+</article>
+
+<style>
+    .pc-head { padding-block: clamp(32px, 5vw, 64px) clamp(28px, 4vw, 48px); }
+    .pc-back { display: inline-flex; align-items: center; gap: 8px; color: rgb(255 255 241 / .68); font-size: 15px; padding: 6px 0; transition: color .2s; }
+    .pc-back:hover { color: var(--color-text); }
+    .pc-back :global(.pi) { transition: transform .3s cubic-bezier(0.16, 1, 0.3, 1); }
+    .pc-back:hover :global(.pi) { transform: translateX(-3px); }
+    .pc-title { font-family: var(--font-display); font-weight: 400; font-size: clamp(52px, 10vw, 136px); line-height: .88; letter-spacing: .01em; margin-top: clamp(24px, 4vw, 40px); text-wrap: balance; width: fit-content; }
+    .pc-sub { font-size: clamp(19px, 2vw, 26px); line-height: 1.35; font-weight: 500; color: rgb(255 255 241 / .68); max-width: 34ch; margin-top: 20px; text-wrap: balance; }
+    .pc-meta { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px; margin-top: clamp(36px, 5vw, 56px); padding-top: 24px; border-top: 1px solid rgb(255 255 241 / .09); }
+    .pc-meta div { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+    .pc-meta dt { font-size: 13px; color: rgb(255 255 241 / .45); }
+    .pc-meta dd { font-size: 15.5px; line-height: 1.45; }
+    @media (max-width: 760px) { .pc-meta { grid-template-columns: 1fr 1fr; } }
+
+    .pc-sec { padding-block: clamp(64px, 9vw, 128px); }
+    .pc-sec-tight { padding-top: 0; }
+    .pc-split { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.3fr); gap: clamp(28px, 6vw, 96px); }
+    .pc-h2 { font-family: var(--font-display); font-weight: 400; font-size: clamp(32px, 4vw, 52px); line-height: 1; letter-spacing: .01em; }
+    .pc-body { font-size: clamp(17px, 1.5vw, 20px); line-height: 1.6; color: rgb(255 255 241 / .68); display: flex; flex-direction: column; gap: 20px; max-width: 58ch; }
+    .pc-body :global(strong) { color: var(--color-text); font-weight: 600; }
+    @media (max-width: 860px) { .pc-split { grid-template-columns: 1fr; } }
+
+    .pc-built { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: clamp(28px, 5vw, 72px); align-items: start; }
+    .pc-stick { position: sticky; top: 110px; }
+    .pc-h2-built { margin-bottom: 28px; }
+    .pc-mod { padding: 26px 0; border-top: 1px solid rgb(255 255 241 / .09); display: flex; flex-direction: column; gap: 10px; transition: opacity .4s cubic-bezier(0.16, 1, 0.3, 1); }
+    .pc-mods.live .pc-mod { min-height: 22vh; opacity: .45; }
+    .pc-mods.live .pc-mod.on { opacity: 1; }
+    .pc-mod h3 { font-family: var(--font-display); font-weight: 400; font-size: clamp(24px, 2.3vw, 30px); letter-spacing: .01em; transition: color .3s; }
+    .pc-mods.live .pc-mod.on h3 { color: var(--color-primary); }
+    .pc-mod p { color: rgb(255 255 241 / .68); font-size: 16px; line-height: 1.55; max-width: 46ch; }
+    @media (max-width: 860px) {
+        .pc-built { grid-template-columns: 1fr; }
+        .pc-stick { position: relative; top: 0; }
+        .pc-mods.live .pc-mod { min-height: 0; opacity: 1; }
+    }
+
+    .pc-statement { font-family: var(--font-display); font-size: clamp(30px, 4.8vw, 64px); line-height: 1.08; letter-spacing: .01em; font-weight: 400; color: rgb(255 255 241 / .38); max-width: 24ch; text-wrap: balance; }
+    .pc-statement :global(strong) { color: var(--color-text); font-weight: 400; }
+    .pc-statement :global(.n) { color: var(--color-primary); font-variant-numeric: tabular-nums; }
+    .pc-stack { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
+    .pc-stack li { font-size: 13.5px; padding: 7px 12px; border: 1px solid rgb(255 255 241 / .18); border-radius: 999px; color: rgb(255 255 241 / .68); }
+
+    .pc-access-wrap { padding-bottom: clamp(48px, 7vw, 96px); }
+    .pc-access { display: grid; grid-template-columns: minmax(0, 1.2fr) auto; gap: 32px; align-items: end; padding: clamp(28px, 4vw, 56px); border-radius: 22px; background: var(--color-primary); color: #fff; }
+    .pc-access h2 { font-family: var(--font-display); font-weight: 400; font-size: clamp(30px, 4.2vw, 56px); line-height: 1; letter-spacing: .01em; text-wrap: balance; }
+    .pc-access p { font-size: 17px; line-height: 1.55; margin-top: 16px; max-width: 52ch; color: rgb(255 255 255 / .86); }
+    .pc-access-btn { display: inline-flex; align-items: center; gap: 10px; font-weight: 600; font-size: 15px; border-radius: 999px; padding: 14px 22px; background: #18181a; color: var(--color-text); white-space: nowrap; transition: background-color .25s; }
+    .pc-access-btn:hover { background: #000; }
+    .pc-access-btn :global(.pi) { transition: transform .3s cubic-bezier(0.16, 1, 0.3, 1); }
+    .pc-access-btn:hover :global(.pi) { transform: translateX(3px); }
+    .pc-access.is-locked { background: #28282c; color: var(--color-text); }
+    .pc-access.is-locked p { color: rgb(255 255 241 / .68); }
+    .pc-access.is-locked .pc-access-btn { background: var(--color-primary); color: #fff; }
+    .pc-access.is-locked .pc-access-btn:hover { background: var(--color-primary-dark); }
+    @media (max-width: 760px) { .pc-access { grid-template-columns: 1fr; } .pc-access-btn { justify-self: start; white-space: normal; } }
+
+    .pc-next { display: block; border-top: 1px solid rgb(255 255 241 / .09); padding-block: clamp(48px, 7vw, 96px); }
+    .pc-next small { font-size: 15px; color: rgb(255 255 241 / .45); }
+    .pc-next-name { font-family: var(--font-display); font-weight: 400; font-size: clamp(44px, 9vw, 128px); line-height: .92; letter-spacing: .01em; display: flex; align-items: center; gap: .25em; margin-top: 14px; transition: color .3s; }
+    .pc-next-name :global(.pi) { font-size: .55em; transition: transform .5s cubic-bezier(0.16, 1, 0.3, 1); }
+    .pc-next:hover .pc-next-name { color: var(--color-primary); }
+    .pc-next:hover .pc-next-name :global(.pi) { transform: translateX(.12em); }
+    .pc-back:focus-visible, .pc-next:focus-visible, .pc-access-btn:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 4px; border-radius: 8px; }
+    @media (prefers-reduced-motion: reduce) { .pc-mod, .pc-next-name, .pc-next-name :global(.pi) { transition: none; } }
+</style>
+
+<script>
+    import { initProjectsMotion, redact } from "@/core/projectsMotion";
+
+    function initCase() {
+        const root = document.querySelector<HTMLElement>("[data-pj-case]");
+        if (!root || root.dataset.ready) return;
+        root.dataset.ready = "true";
+        initProjectsMotion();
+
+        const mods = [...root.querySelectorAll<HTMLElement>("[data-mods] > li")];
+        const frame = root.querySelector<HTMLElement>("[data-modframe]");
+        const drawn = root.dataset.drawn === "true";
+        const screens = frame ? [...frame.querySelectorAll<HTMLElement>(".rui")] : [];
+        let current = screens.findIndex((s) => !s.hidden);
+
+        const activate = (li: HTMLElement) => {
+            mods.forEach((m) => m.classList.toggle("on", m === li));
+            if (!drawn || !frame || li.dataset.screen === "") return;
+            const next = Number(li.dataset.screen);
+            if (next === current || !screens[next]) return;
+            screens.forEach((s, i) => (s.hidden = i !== next));
+            current = next;
+            redact(frame);
+        };
+        const io = new IntersectionObserver(
+            (entries) => entries.forEach((e) => e.isIntersecting && activate(e.target as HTMLElement)),
+            { rootMargin: "-45% 0px -45% 0px" },
+        );
+        mods.forEach((m) => io.observe(m));
+    }
+
+    initCase();
+</script>

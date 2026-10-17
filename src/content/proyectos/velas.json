@@ -1,0 +1,64 @@
+{
+  "orden": 6,
+  "nombre": "Velas Montenegro",
+  "tipo": "cliente",
+  "que": "Landing corporativa",
+  "sector": "Manufactura",
+  "resumen": "Landing de una fábrica de velas de parafina en Chiclayo: catálogo de productos y distribución mayorista en el norte del Perú, con animaciones al hacer scroll.",
+  "frase": "Una fábrica de velas de Chiclayo, presentada para vender al por mayor en todo el norte.",
+  "acceso": {
+    "tipo": "enlace",
+    "url": "https://www.velasmontenegro.com",
+    "etiqueta": "velasmontenegro.com"
+  },
+  "captura": "../../assets/images/proyectos/velas.webp",
+  "rol": "Diseño y desarrollo web",
+  "stack": [
+    "Astro",
+    "GSAP",
+    "Tailwind CSS",
+    "React"
+  ],
+  "encargo": [
+    "Velas Montenegro fabrica velas de parafina en Chiclayo y distribuye al por mayor a bodegas, iglesias y negocios de Lambayeque, Piura, Trujillo y el resto del norte del Perú.",
+    "Hicimos una landing en Astro <strong>pensada para velocidad y SEO</strong>, con el catálogo, las zonas de envío y animaciones con GSAP que acompañan el scroll."
+  ],
+  "modulos": [
+    {
+      "titulo": "Catálogo de productos",
+      "texto": "Las líneas de velas con sus presentaciones, listas para pedir."
+    },
+    {
+      "titulo": "Distribución mayorista",
+      "texto": "Envíos y zonas de reparto en el norte del Perú, con contacto directo para pedidos."
+    },
+    {
+      "titulo": "Animaciones al hacer scroll",
+      "texto": "Productos que giran al aparecer y un video que avanza con el scroll, hechos con GSAP."
+    }
+  ],
+  "declaracion": "Una landing rápida que <strong>vende al por mayor</strong> en todo el norte del Perú.",
+  "arquitectura": {
+    "a": [
+      "Sitio",
+      "Astro"
+    ],
+    "b": [
+      "Animaciones",
+      "GSAP · ScrollTrigger"
+    ],
+    "c": [
+      "Hosting",
+      "Vercel"
+    ],
+    "x": [
+      "Catálogo",
+      "productos"
+    ],
+    "y": [
+      "SEO",
+      "sitemap"
+    ]
+  },
+  "hero": "en el norte."
+}

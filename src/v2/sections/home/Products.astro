@@ -1,0 +1,162 @@
+---
+import { Image } from "astro:assets";
+import { productMockups, productTransitionName } from "@/core/ProductMockups";
+import LogoEnLaMesa from "@/assets/images/product-logos/enlamesa.png";
+import LogoContralio from "@/assets/images/product-logos/contralio.svg";
+
+const items = [
+    {
+        id: "foxrooms",
+        name: "FoxRooms",
+        text: "Sistema para hoteles: reservas, huéspedes, calendario y caja en un solo lugar.",
+        tint: "#ee4d31",
+        rot: -6,
+    },
+    // En La Mesa y Contralio aún no tienen teléfono con captura: muestran su
+    // isotipo hasta que existan los mockups.
+    {
+        id: "enlamesa",
+        name: "En La Mesa",
+        text: "Carta digital para restaurantes: tu menú en línea, con QR y siempre actualizado.",
+        tint: "#ff6b4a",
+        rot: 0,
+        href: "https://enlamesa.pe",
+        logo: LogoEnLaMesa,
+    },
+    {
+        id: "contralio",
+        name: "Contralio",
+        text: "CRM para contratistas: leads, trabajos y seguimientos de mantenimiento automáticos.",
+        tint: "#2554eb",
+        rot: 5,
+        href: "/v2/trabajo#contralio",
+        logo: LogoContralio,
+    },
+];
+---
+
+<section class="py-20 lg:py-28 max-xl:px-5">
+    <div class="w-full max-w-6xl mx-auto">
+        <h2 class="font-display text-[clamp(2.25rem,5vw,4rem)] font-semibold leading-[0.98] tracking-[-0.035em]">
+            Software nuestro,<br />en uso real.
+        </h2>
+
+        <div class="products-grid mt-14 grid gap-10 md:grid-cols-3 md:gap-7">
+            {
+                items.map((p) => (
+                    <a
+                        href={p.href ?? `/v2/trabajo#${p.id}`}
+                        class="product group block"
+                        style={`--tint:${p.tint};--rot:${p.rot}deg`}
+                        {...(p.href?.startsWith("http") && { target: "_blank", rel: "noopener" })}
+                    >
+                        <div class="pic relative grid aspect-[4/5] place-items-center overflow-hidden rounded-[20px] border border-white/10 bg-[#1c1c1f]">
+                            {p.logo ? (
+                                <Image src={p.logo} alt={`Logo de ${p.name}`} width={240} class="logo relative h-auto w-[34%] rounded-[22%]" loading="lazy" />
+                            ) : (
+                                <Image
+                                    src={productMockups[p.id]}
+                                    alt={`${p.name} en un teléfono`}
+                                    width={480}
+                                    class="phone relative h-auto w-[62%]"
+                                    style={`view-transition-name:${productTransitionName(p.id)}`}
+                                    loading="lazy"
+                                />
+                            )}
+                        </div>
+                        <div class="flex items-start justify-between gap-4 px-1 pt-5">
+                            <div>
+                                <h3 class="font-display text-[1.65rem] font-semibold tracking-[-0.025em]">{p.name}</h3>
+                                <p class="mt-1 max-w-[30ch] text-[0.95rem] text-neutral-300">{p.text}</p>
+                            </div>
+                            <span class="go grid size-10 flex-none place-items-center rounded-full border border-white/15" aria-hidden="true">
+                                <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+                            </span>
+                        </div>
+                    </a>
+                ))
+            }
+        </div>
+    </div>
+</section>
+
+<style>
+    .product {
+        --ease: cubic-bezier(0.16, 1, 0.3, 1);
+        border-radius: 20px;
+    }
+
+    .pic {
+        transition: border-color 0.3s;
+    }
+
+    /* Halo con el color de cada producto. */
+    .pic::before {
+        content: "";
+        position: absolute;
+        inset: auto 10% -30% 10%;
+        height: 60%;
+        background: radial-gradient(closest-side, var(--tint), transparent);
+        opacity: 0.35;
+        transition: opacity 0.4s, transform 0.6s var(--ease);
+    }
+
+    .phone {
+        transform: translateY(14%) rotate(var(--rot));
+        filter: drop-shadow(0 30px 30px rgb(0 0 0 / 0.5));
+        transition: transform 0.7s var(--ease);
+    }
+
+    .logo {
+        transform: rotate(var(--rot));
+        filter: drop-shadow(0 24px 30px rgb(0 0 0 / 0.5));
+        transition: transform 0.7s var(--ease);
+    }
+
+    .go {
+        transition: background-color 0.25s, border-color 0.25s, transform 0.35s var(--ease);
+    }
+
+    .product:hover .pic,
+    .product:focus-visible .pic {
+        border-color: rgb(255 255 255 / 0.2);
+    }
+
+    .product:hover .pic::before,
+    .product:focus-visible .pic::before {
+        opacity: 0.7;
+        transform: scale(1.15);
+    }
+
+    /* El teléfono se endereza y sube, como si lo tomaras. */
+    .product:hover .phone,
+    .product:focus-visible .phone {
+        transform: translateY(3%) rotate(0deg) scale(1.04);
+    }
+
+    .product:hover .logo,
+    .product:focus-visible .logo {
+        transform: rotate(0deg) scale(1.08);
+    }
+
+    .product:hover .go,
+    .product:focus-visible .go {
+        background: var(--color-primary);
+        border-color: var(--color-primary);
+        transform: rotate(-45deg);
+    }
+
+    .product:focus-visible {
+        outline: 2px solid var(--color-primary);
+        outline-offset: 4px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .phone,
+        .logo,
+        .pic::before,
+        .go {
+            transition-duration: 1ms;
+        }
+    }
+</style>

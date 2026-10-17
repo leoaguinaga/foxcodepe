@@ -1,0 +1,22 @@
+---
+import Icon from "./Icon.astro";
+import type { Project } from "@/core/ProjectsData";
+
+interface Props { acceso: Project["data"]["acceso"]; link?: boolean }
+const { acceso, link = false } = Astro.props;
+---
+{acceso.tipo === "enlace" && (link
+    ? <a class="chip chip-link" href={acceso.url} target="_blank" rel="noopener" data-ext>{acceso.etiqueta}<Icon name="ne" /></a>
+    : <span class="chip chip-link">{acceso.etiqueta}<Icon name="ne" /></span>)}
+{acceso.tipo === "demo" && <span class="chip chip-demo"><Icon name="play" />Demo guiada</span>}
+{acceso.tipo === "intranet" && <span class="chip chip-lock"><Icon name="lock" />Intranet</span>}
+{acceso.tipo === "mixto" && <span class="chip chip-mixed"><Icon name="split" />{acceso.etiqueta}</span>}
+
+<style is:global>
+    .chip { display: inline-flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 550; line-height: 1; padding: 7px 11px 7px 9px; border-radius: 999px; white-space: nowrap; text-decoration: none; transition: background-color .2s, color .2s; }
+    .chip .pi { font-size: 14px; }
+    .chip-link { background: rgb(238 77 49 / .14); color: var(--color-primary); }
+    a.chip-link:hover { background: var(--color-primary); color: #fff; }
+    .chip-lock, .chip-demo { background: rgb(255 255 241 / .08); color: rgb(255 255 241 / .72); }
+    .chip-mixed { background: rgb(255 255 241 / .08); color: var(--color-text); }
+</style>

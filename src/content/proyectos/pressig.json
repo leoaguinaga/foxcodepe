@@ -1,0 +1,112 @@
+{
+  "orden": 5,
+  "nombre": "Pressig",
+  "tipo": "cliente",
+  "que": "Certificados y PDFs masivos",
+  "sector": "Seguridad y capacitación",
+  "resumen": "Panel interno que genera certificados en lote y una consulta pública donde cualquiera verifica la vigencia de un documento.",
+  "frase": "Certificados emitidos en lote y verificables por cualquiera.",
+  "acceso": {
+    "tipo": "mixto",
+    "etiqueta": "Intranet + consulta pública"
+  },
+  "rol": "Frontend, backend y generador de PDF",
+  "stack": [
+    "Next.js",
+    "Prisma",
+    "PostgreSQL",
+    "Generador de PDF"
+  ],
+  "ui": {
+    "acento": "#2f6fed",
+    "marca": "Pressig",
+    "nav": [
+      "Panel",
+      "Trabajadores",
+      "Certificados",
+      "Lotes PDF",
+      "Consulta",
+      "Ajustes"
+    ],
+    "pantallas": [
+      {
+        "nav": 2,
+        "titulo": "Certificados",
+        "kpis": [
+          "Vigentes",
+          "Por vencer",
+          "Vencidos",
+          "Emitidos mes"
+        ],
+        "columnas": [
+          "Código",
+          "Trabajador",
+          "Curso",
+          "Vence"
+        ],
+        "estado": "Vigente"
+      },
+      {
+        "nav": 3,
+        "titulo": "Lotes de PDF",
+        "kpis": [
+          "Lotes",
+          "Documentos",
+          "En cola",
+          "Errores"
+        ],
+        "columnas": [
+          "Lote",
+          "Plantilla",
+          "Docs",
+          "Estado"
+        ],
+        "estado": "Generado"
+      }
+    ]
+  },
+  "encargo": [
+    "Emitir certificados uno por uno no escala cuando una capacitación tiene decenas de participantes, y los clientes de la empresa necesitan comprobar que un documento es real.",
+    "Hicimos <strong>dos caras</strong>: un panel privado para emitir en lote y una consulta abierta para verificar."
+  ],
+  "modulos": [
+    {
+      "titulo": "Emisión en lote",
+      "texto": "Plantillas por curso y generación masiva de PDFs.",
+      "pantalla": 1
+    },
+    {
+      "titulo": "Trabajadores y cursos",
+      "texto": "Historial de capacitaciones y vigencias por persona.",
+      "pantalla": 0
+    },
+    {
+      "titulo": "Consulta pública",
+      "texto": "Verificación de vigencia por código o documento, abierta a cualquiera.",
+      "pantalla": 0
+    }
+  ],
+  "declaracion": "Lo privado se queda privado; <strong>la verificación es pública</strong>.",
+  "arquitectura": {
+    "a": [
+      "Panel interno",
+      "Next.js"
+    ],
+    "b": [
+      "Generador",
+      "PDF en lote"
+    ],
+    "c": [
+      "Base de datos",
+      "PostgreSQL"
+    ],
+    "x": [
+      "Consulta pública",
+      "Next.js"
+    ],
+    "y": [
+      "Plantillas",
+      "por curso"
+    ]
+  }
+}

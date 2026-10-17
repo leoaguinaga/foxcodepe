@@ -11,17 +11,18 @@ const items = [
         rot: -6,
     },
     {
-        id: "escapify",
-        name: "Escapify",
-        text: "Backoffice multitienda: inventario, pedidos y clientes desde un panel.",
-        tint: "#4caf6a",
+        id: "enlamesa",
+        name: "En La Mesa",
+        text: "Carta digital para restaurantes: tu menú en línea, con QR y siempre actualizado.",
+        tint: "#ff6b4a",
         rot: 0,
+        href: "https://enlamesa.pe",
     },
     {
-        id: "certifox",
-        name: "Certifox",
-        text: "Certificaciones del personal con alertas de vencimiento y reportes.",
-        tint: "#4a7dff",
+        id: "contralio",
+        name: "Contralio",
+        text: "CRM para contratistas: leads, trabajos y seguimientos de mantenimiento automáticos.",
+        tint: "#2554eb",
         rot: 5,
     },
 ];
@@ -36,7 +37,12 @@ const items = [
         <div class="products-grid mt-14 grid gap-10 md:grid-cols-3 md:gap-7">
             {
                 items.map((p) => (
-                    <a href={`/productos#${p.id}`} class="product group block" style={`--tint:${p.tint};--rot:${p.rot}deg`}>
+                    <a
+                        href={p.href ?? `/proyectos/${p.id}`}
+                        class="product group block"
+                        style={`--tint:${p.tint};--rot:${p.rot}deg`}
+                        {...(p.href?.startsWith("http") && { target: "_blank", rel: "noopener" })}
+                    >
                         <div class="pic relative grid aspect-[4/5] place-items-center overflow-hidden rounded-[20px] border border-white/10 bg-[#1c1c1f]">
                             <Image
                                 src={productMockups[p.id]}

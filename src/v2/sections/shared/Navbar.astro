@@ -1,0 +1,194 @@
+---
+import LogoFullWhite from "@/assets/logos/logo-full-white.webp";
+import Image from "astro/components/Image.astro";
+
+const navLinks = [
+    { href: "/v2", label: "Inicio" },
+    { href: "/v2/servicios", label: "Desarrollo" },
+    { href: "/v2/trabajo", label: "Trabajo" },
+    { href: "/v2/nosotros", label: "Nosotros" },
+];
+
+const currentPath = Astro.url.pathname;
+const isActive = (href: string) => {
+    if (href === "/v2") {
+        return currentPath === "/v2" || currentPath === "/v2/";
+    }
+    return currentPath.startsWith(href);
+};
+---
+
+<section
+    data-navbar
+    class="navbar bg-white/10 backdrop-blur max-w-6xl mx-auto rounded-full w-full px-3 md:px-3 py-2 md:py-1.5 relative z-20"
+>
+
+    <nav class="flex items-center justify-between gap-x-5">
+
+        <!-- Logo -->
+        <a href="/v2" class="md:ml-2">
+            <Image
+                src={LogoFullWhite}
+                class="object-contain h-6 w-fit"
+                alt="Logo principal de Foxcode"
+            />
+        </a>
+
+        <!-- Desktop Navigation -->
+        <div class="flex items-center text-sm text-white gap-x-2 md:gap-x-7">
+            
+            <!-- Links -->
+            <div class="hidden md:flex items-center gap-x-7 relative" data-nav-links>
+                {
+                    navLinks.map(({ href, label }) => {
+                        const active = isActive(href);
+                        return (
+                            <a href={href} class="group" data-active={active ? "true" : undefined} aria-current={active ? "page" : undefined}>
+                                <p
+                                    class={
+                                        `py-3  group-hover:text-white transition-colors
+                                        ${active ? "text-white" : "text-white/80"}`
+                                    }
+                                >
+                                    {label}
+                                </p>
+                            </a>
+                        );
+                    })
+                }
+                <span class="nav-ink" data-nav-ink aria-hidden="true"></span>
+            </div>
+
+            <!-- Btn Primary -->
+            <button
+                type="button"
+                class="bg-primary text-white px-3 py-2 font-medium rounded-full hover:bg-primary-dark transition cursor-pointer"
+                aria-haspopup="dialog" aria-expanded="false" aria-controls="contact-us-modal" data-hs-overlay="#contact-us-modal"
+            >
+                Contáctanos
+            </button>
+
+            <!-- Buttton Menu -->
+            <button
+                type="button"
+                class="md:hidden text-white bg-white/10 hover:bg-white/20 p-2 rounded-full transition cursor-pointer"
+                aria-haspopup="dialog" 
+                aria-expanded="false" 
+                aria-controls="hs-links-sidebar" 
+                aria-label="Toggle navigation" 
+                data-hs-overlay="#hs-links-sidebar"
+            >
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="lucide lucide-text-align-justify-icon lucide-text-align-justify size-4"
+                    ><path d="M3 5h18"></path><path d="M3 12h18"></path><path
+                        d="M3 19h18"></path></svg
+                >
+            </button>
+        </div>
+
+    </nav>
+
+</section>
+
+<style>
+    .navbar {
+        transition:
+            background-color 300ms cubic-bezier(0.16, 1, 0.3, 1),
+            box-shadow 300ms cubic-bezier(0.16, 1, 0.3, 1),
+            padding 300ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* Al bajar de 80 px la barra se densifica y se compacta. */
+    .navbar.is-compact {
+        background-color: rgb(24 24 26 / 0.82);
+        box-shadow:
+            0 0 0 1px rgb(255 255 255 / 0.08),
+            0 12px 32px -12px rgb(0 0 0 / 0.6);
+    }
+
+    @media (min-width: 768px) {
+        .navbar.is-compact {
+            padding-top: 0.125rem;
+            padding-bottom: 0.125rem;
+        }
+    }
+
+    .nav-ink {
+        position: absolute;
+        left: 0;
+        bottom: 6px;
+        height: 2px;
+        width: 0;
+        border-radius: 2px;
+        background: var(--color-primary);
+        opacity: 0;
+        transition:
+            transform 350ms cubic-bezier(0.16, 1, 0.3, 1),
+            width 350ms cubic-bezier(0.16, 1, 0.3, 1),
+            opacity 200ms ease;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .navbar,
+        .nav-ink {
+            transition-duration: 1ms;
+        }
+    }
+</style>
+
+<script>
+    function initNavbar() {
+        const navbar = document.querySelector<HTMLElement>("[data-navbar]");
+        const links = document.querySelector<HTMLElement>("[data-nav-links]");
+        const ink = document.querySelector<HTMLElement>("[data-nav-ink]");
+        if (!navbar || !links || !ink || navbar.dataset.ready) return;
+        navbar.dataset.ready = "true";
+
+        const active = links.querySelector<HTMLElement>("a[data-active]");
+
+        // La tinta descansa en el enlace activo y sigue al hover.
+        const moveInk = (target: HTMLElement | null) => {
+            if (!target) {
+                ink.style.opacity = "0";
+                return;
+            }
+            ink.style.opacity = "1";
+            ink.style.width = `${target.offsetWidth}px`;
+            ink.style.transform = `translateX(${target.offsetLeft}px)`;
+        };
+
+        links.querySelectorAll<HTMLElement>("a").forEach((link) => {
+            link.addEventListener("mouseenter", () => moveInk(link));
+            link.addEventListener("focus", () => moveInk(link));
+        });
+        links.addEventListener("mouseleave", () => moveInk(active));
+        moveInk(active);
+        // Las fuentes web cambian el ancho de los enlaces: re-medir al cargar.
+        document.fonts?.ready.then(() => moveInk(active));
+        window.addEventListener("resize", () => moveInk(active));
+
+        let ticking = false;
+        const onScroll = () => {
+            if (ticking) return;
+            ticking = true;
+            requestAnimationFrame(() => {
+                navbar.classList.toggle("is-compact", window.scrollY > 80);
+                ticking = false;
+            });
+        };
+        window.addEventListener("scroll", onScroll, { passive: true });
+        onScroll();
+    }
+
+    initNavbar();
+    document.addEventListener("astro:page-load", initNavbar);
+</script>

@@ -62,18 +62,18 @@ export const seoPages = {
             "consultoria de software",
         ],
     },
-    products: {
-        title: "Productos digitales para hoteles, certificaciones y comercios",
+    projects: {
+        title: "Proyectos: software real para clientes y productos propios",
         description:
-            "Explora FoxRooms, Certifox y Escapify: soluciones digitales de FoxCode para gestión hotelera, certificaciones, inventario y operaciones comerciales.",
-        path: "/productos",
+            "ERPs de obra, sistemas hoteleros, cartas digitales y plataformas de certificados: los desarrollos de FoxCode, con enlace o como intranets que mostramos en una demo guiada.",
+        path: "/proyectos",
         keywords: [
+            "proyectos de software Peru",
+            "casos de exito software",
+            "ERP a medida",
+            "intranet empresarial",
             "FoxRooms",
-            "Certifox",
-            "Escapify",
-            "software hotelero",
-            "software de certificados",
-            "gestion comercial",
+            "En La Mesa",
         ],
     },
     about: {

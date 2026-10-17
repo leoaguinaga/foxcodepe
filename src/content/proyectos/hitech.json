@@ -1,0 +1,64 @@
+{
+  "orden": 4,
+  "nombre": "Hi-Tech H&C",
+  "tipo": "cliente",
+  "que": "Web para empresa de HVAC",
+  "sector": "Climatización (HVAC)",
+  "resumen": "Sitio de una empresa de calefacción, ventilación y aire acondicionado en el Área de la Bahía, con cotizaciones y portafolio conectados a su panel.",
+  "frase": "Una empresa de climatización en California que recibe cotizaciones y publica sus trabajos sin tocar código.",
+  "acceso": {
+    "tipo": "enlace",
+    "url": "https://www.hitechhvacbayarea.com",
+    "etiqueta": "hitechhvacbayarea.com"
+  },
+  "captura": "../../assets/images/proyectos/hitech.webp",
+  "rol": "Diseño, desarrollo web e integración con su panel",
+  "stack": [
+    "Astro",
+    "React",
+    "Tailwind CSS",
+    "Next.js"
+  ],
+  "encargo": [
+    "Hi-Tech H&C da servicios de calefacción, ventilación y aire acondicionado a hogares y comercios del Área de la Bahía de San Francisco. Necesitaban un sitio en inglés que convirtiera visitas en pedidos de cotización.",
+    "Lo construimos con <strong>una página por servicio para aparecer en búsquedas locales</strong>, y conectamos el formulario y el portafolio a su panel: cada cotización llega como lead y cada trabajo publicado aparece en la web."
+  ],
+  "modulos": [
+    {
+      "titulo": "Páginas de servicio",
+      "texto": "Instalación, reparación y limpieza de ductos, cada una con su propia página para búsquedas locales."
+    },
+    {
+      "titulo": "Formulario de cotización",
+      "texto": "Cada pedido llega directo al panel de la empresa como un lead nuevo."
+    },
+    {
+      "titulo": "Portafolio desde el panel",
+      "texto": "Los trabajos que el equipo publica en su panel aparecen en la web sin pasar por un programador."
+    }
+  ],
+  "declaracion": "Una web en inglés para California, hecha desde Chiclayo, que <strong>convierte visitas en cotizaciones</strong>.",
+  "arquitectura": {
+    "a": [
+      "Sitio",
+      "Astro"
+    ],
+    "b": [
+      "Panel",
+      "Next.js · API"
+    ],
+    "c": [
+      "Leads",
+      "cotizaciones"
+    ],
+    "x": [
+      "Portafolio",
+      "publicado desde el panel"
+    ],
+    "y": [
+      "Servicios",
+      "SEO local"
+    ]
+  },
+  "hero": "en California."
+}

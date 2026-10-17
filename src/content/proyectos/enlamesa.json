@@ -1,0 +1,75 @@
+{
+  "orden": 2,
+  "nombre": "En La Mesa",
+  "tipo": "producto",
+  "que": "Carta digital para restaurantes",
+  "sector": "Restaurantes",
+  "resumen": "Cartas digitales con QR que el restaurante actualiza en segundos, con directorio público y suscripción mensual.",
+  "frase": "La carta deja de vivir en un PDF: se edita en segundos y se comparte con un QR.",
+  "acceso": {
+    "tipo": "enlace",
+    "url": "https://enlamesa.pe",
+    "etiqueta": "enlamesa.pe"
+  },
+  "captura": "../../assets/images/proyectos/enlamesa.webp",
+  "rol": "Producto, diseño, frontend, backend y operación",
+  "stack": [
+    "Astro",
+    "Next.js",
+    "NestJS",
+    "Prisma",
+    "PostgreSQL",
+    "Mercado Pago",
+    "VPS + CI/CD"
+  ],
+  "encargo": [
+    "Los restaurantes publicaban su carta como PDF o imagen: cada cambio de precio era un archivo nuevo, un QR nuevo o un enlace roto.",
+    "Construimos <strong>un producto propio que operamos de punta a punta</strong>: sitio público, carta por restaurante, panel de administración y cobro recurrente."
+  ],
+  "modulos": [
+    {
+      "titulo": "Carta pública",
+      "texto": "Una página por restaurante, rápida en el celular, con categorías, platos destacados y estado abierto o cerrado."
+    },
+    {
+      "titulo": "Panel del restaurante",
+      "texto": "Platos, precios, fotos y horarios editables por el propio dueño, sin depender de un diseñador."
+    },
+    {
+      "titulo": "QR siempre vigente",
+      "texto": "El QR apunta a la carta, no a un archivo: cambia el precio y la mesa ya ve el nuevo."
+    },
+    {
+      "titulo": "Directorio de restaurantes",
+      "texto": "Mapa y listado por ciudad para que los comensales encuentren dónde comer."
+    },
+    {
+      "titulo": "Suscripciones",
+      "texto": "Prueba gratuita, cobro mensual con Mercado Pago y periodo de gracia antes de suspender."
+    }
+  ],
+  "declaracion": "Lo diseñamos, lo programamos y <strong>lo operamos nosotros</strong>: despliegue continuo, base de datos propia y cobros reales.",
+  "arquitectura": {
+    "a": [
+      "Sitio y cartas",
+      "Astro"
+    ],
+    "b": [
+      "API",
+      "NestJS"
+    ],
+    "c": [
+      "Base de datos",
+      "PostgreSQL"
+    ],
+    "x": [
+      "Back-office",
+      "Next.js"
+    ],
+    "y": [
+      "Cobros",
+      "Mercado Pago"
+    ]
+  },
+  "hero": "en restaurantes."
+}

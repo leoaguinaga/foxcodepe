@@ -1,0 +1,31 @@
+---
+import { processSteps } from "@/v2/core/OfferData";
+---
+
+<section id="como-trabajamos" class="py-20 lg:py-28 max-xl:px-5 scroll-mt-28">
+    <div class="w-full max-w-6xl mx-auto">
+        <div class="grid gap-6 lg:grid-cols-[1fr_auto] lg:items-end">
+            <h2 class="font-display text-[clamp(2.25rem,5vw,4rem)] font-semibold leading-[0.98] tracking-[-0.035em] text-balance">
+                Cómo trabajamos.
+            </h2>
+            <p class="max-w-md text-neutral-300">
+                El diseño y el diagnóstico no se cobran aparte: son las primeras
+                etapas de cada proyecto. Al cierre de cada una recibes algo concreto.
+            </p>
+        </div>
+
+        <ol class="steps mt-14 grid gap-px overflow-hidden rounded-[20px] border border-white/10 bg-white/10 md:grid-cols-2 lg:grid-cols-4">
+            {processSteps.map((step, i) => (
+                <li class="flex flex-col bg-background p-7">
+                    <span class="font-mono text-sm text-primary tabular-nums">{String(i + 1).padStart(2, "0")}</span>
+                    <h3 class="mt-6 font-display text-[1.75rem] font-semibold tracking-[-0.025em]">{step.title}</h3>
+                    <p class="mt-2 text-[0.95rem] leading-relaxed text-neutral-300">{step.text}</p>
+                    <p class="mt-auto pt-8 text-sm">
+                        <span class="block text-neutral-500">Recibes</span>
+                        <span class="text-neutral-100">{step.deliverable}</span>
+                    </p>
+                </li>
+            ))}
+        </ol>
+    </div>
+</section>

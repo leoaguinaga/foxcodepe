@@ -1,0 +1,101 @@
+---
+import { stats } from "@/v2/core/OfferData";
+---
+
+<section class="py-20 lg:py-28 max-xl:px-5">
+    <div class="w-full max-w-6xl mx-auto">
+        <p class="stats font-display" data-stats>
+            Un equipo peruano con
+            <strong><span class="num" data-to={stats.projects}>{stats.projects}</span>+ proyectos lanzados</strong>,
+            <strong><span class="num" data-to={stats.products}>{stats.products}</span> productos propios</strong> en operación y
+            <span class="mark">más de {stats.years} años</span> convirtiendo ideas en software.
+        </p>
+        <a href="/v2/nosotros" class="about mt-10 inline-flex items-center gap-2 text-neutral-300 hover:text-white transition-colors">
+            Conoce al equipo
+            <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+        </a>
+    </div>
+</section>
+
+<style>
+    .stats {
+        max-width: 22ch;
+        font-size: clamp(2rem, 5.2vw, 4.5rem);
+        font-weight: 600;
+        line-height: 1.08;
+        letter-spacing: -0.035em;
+        text-wrap: balance;
+        color: rgb(255 255 241 / 0.36);
+    }
+
+    .stats strong {
+        font-weight: 650;
+        color: var(--color-text);
+    }
+
+    .num {
+        color: var(--color-primary);
+        font-variant-numeric: tabular-nums;
+    }
+
+    /* Subrayado que se dibuja una vez al entrar en pantalla. */
+    .mark {
+        color: var(--color-text);
+        background: linear-gradient(var(--color-text), var(--color-text)) left 92% / 0 3px no-repeat;
+        transition: background-size 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.5s;
+    }
+
+    .stats.is-in .mark {
+        background-size: 100% 3px;
+    }
+
+    .about svg {
+        transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .about:hover svg {
+        transform: translateX(3px);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .mark {
+            transition: none;
+        }
+    }
+</style>
+
+<script>
+    function initStats() {
+        const el = document.querySelector<HTMLElement>("[data-stats]");
+        if (!el || el.dataset.ready) return;
+        el.dataset.ready = "true";
+        const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+        // Cuenta una sola vez al entrar; el valor final ya está en el HTML.
+        const io = new IntersectionObserver(
+            (entries) => {
+                if (!entries[0].isIntersecting) return;
+                io.disconnect();
+                el.classList.add("is-in");
+                if (reduce) return;
+
+                el.querySelectorAll<HTMLElement>("[data-to]").forEach((num) => {
+                    const to = Number(num.dataset.to);
+                    const start = performance.now();
+                    const tick = (now: number) => {
+                        const k = Math.min(1, (now - start) / 600);
+                        num.textContent = String(Math.round(to * (1 - Math.pow(1 - k, 3))));
+                        if (k < 1) requestAnimationFrame(tick);
+                    };
+                    num.textContent = "0";
+                    requestAnimationFrame(tick);
+                });
+            },
+            { threshold: 0.5 },
+        );
+        io.observe(el);
+    }
+
+    initStats();
+    document.addEventListener("astro:page-load", initStats);
+</script>

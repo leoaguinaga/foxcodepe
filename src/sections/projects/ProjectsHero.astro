@@ -1,0 +1,228 @@
+---
+// Hero de /proyectos: el titular termina con un lugar real («… trabajando en obra.») y la
+// ventana de la derecha muestra el proyecto que corresponde. Rota solo entre los proyectos
+// que tienen `hero` en su contenido.
+import AccessChip from "./AccessChip.astro";
+import ProjectVisual from "./ProjectVisual.astro";
+import Icon from "./Icon.astro";
+import type { Project } from "@/core/ProjectsData";
+
+interface Props { projects: Project[]; total: number }
+const { projects, total } = Astro.props;
+const slides = projects.filter((p) => p.data.hero);
+const urlOf = (p: Project) => {
+    const a = p.data.acceso;
+    if (a.tipo === "enlace") return a.etiqueta;
+    if (a.tipo === "demo") return `${p.data.nombre.toLowerCase().replace(/\s+/g, "")} · demo`;
+    return "intranet · acceso restringido";
+};
+---
+
+<section class="ph max-xl:px-5" data-pj-hero>
+    <div class="ph-grid w-full max-w-6xl mx-auto">
+        <div class="ph-copy">
+            <h1 class="ph-h1">
+                <span class="sr-only">Software que ya está trabajando: {slides.map((p) => `${p.data.hero!.replace(/\.$/, "")} (${p.data.nombre})`).join(", ")}.</span>
+                <span aria-hidden="true">
+                    <span class="ln"><span style="--d:0ms">Software que</span></span>
+                    <span class="ln"><span style="--d:90ms">ya está trabajando</span></span>
+                    <span class="ln ph-rot"><span style="--d:180ms">
+                        {slides.map((p, i) => <span class:list={["ph-word", { on: i === 0 }]}>{p.data.hero}</span>)}
+                    </span></span>
+                </span>
+            </h1>
+            <p class="ph-lead" data-reveal="up" style="--i:3">
+                {total} desarrollos reales, hechos para clientes y como productos propios. Algunos los puedes abrir ahora;
+                otros viven detrás del login de nuestros clientes y te los mostramos en vivo.
+            </p>
+
+            <div class="ph-meta" data-reveal="up" style="--i:4" aria-live="polite">
+                {slides.map((p, i) => (
+                    <div class="ph-meta-item" hidden={i !== 0} data-meta={i}>
+                        <AccessChip acceso={p.data.acceso} />
+                        <a href={`/proyectos/${p.id}`}><b>{p.data.nombre}</b><span> · {p.data.que}</span><Icon name="right" /></a>
+                    </div>
+                ))}
+            </div>
+
+            <div class="ph-bar" data-reveal="up" style="--i:5">
+                {slides.map((p, i) => (
+                    <button type="button" aria-label={`Mostrar ${p.data.nombre}`} aria-current={i === 0 ? "true" : undefined} data-go={i}><i></i></button>
+                ))}
+                <button type="button" class="ph-pause" data-pause aria-label="Pausar">
+                    <svg class="pi" viewBox="0 0 24 24" aria-hidden="true"><path class="ph-ico-pause" d="M9 6v12M15 6v12" /><path class="ph-ico-play" d="m9 6 9 6-9 6z" /></svg>
+                </button>
+            </div>
+        </div>
+
+        <div class="ph-stage" data-reveal="scale" style="--i:2">
+            <span class="ph-ghost" aria-hidden="true"></span>
+            <div class="bframe">
+                <div class="bframe-bar">
+                    <span class="bframe-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+                    <span class="bframe-url"><Icon name="lock" />
+                        <span class="ph-urls">{slides.map((p, i) => <span hidden={i !== 0} data-url={i}>{urlOf(p)}</span>)}</span>
+                    </span>
+                </div>
+                <div class="bframe-body ph-body">
+                    {slides.map((p, i) => (
+                        <a class:list={["ph-layer", { on: i === 0 }]} href={`/proyectos/${p.id}`} data-layer={i} tabindex="-1" aria-hidden="true">
+                            <ProjectVisual project={p} eager={i === 0} sizes="(min-width: 1152px) 560px, 100vw" />
+                        </a>
+                    ))}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    .ph { padding-block: clamp(40px, 6vw, 88px) clamp(48px, 6vw, 88px); }
+    .ph-grid { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, .95fr); gap: clamp(32px, 5vw, 64px); align-items: center; }
+
+    .ph-h1 { font-family: var(--font-display); font-weight: 400; font-size: clamp(48px, 6.2vw, 92px); line-height: .92; letter-spacing: .01em; }
+    .ph-h1 .ln { display: block; overflow: hidden; padding-bottom: .04em; }
+    .ph-h1 .ln > span { display: inline-block; }
+    :global(.reveal-ready) .ph-h1 .ln > span { transform: translateY(105%); animation: ph-line 1s cubic-bezier(0.16, 1, 0.3, 1) forwards; animation-delay: calc(var(--d) + 120ms); }
+    @keyframes ph-line { to { transform: none; } }
+
+    /* El remate rota: cada frase entra desde abajo y sale hacia arriba. */
+    .ph-rot { color: var(--color-primary); height: .98em; }
+    .ph-rot > span { position: relative; display: block !important; height: 100%; }
+    .ph-word { position: absolute; left: 0; top: 0; white-space: nowrap; transform: translateY(105%); transition: transform .7s cubic-bezier(0.16, 1, 0.3, 1); }
+    .ph-word.on { transform: none; }
+    .ph-word.out { transform: translateY(-105%); }
+
+    .ph-lead { font-size: clamp(16px, 1.4vw, 18px); line-height: 1.65; color: rgb(255 255 241 / .68); max-width: 44ch; margin-top: clamp(20px, 3vw, 28px); }
+
+    .ph-meta { margin-top: 28px; min-height: 32px; }
+    .ph-meta-item { display: flex; align-items: center; gap: 12px; font-size: 14.5px; animation: ph-fade .5s cubic-bezier(0.16, 1, 0.3, 1); }
+    .ph-meta-item[hidden] { display: none; }
+    .ph-meta-item a { display: inline-flex; align-items: center; gap: 4px; color: rgb(255 255 241 / .55); transition: color .2s; }
+    .ph-meta-item a b { color: var(--color-text); font-weight: 600; }
+    .ph-meta-item a :global(.pi) { margin-left: 4px; transition: transform .3s cubic-bezier(0.16, 1, 0.3, 1); }
+    .ph-meta-item a:hover { color: var(--color-text); }
+    .ph-meta-item a:hover :global(.pi) { transform: translateX(3px); }
+    @keyframes ph-fade { from { opacity: 0; transform: translateY(6px); } }
+
+    .ph-bar { display: flex; align-items: center; gap: 6px; margin-top: 22px; }
+    .ph-bar [data-go] { position: relative; width: 36px; height: 20px; padding: 0; background: none; border: 0; }
+    .ph-bar [data-go]::before { content: ""; position: absolute; left: 0; right: 0; top: 8px; height: 4px; border-radius: 4px; background: rgb(255 255 241 / .18); }
+    .ph-bar [data-go] i { position: absolute; left: 0; right: 0; top: 8px; height: 4px; border-radius: 4px; background: var(--color-primary); transform: scaleX(0); transform-origin: left; }
+    .ph-bar [data-go].done i { transform: scaleX(1); }
+    .ph-bar [data-go][aria-current="true"] i { animation: ph-fill var(--dur, 4s) linear forwards; }
+    .ph-hero-paused .ph-bar [data-go][aria-current="true"] i, .ph-bar.is-static [data-go][aria-current="true"] i { animation: none; transform: scaleX(1); }
+    @keyframes ph-fill { to { transform: scaleX(1); } }
+    .ph-pause { margin-left: 8px; width: 28px; height: 28px; display: grid; place-items: center; border-radius: 50%; color: rgb(255 255 241 / .6); border: 1px solid rgb(255 255 241 / .18); transition: color .2s, border-color .2s; }
+    .ph-pause:hover { color: var(--color-text); border-color: var(--color-text); }
+    .ph-pause .pi { font-size: 13px; }
+    .ph-ico-play { display: none; }
+    .ph-pause[aria-pressed="true"] .ph-ico-pause { display: none; }
+    .ph-pause[aria-pressed="true"] .ph-ico-play { display: inline; }
+    .ph-bar button:focus-visible, .ph-meta-item a:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 3px; border-radius: 6px; }
+
+    .ph-stage { position: relative; }
+    .ph-ghost { position: absolute; inset: 0; transform: translate(22px, 22px) rotate(2.5deg); border-radius: 18px; background: #2c2c31; border: 1px solid rgb(255 255 241 / .14); }
+    .ph-stage .bframe { position: relative; }
+    .ph-body { aspect-ratio: 16 / 10.5; background: #f4f3ee; }
+    .ph-urls span[hidden] { display: none; }
+    .ph-layer { position: absolute; inset: 0; display: block; clip-path: inset(0 0 100% 0); transition: clip-path .8s cubic-bezier(0.16, 1, 0.3, 1); }
+    .ph-layer.on { clip-path: inset(0 0 0 0); z-index: 2; }
+    .ph-layer.prev { clip-path: inset(0 0 0 0); z-index: 1; }
+    .ph-layer :global(img) { width: 100%; height: 100%; object-fit: cover; object-position: top left; }
+
+    @media (max-width: 860px) {
+        .ph-grid { grid-template-columns: 1fr; }
+        .ph-ghost { transform: translate(12px, 12px) rotate(2deg); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+        .ph-word, .ph-layer, .ph-meta-item { transition: none; animation: none; }
+    }
+</style>
+
+<script>
+    import { redact } from "@/core/projectsMotion";
+
+    const DURATION = 4000;
+
+    function initHero() {
+        const hero = document.querySelector<HTMLElement>("[data-pj-hero]");
+        if (!hero || hero.dataset.ready) return;
+        hero.dataset.ready = "true";
+
+        const words = [...hero.querySelectorAll<HTMLElement>(".ph-word")];
+        const layers = [...hero.querySelectorAll<HTMLElement>("[data-layer]")];
+        const metas = [...hero.querySelectorAll<HTMLElement>("[data-meta]")];
+        const urls = [...hero.querySelectorAll<HTMLElement>("[data-url]")];
+        const dots = [...hero.querySelectorAll<HTMLButtonElement>("[data-go]")];
+        const pauseBtn = hero.querySelector<HTMLButtonElement>("[data-pause]")!;
+        const bar = hero.querySelector<HTMLElement>(".ph-bar")!;
+        if (words.length < 2) { bar.hidden = true; return; }
+
+        // Con movimiento reducido no hay rotación automática; los botones siguen funcionando.
+        const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+        let current = 0;
+        let timer = 0;
+        let userPaused = reduced;
+        let hovering = false;
+        let visible = true;
+        hero.style.setProperty("--dur", `${DURATION}ms`);
+        pauseBtn.setAttribute("aria-pressed", String(userPaused));
+        pauseBtn.setAttribute("aria-label", userPaused ? "Reproducir" : "Pausar");
+        bar.classList.toggle("is-static", reduced);
+
+        const show = (i: number) => {
+            const prev = current;
+            current = i;
+            words.forEach((w, k) => {
+                w.classList.toggle("on", k === i);
+                w.classList.toggle("out", k === prev && k !== i);
+                if (k !== i && k !== prev) w.classList.remove("out");
+            });
+            layers.forEach((l, k) => {
+                l.classList.toggle("on", k === i);
+                l.classList.toggle("prev", k === prev && k !== i);
+            });
+            metas.forEach((m, k) => (m.hidden = k !== i));
+            urls.forEach((u, k) => (u.hidden = k !== i));
+            dots.forEach((d, k) => {
+                d.classList.toggle("done", k < i);
+                if (k === i) d.setAttribute("aria-current", "true");
+                else d.removeAttribute("aria-current");
+                // Reinicia la animación de la barra activa.
+                const fill = d.querySelector("i")!;
+                fill.style.animation = "none";
+                void fill.offsetWidth;
+                fill.style.animation = "";
+            });
+            redact(layers[i]);
+            schedule();
+        };
+
+        const running = () => !userPaused && !hovering && visible && !document.hidden;
+        const schedule = () => {
+            window.clearTimeout(timer);
+            hero.classList.toggle("ph-hero-paused", !running());
+            if (running()) timer = window.setTimeout(() => show((current + 1) % words.length), DURATION);
+        };
+
+        dots.forEach((d) => d.addEventListener("click", () => show(Number(d.dataset.go))));
+        pauseBtn.addEventListener("click", () => {
+            userPaused = !userPaused;
+            pauseBtn.setAttribute("aria-pressed", String(userPaused));
+            pauseBtn.setAttribute("aria-label", userPaused ? "Reproducir" : "Pausar");
+            schedule();
+        });
+        const stage = hero.querySelector<HTMLElement>(".ph-stage")!;
+        stage.addEventListener("pointerenter", () => { hovering = true; schedule(); });
+        stage.addEventListener("pointerleave", () => { hovering = false; show(current); });
+        document.addEventListener("visibilitychange", schedule);
+        new IntersectionObserver(([e]) => { visible = e.isIntersecting; schedule(); }).observe(hero);
+
+        // La primera pantalla se tapa al entrar; luego arranca la rotación.
+        window.setTimeout(() => redact(layers[0]), 700);
+        schedule();
+    }
+
+    initHero();
+</script>

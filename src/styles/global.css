@@ -1,5 +1,4 @@
 @import "tailwindcss";
-@import "@fontsource-variable/inter";
 
 @import "preline/variants.css";
 @source "../../node_modules/preline/dist/*.js";
@@ -7,7 +6,17 @@
 @custom-variant dark (&:is(.dark *));
 
 body {
-  font-family: "Inter Variable", sans-serif;
+  font-family: var(--font-body);
+  /* Bebas Neue solo tiene un peso: sin esto el navegador inventa negritas. */
+  font-synthesis-weight: none;
+}
+
+/* Tipografía oficial: Bebas Neue (títulos) es condensada y en mayúsculas,
+   así que no admite el tracking negativo ni los pesos de los títulos
+   anteriores. Va fuera de @layer para ganarle a font-semibold/tracking-*. */
+.font-display {
+  font-weight: 400;
+  letter-spacing: 0.01em;
 }
 
 @layer base {
@@ -29,7 +38,9 @@ body {
   --color-background: #18181a;
   --color-text: #fffff1;
 
-  --font-display: "Bricolage Grotesque", "Inter Variable", sans-serif;
+  --font-display: "Bebas Neue", "Arial Narrow", sans-serif;
+  --font-body: "Raleway", system-ui, sans-serif;
+  --font-sans: var(--font-body);
 }
 
 /* Transiciones entre páginas (MPA nativo). Los elementos con el mismo

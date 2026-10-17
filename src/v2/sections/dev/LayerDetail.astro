@@ -1,0 +1,41 @@
+---
+import { layers } from "@/v2/core/OfferData";
+---
+
+<section class="py-12 lg:py-16 max-xl:px-5" aria-label="Capas del servicio">
+    <div class="w-full max-w-6xl mx-auto border-b border-white/10">
+        {layers.map((layer) => (
+            <article id={layer.id} class="layer-band grid gap-10 border-t border-white/10 py-14 lg:grid-cols-[0.95fr_1.05fr] lg:gap-16 scroll-mt-28">
+                <div>
+                    <p class="font-mono text-[0.8rem] text-primary">{layer.tag}</p>
+                    <h2 class="mt-3 font-display text-[clamp(2.25rem,4.6vw,3.75rem)] font-semibold leading-[0.98] tracking-[-0.035em]">
+                        {layer.name}
+                    </h2>
+                    <p class="mt-5 max-w-[30rem] text-lg leading-relaxed text-neutral-300">{layer.summary}</p>
+                    {layer.example && (
+                        <p class="mt-8 max-w-[30rem] border-t border-white/10 pt-5 text-[0.95rem] text-neutral-400">
+                            <span class="text-white font-medium">En {layer.example.product}:</span> {layer.example.text}
+                        </p>
+                    )}
+                </div>
+                <div>
+                    <h3 class="text-sm text-neutral-400">Qué construimos</h3>
+                    <ul class="mt-4">
+                        {layer.builds.map((item) => (
+                            <li class="flex gap-3 border-b border-white/[0.07] py-3.5 text-[1.05rem] text-neutral-100 last:border-b-0">
+                                <svg class="mt-1 size-4 flex-none text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg>
+                                {item}
+                            </li>
+                        ))}
+                    </ul>
+                    <h3 class="mt-8 text-sm text-neutral-400">Con qué</h3>
+                    <ul class="mt-3 flex flex-wrap gap-2">
+                        {layer.stack.map((tech) => (
+                            <li class="rounded-full border border-white/12 px-3 py-1.5 font-mono text-[0.8rem] text-neutral-300">{tech}</li>
+                        ))}
+                    </ul>
+                </div>
+            </article>
+        ))}
+    </div>
+</section>

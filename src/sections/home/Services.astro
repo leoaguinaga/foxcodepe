@@ -1,10 +1,11 @@
 ---
+// Una sola oferta: las tres capas que construye el mismo equipo, y el
+// diagnóstico como puerta de entrada.
 const services = [
-    { href: "/servicios#desarrollo-software", title: "Desarrollo de software", text: "Web apps y sistemas a la medida de tu operación." },
-    { href: "/servicios#diseno-ui-ux", title: "Diseño UI/UX", text: "Interfaces intuitivas, orientadas a conversión y retención." },
-    { href: "/servicios#branding", title: "Branding e identidad", text: "Identidades visuales sólidas que comunican valor." },
-    { href: "/servicios#desarrollo-movil", title: "Desarrollo móvil", text: "Apps rápidas y fluidas, listas para miles de usuarios." },
-    { href: "/servicios#consultoria-tech", title: "Consultoría tech", text: "Decisiones técnicas alineadas a tu negocio." },
+    { href: "/servicios#web", title: "Desarrollo web", text: "Sistemas, paneles y plataformas SaaS a la medida de tu operación." },
+    { href: "/servicios#backend", title: "Backend y APIs", text: "Datos, integraciones con SUNAT y pagos, e infraestructura que escala." },
+    { href: "/servicios#mobile", title: "Desarrollo móvil", text: "Apps para iOS y Android conectadas a tu mismo backend." },
+    { title: "Diagnóstico técnico", text: "Alcance, arquitectura y cronograma antes de escribir código.", price: "S/850" },
 ];
 ---
 
@@ -16,8 +17,8 @@ const services = [
                 Lo que hacemos.
             </h2>
             <p class="max-w-md text-neutral-300">
-                Te acompañamos desde la idea hasta el lanzamiento, con productos
-                que se alinean con tu negocio, no al revés.
+                Un solo equipo construye tu software completo: la web, el backend
+                y la app. Sin coordinar agencias ni freelancers por separado.
             </p>
         </div>
 
@@ -25,18 +26,37 @@ const services = [
             {
                 services.map((s) => (
                     <li>
-                        <a href={s.href} class="service">
-                            <span class="title font-display">{s.title}</span>
-                            <span class="text">{s.text}</span>
-                            <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
-                        </a>
+                        {s.href ? (
+                            <a href={s.href} class="service">
+                                <span class="title font-display">{s.title}</span>
+                                <span class="text">{s.text}</span>
+                                <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+                            </a>
+                        ) : (
+                            <button
+                                type="button"
+                                class="service w-full text-left"
+                                aria-haspopup="dialog"
+                                aria-expanded="false"
+                                aria-controls="contact-us-modal"
+                                data-hs-overlay="#contact-us-modal"
+                            >
+                                <span class="title font-display">{s.title}</span>
+                                <span class="text">
+                                    {s.text}
+                                    {s.price && <b class="price">{s.price}</b>}
+                                </span>
+                                <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+                            </button>
+                        )}
                     </li>
                 ))
             }
         </ul>
 
         <p class="mt-8 text-neutral-300">
-            ¿Necesitas algo distinto?
+            El diseño de interfaz, las pruebas y el despliegue van incluidos en cada proyecto.
+            ¿Tienes algo distinto en mente?
             <button
                 type="button"
                 class="text-primary underline underline-offset-4 decoration-primary/40 hover:decoration-primary transition"
@@ -47,7 +67,7 @@ const services = [
             >
                 Cuéntanos tu proyecto
             </button>
-            y armamos un servicio a tu medida.
+            y lo vemos juntos.
         </p>
     </div>
 </section>
@@ -94,6 +114,15 @@ const services = [
         transition: color 0.2s;
     }
 
+    .price {
+        display: block;
+        margin-top: 0.35rem;
+        font-weight: 600;
+        font-size: 1rem;
+        color: var(--color-text);
+        font-variant-numeric: tabular-nums;
+    }
+
     .arrow {
         width: 1.6rem;
         height: 1.6rem;
@@ -134,6 +163,21 @@ const services = [
 
         .text {
             display: none;
+        }
+
+        /* En móvil solo queda visible el precio del diagnóstico. */
+        .service:has(.price) {
+            grid-template-columns: 1fr auto auto;
+        }
+
+        .text:has(.price) {
+            display: block;
+            max-width: none;
+            font-size: 0;
+        }
+
+        .text .price {
+            margin-top: 0;
         }
     }
 

@@ -1,0 +1,36 @@
+---
+import type { GetStaticPaths } from "astro";
+import Layout from "@/layouts/Layout.astro";
+import ProjectCase from "@/sections/projects/ProjectCase.astro";
+import { getProjects, kindLabel, type Project } from "@/core/ProjectsData";
+
+export const prerender = true;
+
+export const getStaticPaths = (async () => {
+    const projects = await getProjects();
+    return projects.map((project, i) => ({
+        params: { slug: project.id },
+        props: { project, next: projects[(i + 1) % projects.length] },
+    }));
+}) satisfies GetStaticPaths;
+
+interface Props { project: Project; next: Project }
+const { project, next } = Astro.props;
+const d = project.data;
+---
+
+<Layout
+    title={`${d.nombre}: ${d.que}`}
+    description={d.resumen}
+    path={`/proyectos/${project.id}`}
+    keywords={[d.nombre, d.sector, d.que, kindLabel(project), ...d.stack]}
+    type="article"
+    image={d.captura?.src ?? "/og.png"}
+>
+    <script is:inline>
+        if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
+            document.documentElement.classList.add("reveal-ready");
+        }
+    </script>
+    <ProjectCase project={project} next={next} />
+</Layout>

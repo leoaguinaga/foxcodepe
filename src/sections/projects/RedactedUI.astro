@@ -1,0 +1,87 @@
+---
+// Interfaz de una intranet dibujada desde su estructura (`ui` en el contenido).
+// Los valores son relleno genérico y se tapan con barras al entrar en pantalla.
+import Icon from "./Icon.astro";
+import { filler, barWidth, type ProjectUI } from "@/core/ProjectsData";
+
+interface Props { ui: ProjectUI; screen?: number; rows?: number; redacted?: boolean; hidden?: boolean }
+const { ui, screen = 0, rows = 5, redacted = false, hidden = false } = Astro.props;
+const s = ui.pantallas[screen] ?? ui.pantallas[0];
+const kpiFill = ["24", "12", "8", "S/ 9k"];
+const kpiBar = [46, 38, 30, 62];
+---
+<div class:list={["rui", { redacted }]} style={`--acc:${ui.acento}`} data-screen={screen} hidden={hidden} aria-hidden="true">
+    <div class="rui-side">
+        <div class="rui-brand"><i></i>{ui.marca}</div>
+        {ui.nav.map((n, i) => <div class:list={["rui-nav", { on: i === s.nav }]}>{n}</div>)}
+    </div>
+    <div class="rui-main">
+        <div class="rui-top">
+            <span class="rui-title">{s.titulo}</span>
+            <span class="rui-lock"><Icon name="lock" />Datos del cliente ocultos</span>
+        </div>
+        <div class="rui-kpis">
+            {s.kpis.map((k, i) => (
+                <div class="rui-kpi">
+                    <small>{k}</small>
+                    <span class="rui-cell"><span class="t rui-kpi-n">{kpiFill[i]}</span><span class="b" style={`width:${kpiBar[i]}%`}></span></span>
+                </div>
+            ))}
+        </div>
+        <div class="rui-table">
+            <div class="rui-tr rui-th">{s.columnas.map((c) => <span>{c}</span>)}</div>
+            {Array.from({ length: rows }, (_, r) => (
+                <div class="rui-tr">
+                    {s.columnas.map((c, ci) =>
+                        ci === 3 && r % 2 === 0 ? (
+                            <span><span class="rui-pill">{s.estado}</span></span>
+                        ) : (
+                            <span class="rui-cell">
+                                <span class="t">{filler(c, r)}</span>
+                                <span class="b" style={`width:${barWidth(r, ci)}%;transition-delay:${ci * 90 + r * 30}ms`}></span>
+                            </span>
+                        ),
+                    )}
+                </div>
+            ))}
+        </div>
+    </div>
+    <span class="rui-scan"></span>
+</div>
+
+<style is:global>
+    .rui { position: relative; width: 100%; height: 100%; background: #f4f3ee; color: #1b1b1d; display: grid; grid-template-columns: 22% 1fr; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; overflow: hidden; container-type: inline-size; text-align: left; }
+    .rui[hidden] { display: none; }
+    .rui-side { background: #fff; border-right: 1px solid #e5e3dc; padding: 5cqi 2.6cqi; display: flex; flex-direction: column; gap: 1.2cqi; }
+    .rui-brand { display: flex; align-items: center; gap: 1.4cqi; font-weight: 650; font-size: 1.9cqi; margin-bottom: 2.4cqi; }
+    .rui-brand i { width: 3.2cqi; height: 3.2cqi; border-radius: .9cqi; background: var(--acc); display: block; flex: none; }
+    .rui-nav { font-size: 1.55cqi; color: #7a7972; padding: 1.1cqi 1.4cqi; border-radius: 1cqi; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .rui-nav.on { background: #1b1b1d; color: #fff; }
+    .rui-main { padding: 4.4cqi 4cqi; display: flex; flex-direction: column; gap: 2.6cqi; min-width: 0; }
+    .rui-top { display: flex; justify-content: space-between; align-items: center; gap: 2cqi; }
+    .rui-title { font-weight: 650; font-size: 2.9cqi; letter-spacing: -.02em; }
+    .rui-lock { display: inline-flex; align-items: center; gap: .8cqi; font-size: 1.35cqi; color: #7a7972; background: #fff; border: 1px solid #e5e3dc; border-radius: 99px; padding: .8cqi 1.6cqi; }
+    .rui-lock .pi { width: 1.6cqi; height: 1.6cqi; }
+    .rui-kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.6cqi; }
+    .rui-kpi { background: #fff; border: 1px solid #e5e3dc; border-radius: 1.4cqi; padding: 2cqi; display: flex; flex-direction: column; gap: 1.2cqi; min-width: 0; }
+    .rui-kpi small { font-size: 1.3cqi; color: #7a7972; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .rui-kpi-n { font-size: 2.6cqi; font-weight: 650; }
+    .rui-table { background: #fff; border: 1px solid #e5e3dc; border-radius: 1.4cqi; overflow: hidden; flex: 1; }
+    .rui-tr { display: grid; grid-template-columns: 1.1fr 2fr 1.2fr .9fr; gap: 2cqi; align-items: center; padding: 1.7cqi 2.2cqi; border-top: 1px solid #e5e3dc; font-size: 1.4cqi; }
+    .rui-th { border-top: 0; color: #7a7972; font-size: 1.25cqi; background: #faf9f6; }
+    .rui-cell { position: relative; height: 1.6cqi; display: flex; align-items: center; white-space: nowrap; overflow: hidden; }
+    .rui-kpi .rui-cell { height: 3.4cqi; }
+    .rui-cell .t { transition: opacity .2s; }
+    .rui-cell .b { position: absolute; left: 0; top: 50%; height: 1.5cqi; transform: translateY(-50%) scaleX(0); transform-origin: left; border-radius: .4cqi; background: #1b1b1d; transition: transform .45s cubic-bezier(0.16, 1, 0.3, 1); }
+    .rui-kpi .rui-cell .b { height: 3cqi; border-radius: .6cqi; }
+    .rui-pill { display: inline-block; font-size: 1.2cqi; padding: .5cqi 1.2cqi; border-radius: 99px; background: color-mix(in srgb, var(--acc) 16%, #fff); color: color-mix(in srgb, var(--acc) 80%, #000); white-space: nowrap; }
+    .rui.redacted .rui-cell .t { opacity: 0; }
+    .rui.redacted .rui-cell .b { transform: translateY(-50%) scaleX(1); }
+    .rui-scan { position: absolute; top: 0; bottom: 0; left: 0; width: 2px; background: var(--acc); box-shadow: 0 0 24px 4px color-mix(in srgb, var(--acc) 45%, transparent); opacity: 0; pointer-events: none; }
+    .rui.scanning .rui-scan { animation: rui-scan 1.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    @keyframes rui-scan { 0% { left: 22%; opacity: 1; } 85% { opacity: 1; } 100% { left: 100%; opacity: 0; } }
+    @media (prefers-reduced-motion: reduce) {
+        .rui-cell .b, .rui-cell .t { transition: none; }
+        .rui.scanning .rui-scan { animation: none; }
+    }
+</style>

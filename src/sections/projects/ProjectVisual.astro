@@ -1,0 +1,21 @@
+---
+import { Image } from "astro:assets";
+import RedactedUI from "./RedactedUI.astro";
+import type { Project } from "@/core/ProjectsData";
+
+interface Props { project: Project; screen?: number; rows?: number; redacted?: boolean; eager?: boolean; sizes?: string }
+const { project, screen = 0, rows = 5, redacted = false, eager = false, sizes = "(min-width: 1152px) 1152px, 100vw" } = Astro.props;
+const { captura, ui, nombre } = project.data;
+---
+{captura ? (
+    <Image src={captura} alt={`Captura de ${nombre}`} widths={[480, 960, 1440]} sizes={sizes} loading={eager ? "eager" : "lazy"} />
+) : ui ? (
+    <RedactedUI ui={ui} screen={screen} rows={rows} redacted={redacted} />
+) : (
+    <div class="pv-empty"><span>{nombre}</span></div>
+)}
+
+<style is:global>
+    .pv-empty { height: 100%; display: grid; place-items: center; background: radial-gradient(120% 90% at 0% 0%, rgb(238 77 49 / .16), transparent 60%), #232327; }
+    .pv-empty span { font-family: var(--font-display); font-weight: 400; font-size: clamp(28px, 4vw, 52px); letter-spacing: .01em; color: var(--color-text); }
+</style>

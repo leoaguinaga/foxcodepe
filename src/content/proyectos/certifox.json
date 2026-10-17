@@ -1,0 +1,62 @@
+{
+  "orden": 7,
+  "nombre": "Certifox",
+  "tipo": "producto",
+  "que": "Emisión de certificados",
+  "sector": "Certificación",
+  "resumen": "Emisión, validación y trazabilidad de certificados con marca propia, alertas de vencimiento y verificación por QR.",
+  "frase": "Certificados con tu marca, alertas de vencimiento y verificación por QR.",
+  "acceso": {
+    "tipo": "enlace",
+    "url": "https://certifox.foxcodepe.com",
+    "etiqueta": "certifox.foxcodepe.com"
+  },
+  "captura": "../../assets/images/proyectos/certifox.webp",
+  "rol": "Producto, diseño, frontend y backend",
+  "stack": [
+    "Next.js",
+    "NestJS",
+    "PostgreSQL",
+    "QR"
+  ],
+  "encargo": [
+    "Lo aprendido con clientes que certifican, convertido en un producto que cualquier institución puede usar sin un desarrollo a medida."
+  ],
+  "modulos": [
+    {
+      "titulo": "Certificados",
+      "texto": "Individuales o por lote, con tu marca y su vigencia."
+    },
+    {
+      "titulo": "Alertas",
+      "texto": "Avisos de documentos por vencer y vencidos."
+    },
+    {
+      "titulo": "Verificación",
+      "texto": "Un QR en cada PDF que confirma que el documento es auténtico."
+    }
+  ],
+  "declaracion": "De un desarrollo a medida a <strong>un producto para cualquier institución</strong>.",
+  "arquitectura": {
+    "a": [
+      "Panel",
+      "Next.js"
+    ],
+    "b": [
+      "API",
+      "NestJS"
+    ],
+    "c": [
+      "Base de datos",
+      "PostgreSQL"
+    ],
+    "x": [
+      "Verificación",
+      "QR"
+    ],
+    "y": [
+      "Documentos",
+      "PDF"
+    ]
+  }
+}

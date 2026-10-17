@@ -1,0 +1,60 @@
+{
+  "orden": 10,
+  "nombre": "AYM Corporación",
+  "tipo": "cliente",
+  "que": "Web corporativa",
+  "sector": "Maquinaria y agregados",
+  "resumen": "Sitio para una empresa de transporte de agregados, construcción y alquiler de maquinaria pesada en Chiclayo.",
+  "frase": "Maquinaria, agregados y obra, presentados para pedir cotización en un clic.",
+  "acceso": {
+    "tipo": "enlace",
+    "url": "https://aymcorporacion.com",
+    "etiqueta": "aymcorporacion.com"
+  },
+  "captura": "../../assets/images/proyectos/aym.webp",
+  "rol": "Diseño y desarrollo web",
+  "stack": [
+    "Astro",
+    "Tailwind CSS"
+  ],
+  "encargo": [
+    "Una empresa con maquinaria propia y clientes inmobiliarios necesitaba una presencia que respondiera a una sola pregunta: <strong>¿pueden hacer mi obra?</strong>"
+  ],
+  "modulos": [
+    {
+      "titulo": "Servicios",
+      "texto": "Transporte de agregados, construcción y alquiler de maquinaria."
+    },
+    {
+      "titulo": "Clientes",
+      "texto": "Las inmobiliarias a las que provee, visibles desde el inicio."
+    },
+    {
+      "titulo": "Cotización",
+      "texto": "Contacto directo desde cada sección."
+    }
+  ],
+  "declaracion": "Una web que <strong>lleva a cotizar</strong>.",
+  "arquitectura": {
+    "a": [
+      "Sitio",
+      "Astro"
+    ],
+    "b": [
+      "Formularios",
+      "contacto"
+    ],
+    "c": [
+      "Hosting",
+      "estático"
+    ],
+    "x": [
+      "WhatsApp",
+      "directo"
+    ],
+    "y": [
+      "SEO",
+      "local"
+    ]
+  }
+}

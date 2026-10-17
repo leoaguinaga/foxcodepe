@@ -1,5 +1,6 @@
 import type { APIRoute } from "astro";
 import { sitemapPages } from "@/core/SeoData";
+import { getProjects } from "@/core/ProjectsData";
 
 function getSiteUrl() {
     const rawSiteUrl = import.meta.env.PUBLIC_SITE_URL || "https://foxcode.pe";
@@ -16,12 +17,12 @@ function escapeXml(value: string) {
         .replace(/'/g, "&apos;");
 }
 
-export const GET: APIRoute = () => {
+export const GET: APIRoute = async () => {
     const siteUrl = getSiteUrl();
-    const urls = sitemapPages
-        .filter((page) => !page.noindex)
-        .map((page) => {
-            const loc = new URL(page.path, siteUrl).toString();
+    const projectPaths = (await getProjects()).map((p) => `/proyectos/${p.id}`);
+    const urls = [...sitemapPages.filter((page) => !page.noindex).map((page) => page.path), ...projectPaths]
+        .map((path) => {
+            const loc = new URL(path, siteUrl).toString();
 
             return [
                 "  <url>",

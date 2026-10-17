@@ -1,0 +1,200 @@
+{
+  "orden": 1,
+  "nombre": "Díaz y Castillo",
+  "tipo": "cliente",
+  "que": "ERP de obra",
+  "sector": "Construcción",
+  "resumen": "Sistema interno que lleva cada compra de obra del requerimiento a la orden de compra y al pago, con asistencia y planilla del personal.",
+  "frase": "Del requerimiento en obra al pago al proveedor, en un solo sistema.",
+  "acceso": {
+    "tipo": "intranet"
+  },
+  "captura": "../../assets/images/proyectos/dyc.webp",
+  "rol": "Diseño de producto, frontend y backend",
+  "stack": [
+    "Next.js",
+    "NestJS",
+    "Prisma",
+    "PostgreSQL · Neon",
+    "Correo transaccional",
+    "PDF"
+  ],
+  "ui": {
+    "acento": "#ee4d31",
+    "marca": "DyC",
+    "nav": [
+      "Panel",
+      "Requerimientos",
+      "Cotizaciones",
+      "Órdenes de compra",
+      "Pagos",
+      "Asistencia",
+      "Planilla",
+      "Reportes"
+    ],
+    "pantallas": [
+      {
+        "nav": 1,
+        "titulo": "Requerimientos",
+        "kpis": [
+          "Pendientes",
+          "Aprobados",
+          "En cotización",
+          "Atendidos"
+        ],
+        "columnas": [
+          "Código",
+          "Obra",
+          "Solicitante",
+          "Estado"
+        ],
+        "estado": "Por aprobar"
+      },
+      {
+        "nav": 2,
+        "titulo": "Matriz de adjudicación",
+        "kpis": [
+          "Solicitudes",
+          "Cotizaciones",
+          "Proveedores",
+          "Ahorro"
+        ],
+        "columnas": [
+          "Ítem",
+          "Proveedor",
+          "Precio",
+          "Plazo"
+        ],
+        "estado": "Adjudicado"
+      },
+      {
+        "nav": 3,
+        "titulo": "Órdenes de compra",
+        "kpis": [
+          "Emitidas",
+          "Por entregar",
+          "Entregadas",
+          "Monto mes"
+        ],
+        "columnas": [
+          "OC",
+          "Proveedor",
+          "Monto",
+          "Entrega"
+        ],
+        "estado": "Emitida"
+      },
+      {
+        "nav": 4,
+        "titulo": "Pagos",
+        "kpis": [
+          "Pendiente",
+          "Vencido",
+          "Próx. 7 días",
+          "Pagado mes"
+        ],
+        "columnas": [
+          "OC",
+          "Beneficiario",
+          "Tramo",
+          "Vence"
+        ],
+        "estado": "Por vencer"
+      },
+      {
+        "nav": 5,
+        "titulo": "Asistencia de hoy",
+        "kpis": [
+          "Presentes",
+          "Tardanzas",
+          "Faltas",
+          "Turnos"
+        ],
+        "columnas": [
+          "Trabajador",
+          "Obra",
+          "Entrada",
+          "Turno"
+        ],
+        "estado": "Presente"
+      },
+      {
+        "nav": 7,
+        "titulo": "Reportes",
+        "kpis": [
+          "Gasto obra",
+          "OCs",
+          "Proveedores",
+          "Pagos"
+        ],
+        "columnas": [
+          "Obra",
+          "Partida",
+          "Gasto",
+          "Periodo"
+        ],
+        "estado": "Guardado"
+      }
+    ]
+  },
+  "encargo": [
+    "Una constructora coordina compras entre obra, logística, ingeniería y gerencia. Cada requerimiento pasa por varias manos antes de convertirse en una orden de compra, y cada orden en uno o varios pagos.",
+    "Necesitaban <strong>un solo lugar con permisos por rol</strong>: que el supervisor pida desde la obra, que quien aprueba vea solo lo que le toca y que gerencia y tesorería sepan qué se debe y cuándo vence."
+  ],
+  "modulos": [
+    {
+      "titulo": "Requerimientos",
+      "texto": "Se piden desde obra con ítems, archivos y PDF; se aprueban según el tipo y el rol de quien los crea.",
+      "pantalla": 0
+    },
+    {
+      "titulo": "Cotizaciones",
+      "texto": "Se invita a proveedores, se reciben precios y se adjudica ítem por ítem en una matriz comparativa.",
+      "pantalla": 1
+    },
+    {
+      "titulo": "Órdenes de compra",
+      "texto": "La adjudicación genera la orden con forma de pago, lugar de entrega y su PDF listo para enviar.",
+      "pantalla": 2
+    },
+    {
+      "titulo": "Pagos",
+      "texto": "Cada orden se divide en tramos; el sistema avisa a diario por correo lo vencido y lo que vence pronto.",
+      "pantalla": 3
+    },
+    {
+      "titulo": "Asistencia y planilla",
+      "texto": "Marcación por obra y turno, cierre del día y planilla calculada a partir de lo marcado.",
+      "pantalla": 4
+    },
+    {
+      "titulo": "Reportes",
+      "texto": "Gasto por obra, órdenes por proveedor y pagos por periodo, con reportes guardados por usuario.",
+      "pantalla": 5
+    }
+  ],
+  "declaracion": "Un solo sistema para <strong>más de <span class=\"n\">10</span> roles</strong>, de la obra a <strong>gerencia y tesorería</strong>, cada uno viendo solo lo que le toca.",
+  "arquitectura": {
+    "a": [
+      "Panel web",
+      "Next.js · por rol"
+    ],
+    "b": [
+      "API",
+      "NestJS · permisos"
+    ],
+    "c": [
+      "Base de datos",
+      "PostgreSQL · Neon"
+    ],
+    "x": [
+      "Correo",
+      "avisos y vencimientos"
+    ],
+    "y": [
+      "Documentos",
+      "PDF de requerimiento y OC"
+    ]
+  },
+  "hero": "en obra."
+}

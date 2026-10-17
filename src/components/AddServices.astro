@@ -35,10 +35,10 @@ const servicesWithAddOns = services.map((service) => ({
                             <button
                                 class="service-btn px-3 py-2 rounded-lg border border-white/10 bg-white/5 text-xs text-white hover:bg-white/10 transition-colors flex items-center gap-2"
                                 data-service-id={`${service.id}-${index}`}
-                                data-service-name={addOn.name}
+                                data-service-name={addOn.period ? `${addOn.name} (por ${addOn.period})` : addOn.name}
                                 data-service-price={addOn.price}
                             >
-                                <span>{addOn.name} - S/. {addOn.price.toLocaleString("es-PE")}</span>
+                                <span>{addOn.name} - S/ {addOn.price.toLocaleString("es-PE")}{addOn.period && `/${addOn.period}`}</span>
 
                                 {/* Icon X - shown on hover when selected */}
                                 <span class="icon-x hidden">

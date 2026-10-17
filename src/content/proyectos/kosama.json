@@ -1,0 +1,64 @@
+{
+  "orden": 9,
+  "nombre": "Ko-Sama",
+  "tipo": "cliente",
+  "que": "Web y back-office",
+  "sector": "Arquitectura",
+  "resumen": "Sitio del estudio del Arq. Jorge Guerrero con proyectos, formulario que califica cada consulta y panel para publicar obras.",
+  "frase": "Un estudio de arquitectura que muestra obra y filtra consultas antes de responder.",
+  "acceso": {
+    "tipo": "enlace",
+    "url": "https://ko-sama.vercel.app",
+    "etiqueta": "ko-sama.vercel.app"
+  },
+  "captura": "../../assets/images/proyectos/kosama.webp",
+  "rol": "Diseño, frontend y back-office",
+  "stack": [
+    "Astro",
+    "Next.js",
+    "Better-Auth",
+    "Prisma",
+    "PostgreSQL"
+  ],
+  "encargo": [
+    "El estudio recibía consultas sin presupuesto ni alcance claro.",
+    "El sitio <strong>presenta la obra y califica cada consulta por pasos</strong>; el panel permite publicar proyectos sin programador."
+  ],
+  "modulos": [
+    {
+      "titulo": "Sitio del estudio",
+      "texto": "Proyectos, estudio y contacto."
+    },
+    {
+      "titulo": "Formulario por pasos",
+      "texto": "Tipo de obra, metraje y presupuesto antes de la primera llamada."
+    },
+    {
+      "titulo": "Back-office",
+      "texto": "Usuarios con roles para publicar y editar proyectos."
+    }
+  ],
+  "declaracion": "Menos consultas sueltas, <strong>más proyectos con alcance claro</strong>.",
+  "arquitectura": {
+    "a": [
+      "Sitio",
+      "Astro"
+    ],
+    "b": [
+      "Back-office",
+      "Next.js"
+    ],
+    "c": [
+      "Base de datos",
+      "PostgreSQL"
+    ],
+    "x": [
+      "Consultas",
+      "correo"
+    ],
+    "y": [
+      "Accesos",
+      "Better-Auth"
+    ]
+  }
+}

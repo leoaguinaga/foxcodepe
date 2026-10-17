@@ -1,0 +1,25 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import ProjectsHero from "@/sections/projects/ProjectsHero.astro";
+import ProjectsIndex from "@/sections/projects/ProjectsIndex.astro";
+import PrivateWork from "@/sections/projects/PrivateWork.astro";
+import { getProjects } from "@/core/ProjectsData";
+import { seoPages } from "@/core/SeoData";
+
+export const prerender = true;
+
+const projects = await getProjects();
+const example = projects.find((p) => p.data.acceso.tipo === "intranet" && p.data.ui) ?? projects[0];
+---
+
+<Layout {...seoPages.projects}>
+    <!-- Marca <html> antes de pintar para que los [data-reveal] no parpadeen. -->
+    <script is:inline>
+        if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
+            document.documentElement.classList.add("reveal-ready");
+        }
+    </script>
+    <ProjectsHero projects={projects} total={projects.length} />
+    <ProjectsIndex projects={projects} />
+    <PrivateWork example={example} />
+</Layout>

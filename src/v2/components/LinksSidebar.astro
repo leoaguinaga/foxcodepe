@@ -1,0 +1,85 @@
+---
+import Logo from "@/assets/logos/logo-full-white.webp";
+import Image from "astro/components/Image.astro";
+---
+
+<section class="h-[100dvh] max-w-[25rem] w-[90dvw] bg-background shadow-2xl relative">
+    
+    <!-- Header del Sidebar -->
+    <div class="flex items-center justify-between p-5 pl-10 border-b border-white/10">
+        
+        <!-- Logo -->
+        <a href="/v2" class="">
+            <Image
+                src={Logo}
+                class="object-contain h-6 w-fit"
+                alt="Logo principal de Foxcode"
+            />
+        </a>
+
+        <button
+            id="sidebar-close"
+            type="button"
+            class="text-white/60 hover:text-white p-2 rounded-full bg-white/10 hover:bg-white/20 transition"
+            aria-haspopup="dialog" 
+            aria-expanded="false" 
+            aria-controls="hs-links-sidebar" 
+            aria-label="Toggle navigation" 
+            data-hs-overlay="#hs-links-sidebar"
+        >
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="size-5"
+            >
+                <path d="M18 6L6 18"></path>
+                <path d="M6 6l12 12"></path>
+            </svg>
+        </button>
+    </div>
+
+    <!-- Contenido del Sidebar -->
+    <nav class="flex flex-col p-5 px-5 text-lg gap-y-1">
+        <a href="/v2" class="uppercase py-3 px-5 font-light text-white/80 tracking-wider hover:text-white hover:bg-white/5 hover:underline">
+            Inicio
+        </a>
+        <a href="/v2/servicios" class="uppercase py-3 px-5 font-light text-white/80 tracking-wider hover:text-white hover:bg-white/5 hover:underline">
+            Desarrollo
+        </a>
+        <a href="/v2/trabajo" class="uppercase py-3 px-5 font-light text-white/80 tracking-wider hover:text-white hover:bg-white/5 hover:underline">
+            Trabajo
+        </a>
+        <a href="/v2/nosotros" class="uppercase py-3 px-5 font-light text-white/80 tracking-wider hover:text-white hover:bg-white/5 hover:underline">
+            Nosotros
+        </a>
+        <a href="/v2#agendar" class="uppercase py-3 px-5 font-light text-white/80 tracking-wider hover:text-white hover:bg-white/5 hover:underline">
+            Agenda una reunión
+        </a>
+        <button 
+            class="text-start uppercase py-3 px-5 font-light text-white/80 tracking-wider hover:text-white hover:bg-white/5 hover:underline"
+            aria-haspopup="dialog" 
+            aria-expanded="false" 
+            aria-controls="contact-us-modal" 
+            aria-label="Toggle navigation" 
+            data-hs-overlay="#contact-us-modal"
+        >
+            contáctanos
+        </button>
+        <a href="/legal#terms" class="uppercase py-3 px-5 font-light text-white/80 tracking-wider hover:text-white hover:bg-white/5 hover:underline">
+            términos y condiciones
+        </a>
+        <a href="/legal#privacity" class="uppercase py-3 px-5 font-light text-white/80 tracking-wider hover:text-white hover:bg-white/5 hover:underline">
+            política de privacidad
+        </a>
+        <button class="">
+
+        </button>
+    </nav>
+</section>

@@ -1,0 +1,67 @@
+{
+  "orden": 3,
+  "nombre": "FoxRooms",
+  "tipo": "producto",
+  "que": "Sistema para hoteles",
+  "sector": "Hotelería",
+  "resumen": "Gestión hotelera completa: calendario de reservas, check-in y check-out, caja, limpieza y conexión con canales de venta.",
+  "frase": "Reservas, estadías, caja y limpieza de un hotel en un mismo tablero.",
+  "acceso": {
+    "tipo": "demo"
+  },
+  "captura": "../../assets/images/proyectos/foxrooms.webp",
+  "rol": "Producto, diseño, frontend y backend",
+  "stack": [
+    "Next.js",
+    "NestJS",
+    "Prisma",
+    "PostgreSQL",
+    "iCal · Channex"
+  ],
+  "encargo": [
+    "Los hoteles pequeños manejan reservas en cuadernos, Excel y varias plataformas de venta a la vez, y la caja no cuadra con lo que pasó en recepción.",
+    "FoxRooms junta <strong>reservas, estadías, cobros y limpieza</strong> con un panel distinto para cada rol."
+  ],
+  "modulos": [
+    {
+      "titulo": "Calendario de reservas",
+      "texto": "Tablero por habitación y día, también para reservas por horas."
+    },
+    {
+      "titulo": "Check-in y check-out",
+      "texto": "Identidad por DNI o RUC, acompañantes, ticket y ajustes al cerrar la estadía."
+    },
+    {
+      "titulo": "Caja y turnos",
+      "texto": "Apertura, cierre y pagos divididos por medio de pago."
+    },
+    {
+      "titulo": "Canales de venta",
+      "texto": "Sincronización por iCal y Channex con las plataformas de reservas."
+    }
+  ],
+  "declaracion": "Un panel para <strong>administración, recepción y limpieza</strong>, cada uno con su propia vista.",
+  "arquitectura": {
+    "a": [
+      "Panel",
+      "Next.js"
+    ],
+    "b": [
+      "API",
+      "NestJS"
+    ],
+    "c": [
+      "Base de datos",
+      "PostgreSQL"
+    ],
+    "x": [
+      "Canales",
+      "iCal · Channex"
+    ],
+    "y": [
+      "Identidad",
+      "DNI / RUC"
+    ]
+  },
+  "hero": "en hoteles."
+}

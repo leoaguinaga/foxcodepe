@@ -44,6 +44,8 @@ export interface ServiceImage {
 export interface ServiceAddOn {
     name: string;
     price: number;
+    /** Extras recurrentes; sin periodo es pago único. */
+    period?: "mes" | "año";
 }
 
 export interface Service {
@@ -92,84 +94,87 @@ export const services: Service[] = [
         addOns: [
             {
                 name: "Módulo CRM",
-                price: 300,
+                price: 1500,
             },
             {
                 name: "E-commerce",
-                price: 350,
+                price: 2500,
             },
             {
-                name: "Módulo de facturación",
-                price: 180,
+                name: "Facturación electrónica SUNAT",
+                price: 1800,
             },
             {
                 name: "Integración con API de terceros",
-                price: 400,
-            },
-            {
-                name: "Hosting premium",
-                price: 250,
-            },
-            {
-                name: "Mantenimiento mensual",
-                price: 350,
+                price: 800,
             },
             {
                 name: "Panel de analítica",
-                price: 220,
+                price: 900,
+            },
+            {
+                name: "Hosting y dominio",
+                price: 450,
+                period: "año",
+            },
+            {
+                name: "Mantenimiento",
+                price: 350,
+                period: "mes",
             },
             {
                 name: "Soporte técnico prioritario",
-                price: 120,
+                price: 250,
+                period: "mes",
             },
         ],
         plans: [
             {
-                level: "Básico",
-                price: "S/.200",
-                description: "Ideal para pequeñas empresas y proyectos personales.",
+                level: "Landing page",
+                price: "S/900",
+                description: "Una página enfocada en convertir visitas en clientes.",
                 features: [
-                    "Landing pages",
-                    "SaaS 2 módulos",
-                    "Mantenimiento por 3 meses",
+                    "1 página responsive",
+                    "Botón de WhatsApp y formulario",
+                    "SEO básico y Google Analytics",
                     "Soporte por 1 mes",
                 ],
                 isRecommended: false,
             },
             {
-                level: "Intermedio",
-                price: "S/.400",
-                description: "Para empresas en crecimiento y proyectos más grandes.",
+                level: "Web corporativa",
+                price: "S/1,800",
+                description: "Sitio completo para presentar tu empresa y tus servicios.",
                 features: [
-                    "Landing pages",
-                    "SaaS 4 módulos",
-                    "Mantenimiento por 6 meses",
+                    "Hasta 6 secciones",
+                    "Blog o noticias autoadministrables",
+                    "SEO on-page",
                     "Soporte por 3 meses",
                 ],
                 isRecommended: false,
             },
             {
-                level: "Avanzado",
-                price: "S/.600",
-                description: "Soluciones personalizadas y soporte prioritario.",
+                level: "Sistema a medida",
+                price: "S/6,500",
+                description: "Software web para digitalizar la operación de tu empresa.",
                 features: [
-                    "Landing pages",
-                    "SaaS 6 módulos",
-                    "Mantenimiento por 12 meses",
-                    "Soporte por 6 meses",
-                    "Funcionalidad adicional",
+                    "Hasta 4 módulos",
+                    "Panel administrativo con roles",
+                    "Reportes exportables",
+                    "Mantenimiento por 3 meses",
+                    "Capacitación a tu equipo",
                 ],
                 isRecommended: true,
             },
             {
                 level: "Personalizado",
                 price: "A tratar",
-                description: "Todo lo que necesitas para llevar tu proyecto al siguiente nivel.",
+                description: "SaaS o plataformas con más módulos, integraciones y usuarios.",
                 features: [
-                    "Landing pages",
-                    "SaaS 10 módulos",
-                    "Mantenimiento por 24 meses",
-                    "Soporte por 12 meses",
+                    "Módulos ilimitados",
+                    "Integraciones a medida",
+                    "Arquitectura escalable",
+                    "Mantenimiento por 12 meses",
                 ],
                 isRecommended: false,
             },
@@ -209,36 +214,36 @@ export const services: Service[] = [
         addOns: [
             {
                 name: "Investigación de usuarios",
-                price: 180,
+                price: 800,
             },
             {
                 name: "Prototipo interactivo",
-                price: 150,
+                price: 500,
             },
             {
                 name: "Sistema de diseño base",
-                price: 250,
+                price: 1500,
             },
             {
                 name: "Pack de 5 pantallas extra",
-                price: 120,
+                price: 600,
             },
             {
                 name: "Test de usabilidad",
-                price: 220,
+                price: 700,
             },
             {
                 name: "Handoff para desarrollo",
-                price: 100,
+                price: 300,
             },
         ],
         plans: [
             {
                 level: "Básico",
-                price: "S/150",
+                price: "S/600",
                 description: "Diseño de interfaz para proyectos pequeños.",
                 features: [
-                    "Diseño de 1 pantalla",
+                    "Diseño de hasta 3 pantallas",
                     "Revisión por 1 ronda",
                     "Entrega en 1 semana",
                 ],
@@ -246,13 +251,14 @@ export const services: Service[] = [
             },
             {
                 level: "Completo",
-                price: "S/350",
+                price: "S/1,800",
                 description: "Diseño integral para proyectos medianos y grandes.",
                 features: [
-                    "Diseño de hasta 5 pantallas",
+                    "Diseño de hasta 10 pantallas",
                     "Revisión por 3 rondas",
-                    "Entrega en 2 semanas",
-                    "Guías de estilo",
+                    "Entrega en 3 semanas",
+                    "Guía de estilos",
+                    "Prototipo navegable",
                 ],
                 isRecommended: true,
             },
@@ -268,8 +274,7 @@ export const services: Service[] = [
                     "Prototipos interactivos",
                 ],
                 isRecommended: false,
-            }
-
+            },
         ],
     },
     {
@@ -310,33 +315,33 @@ export const services: Service[] = [
         addOns: [
             {
                 name: "Naming de marca",
-                price: 250,
+                price: 600,
             },
             {
                 name: "Estrategia de marca",
-                price: 300,
+                price: 1200,
             },
             {
                 name: "Manual de marca extendido",
-                price: 220,
+                price: 900,
             },
             {
                 name: "Plantillas para redes sociales",
-                price: 180,
+                price: 450,
             },
             {
                 name: "Papelería corporativa",
-                price: 120,
+                price: 350,
             },
             {
                 name: "Diseño de packaging base",
-                price: 300,
+                price: 1200,
             },
         ],
         plans: [
             {
                 level: "Básico",
-                price: "S/350",
+                price: "S/1,200",
                 description: "Ideal si estás empezando y quieres un distintivo para tu marca o negocio.",
                 features: [
                     "Naming creativo (opcional, si aún no tienes nombre definido)",
@@ -351,7 +356,7 @@ export const services: Service[] = [
             },
             {
                 level: "Completo",
-                price: "S/700",
+                price: "S/2,800",
                 description: "Branding integral para tu marca.",
                 features: [
                     "Diseño de logotipo profesional (hasta 5 versiones: principal, secundaria, monocromática, dependiendo el diseño final)",
@@ -417,37 +422,37 @@ export const services: Service[] = [
         addOns: [
             {
                 name: "Notificaciones push",
-                price: 180,
+                price: 600,
             },
             {
                 name: "Publicación en App Store y Google Play",
-                price: 150,
+                price: 400,
             },
             {
                 name: "Integración de pagos",
-                price: 300,
+                price: 1200,
             },
             {
                 name: "Backend y API para app",
-                price: 500,
+                price: 3500,
             },
             {
                 name: "Analítica y tracking de eventos",
-                price: 220,
+                price: 600,
             },
             {
                 name: "Login social",
-                price: 160,
+                price: 500,
             },
             {
                 name: "Modo offline básico",
-                price: 350,
+                price: 1500,
             },
         ],
         plans: [
             {
                 level: "MVP",
-                price: "S/800",
+                price: "S/8,000",
                 description: "Producto mínimo viable para validar tu idea.",
                 features: [
                     "App para 1 plataforma",
@@ -459,7 +464,7 @@ export const services: Service[] = [
             },
             {
                 level: "Full",
-                price: "S/1500",
+                price: "S/18,000",
                 description: "Aplicación completa y robusta.",
                 features: [
                     "App multiplataforma",
@@ -495,33 +500,34 @@ export const services: Service[] = [
         addOns: [
             {
                 name: "Auditoría técnica documentada",
-                price: 220,
+                price: 1200,
             },
             {
                 name: "Roadmap tecnológico trimestral",
-                price: 300,
+                price: 1500,
             },
             {
                 name: "Revisión de arquitectura",
-                price: 250,
+                price: 1000,
             },
             {
                 name: "Optimización de costos cloud",
-                price: 180,
+                price: 800,
             },
             {
                 name: "Sesión de capacitación para equipo",
-                price: 160,
+                price: 600,
             },
             {
                 name: "Acompañamiento de implementación",
-                price: 400,
+                price: 2000,
+                period: "mes",
             },
         ],
         plans: [
             {
                 level: "Básico",
-                price: "S/100",
+                price: "S/250",
                 description: "Sesión de consultoría estratégica.",
                 features: [
                     "1 sesión de 2 horas",
@@ -532,7 +538,7 @@ export const services: Service[] = [
             },
             {
                 level: "Mensual",
-                price: "S/350",
+                price: "S/900",
                 description: "Acompañamiento continuo.",
                 features: [
                     "4 sesiones mensuales",
