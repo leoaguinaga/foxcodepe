@@ -1,5 +1,5 @@
 // Solo servidor: la landing no abre la base del panel, llama a su API.
-type EnvName = "PANEL_API_URL" | "LANDING_API_KEY" | "PUBLIC_SITE_URL";
+type EnvName = "PANEL_API_URL" | "LANDING_API_KEY" | "PANEL_PROXY_KEY" | "PUBLIC_SITE_URL";
 
 export function getEnv(name: EnvName) {
     const nodeProcess = (globalThis as typeof globalThis & {
@@ -49,6 +49,7 @@ export function isAllowedOrigin(request: Request) {
 export async function callPanelApi(path: string, init: { method?: "GET" | "POST"; body?: unknown } = {}) {
     const baseUrl = getEnv("PANEL_API_URL")?.replace(/\/+$/, "");
     const apiKey = getEnv("LANDING_API_KEY");
+    const proxyKey = getEnv("PANEL_PROXY_KEY");
 
     if (!baseUrl || !apiKey) {
         throw new Error("PANEL_API_URL / LANDING_API_KEY is not configured");
@@ -56,7 +57,11 @@ export async function callPanelApi(path: string, init: { method?: "GET" | "POST"
 
     const response = await fetch(`${baseUrl}/public/landing/${path}`, {
         method: init.method ?? "GET",
-        headers: { "content-type": "application/json", "x-landing-key": apiKey },
+        headers: {
+            "content-type": "application/json",
+            "x-landing-key": apiKey,
+            ...(proxyKey ? { "x-panel-proxy-key": proxyKey } : {}),
+        },
         body: init.body === undefined ? undefined : JSON.stringify(init.body),
         signal: AbortSignal.timeout(10_000),
     });
