@@ -19,6 +19,17 @@ body {
   letter-spacing: 0.01em;
 }
 
+/* Autocompletado del navegador: conserva el fondo oscuro y el texto claro
+   de los campos (Chrome los pinta celestes y esconde la etiqueta flotante). */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill {
+  -webkit-text-fill-color: var(--color-text);
+  caret-color: var(--color-text);
+  transition: background-color 600000s 0s, color 600000s 0s;
+}
+
 @layer base {
 
   button:not(:disabled),
@@ -296,4 +307,147 @@ html {
 
 @media (prefers-reduced-motion: reduce) {
   .animate-spin-slow { animation: none; }
+}
+
+/* Agenda de reuniones y modal de contacto (MeetingScheduler, ContactUsModal).
+   Curvas: ease-out fuerte para lo que entra; ease-in-out para lo que cambia
+   de tamaño en pantalla. Todo con transiciones para que se pueda interrumpir. */
+:root {
+  --meeting-ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --meeting-ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+}
+
+/* Cambio de paso: corto y en la dirección del recorrido. */
+.meeting-step {
+  animation: meeting-step-in 240ms var(--meeting-ease-out);
+}
+
+.meeting-step[data-dir="back"] {
+  --meeting-from: -10px;
+}
+
+/* Calendario ↔ horas: un panel se pliega mientras el otro se despliega,
+   con la misma curva y duración para que la tarjeta cambie de alto de una vez.
+   Al plegar, el contenido se desvanece rápido; al desplegar, aparece cuando
+   ya hay espacio. */
+.meeting-collapse {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transition:
+    grid-template-rows 280ms var(--meeting-ease-in-out),
+    opacity 140ms var(--meeting-ease-out);
+}
+
+.meeting-collapse[data-open="true"] {
+  grid-template-rows: 1fr;
+  opacity: 1;
+  transition:
+    grid-template-rows 280ms var(--meeting-ease-in-out),
+    opacity 200ms var(--meeting-ease-out) 80ms;
+}
+
+/* El margen negativo evita que el recorte se coma los anillos de foco. */
+.meeting-collapse > div {
+  min-height: 0;
+  overflow: hidden;
+  margin: 0 -4px -4px;
+  padding: 0 4px 4px;
+}
+
+/* Las filas de horas entran escalonadas cuando el panel ya se está abriendo. */
+.meeting-collapse[data-open="true"] .meeting-slot-row {
+  animation: meeting-row-in 240ms var(--meeting-ease-out) backwards;
+  animation-delay: calc(120ms + var(--row, 0) * 50ms);
+}
+
+.meeting-press {
+  transition-property: color, background-color, border-color, transform;
+  transition-duration: 160ms;
+  transition-timing-function: var(--meeting-ease-out);
+}
+
+.meeting-press:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+/* Respuestas comunes: el + gira a × cuando la frase ya está en el texto. */
+.meeting-hint-icon {
+  transition: transform 200ms var(--meeting-ease-out);
+}
+
+.meeting-hint-icon[data-added="true"] {
+  transform: rotate(45deg);
+}
+
+.meeting-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgb(255 255 255 / 0.4);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: meeting-spin 0.7s linear infinite;
+}
+
+/* Éxito: el check se dibuja con trazo, el mismo gesto del resto del sitio. */
+.meeting-check path {
+  fill: none;
+  stroke: #34d399;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: meeting-draw 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.1s;
+}
+
+@keyframes meeting-step-in {
+  from {
+    opacity: 0;
+    transform: translateX(var(--meeting-from, 10px));
+  }
+}
+
+@keyframes meeting-row-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+@keyframes meeting-spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes meeting-draw {
+  to { stroke-dashoffset: 0; }
+}
+
+/* Movimiento reducido: sin desplazamientos ni cambios de alto animados;
+   se conservan los fundidos que explican el cambio. */
+@media (prefers-reduced-motion: reduce) {
+  .meeting-step {
+    animation: meeting-fade 160ms ease;
+  }
+
+  .meeting-collapse,
+  .meeting-collapse[data-open="true"] {
+    transition: opacity 160ms ease;
+  }
+
+  .meeting-collapse[data-open="true"] .meeting-slot-row {
+    animation: none;
+  }
+
+  .meeting-press:active:not(:disabled) {
+    transform: none;
+  }
+
+  .meeting-check path {
+    animation-duration: 1ms;
+  }
+
+  @keyframes meeting-fade {
+    from { opacity: 0; }
+  }
 }

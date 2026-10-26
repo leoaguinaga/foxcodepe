@@ -1,9 +1,29 @@
-import { useCallback, useState, type FormEventHandler, type MouseEventHandler } from "react";
+import { useCallback, useRef, useState, type FormEventHandler, type MouseEventHandler } from "react";
+import { MEETING_SERVICES, type MeetingServiceId } from "@/core/meetingSlots";
 
 type TabType = 'form' | 'channels';
-type SubmitStatus = "idle" | "success" | "error";
+type FieldName = "name" | "email" | "message";
 
 const CONTACT_MODAL_ID = "contact-us-modal";
+const EMPTY_FIELDS = { name: "", email: "", phone: "", message: "", website: "" };
+
+const FIELD_MESSAGES: Record<FieldName, string> = {
+    name: "Escribe tu nombre para saber a quién responder.",
+    email: "Revisa el correo: ahí te llega la respuesta.",
+    message: "Cuéntanos al menos en una frase de qué se trata.",
+};
+
+const SERVICE_CHIPS: Record<MeetingServiceId, string> = {
+    WEB: "Sitio web o landing",
+    SYSTEM: "Sistema a medida",
+    APP: "App móvil",
+    EXPLORE: "Aún lo estoy definiendo",
+};
+
+const inputClass =
+    "peer w-full border text-sm border-white/10 bg-white/5 rounded-lg px-4 pt-6.5 pb-3 placeholder-transparent hover:shadow focus:outline-none focus:ring-2 focus:ring-primary hover:bg-white/10 aria-[invalid=true]:border-red-400/70";
+const labelClass =
+    "pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-white/60 transition-all duration-200 peer-placeholder-shown:top-1/2 peer-placeholder-shown:text-base peer-[:not(:placeholder-shown)]:top-4 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:font-medium peer-focus:top-4 peer-focus:font-medium peer-focus:text-xs";
 
 declare global {
     interface Window {
@@ -15,9 +35,14 @@ declare global {
 
 export default function ContactModal() {
     const [activeTab, setActiveTab] = useState<TabType>('form');
+    const [fields, setFields] = useState(EMPTY_FIELDS);
+    const [service, setService] = useState<MeetingServiceId | null>(null);
+    const [invalid, setInvalid] = useState<FieldName[]>([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [submitStatus, setSubmitStatus] = useState<SubmitStatus>("idle");
-    const [submitMessage, setSubmitMessage] = useState("");
+    const [errorMessage, setErrorMessage] = useState("");
+    const [sentTo, setSentTo] = useState<{ name: string; email: string } | null>(null);
+    // Trampa de tiempo anti-spam: cuenta desde que la persona empieza a llenar.
+    const startedAt = useRef<number | null>(null);
 
     const closeModal = useCallback(() => {
         const modal = document.getElementById(CONTACT_MODAL_ID);
@@ -46,23 +71,48 @@ export default function ContactModal() {
         [closeModal],
     );
 
+    // La agenda vive en la home: cerrar el modal y llevar a la sección.
+    const goToSchedule = useCallback(() => {
+        closeModal();
+
+        const section = document.getElementById("agenda");
+
+        if (section) {
+            section.scrollIntoView({ behavior: "smooth", block: "start" });
+            return;
+        }
+
+        window.location.href = "/#agenda";
+    }, [closeModal]);
+
+    const updateField = (name: keyof typeof EMPTY_FIELDS, value: string) => {
+        setFields((current) => ({ ...current, [name]: value }));
+        setInvalid((current) => current.filter((field) => field !== name));
+    };
+
     const handleContactSubmit = useCallback<FormEventHandler<HTMLFormElement>>(
         async (event) => {
             event.preventDefault();
 
-            const form = event.currentTarget;
+            const missing: FieldName[] = [];
+            if (!fields.name.trim()) missing.push("name");
+            if (!/^\S+@\S+\.\S+$/.test(fields.email.trim())) missing.push("email");
+            if (!fields.message.trim()) missing.push("message");
 
-            if (!form.reportValidity()) {
+            if (missing.length) {
+                setInvalid(missing);
+                document.getElementById(`contact-${missing[0]}`)?.focus();
                 return;
             }
 
-            const formData = new FormData(form);
             const payload = {
-                name: String(formData.get("name") || "").trim(),
-                email: String(formData.get("email") || "").trim(),
-                phone: String(formData.get("phone") || "").trim(),
-                message: String(formData.get("message") || "").trim(),
-                website: String(formData.get("website") || ""),
+                name: fields.name.trim(),
+                email: fields.email.trim(),
+                phone: fields.phone.trim(),
+                message: fields.message.trim(),
+                website: fields.website,
+                ...(service ? { service } : {}),
+                elapsedMs: startedAt.current ? Date.now() - startedAt.current : 0,
                 metadata: {
                     pagePath: window.location.pathname,
                     userAgent: window.navigator.userAgent,
@@ -70,8 +120,7 @@ export default function ContactModal() {
             };
 
             setIsSubmitting(true);
-            setSubmitStatus("idle");
-            setSubmitMessage("");
+            setErrorMessage("");
 
             try {
                 const response = await fetch("/api/contact", {
@@ -84,28 +133,28 @@ export default function ContactModal() {
 
                 const result = await response.json().catch(() => null);
 
+                // Límite anti-spam: el mensaje del servidor ya dice qué hacer.
+                if (response.status === 429) {
+                    setErrorMessage(result?.error || "Enviaste varios mensajes seguidos. Espera unos minutos.");
+                    return;
+                }
+
                 if (!response.ok || !result?.ok) {
                     throw new Error(result?.error || "No se pudo enviar el mensaje.");
                 }
 
-                form.reset();
-                setSubmitStatus("success");
-                setSubmitMessage("Mensaje enviado. Te contactaremos pronto.");
-
-                window.setTimeout(() => {
-                    closeModal();
-                    setSubmitStatus("idle");
-                    setSubmitMessage("");
-                }, 900);
+                setSentTo({ name: payload.name.split(/\s+/)[0], email: payload.email });
+                setFields(EMPTY_FIELDS);
+                setService(null);
+                startedAt.current = null;
             } catch (error) {
                 console.error("Contact form failed", error);
-                setSubmitStatus("error");
-                setSubmitMessage("No se pudo enviar el mensaje. Inténtalo nuevamente.");
+                setErrorMessage("No se pudo enviar el mensaje. Tus datos siguen aquí; vuelve a intentarlo.");
             } finally {
                 setIsSubmitting(false);
             }
         },
-        [closeModal],
+        [fields, service],
     );
 
     return (
@@ -114,14 +163,14 @@ export default function ContactModal() {
             onMouseDown={handleBackdropClick}
         >
 
-            <div className="flex flex-col bg-background rounded-2xl gap-y-7 w-full max-sm:max-h-full max-w-xl p-5 sm:p-8">
+            <div className="flex flex-col bg-background border border-white/10 rounded-2xl gap-y-6 w-full max-sm:max-h-full max-w-xl p-5 sm:p-8">
 
                 {/* Title and description */}
                 <div className="flex gap-x-5 justify-between">
                     <div>
-                        <h2 className="text-xl font-medium text-white">Contáctanos ahora</h2>
+                        <h2 id="contact-us-modal-label" className="text-xl font-medium text-white">Cuéntanos tu proyecto</h2>
                         <p className="text-sm text-neutral-300 mt-2">
-                            ¿Tienes alguna pregunta o proyecto en mente? Déjanos tus datos y nos pondremos en contacto contigo.
+                            No necesitas tenerlo todo definido. Te respondemos en menos de 24 horas hábiles.
                         </p>
                     </div>
 
@@ -129,25 +178,15 @@ export default function ContactModal() {
                         type="button"
                         aria-label="Cerrar modal de contacto"
                         onClick={closeModal}
-                        className="text-white/20 hover:text-white h-fit">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-x-icon lucide-x"><path d="M18 6 6 18" /><path d="m6 6 12 12" /></svg>
+                        className="text-white/40 hover:text-white h-fit">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-x-icon lucide-x"><path d="M18 6 6 18" /><path d="m6 6 12 12" /></svg>
                     </button>
                 </div>
 
                 {/* Tabs */}
                 <div className="flex items-center gap-x-2">
                     <button
-                        onClick={() => setActiveTab('channels')}
-                        className={
-                            `text-sm px-4 py-2 rounded-lg font-medium transition 
-                            ${activeTab === 'channels'
-                                ? 'text-white bg-primary'
-                                : 'hover:bg-white/10 text-white/60 bg-white/5 hover:text-white'
-                            }`}
-                    >
-                        Canales de contacto
-                    </button>
-                    <button
+                        type="button"
                         onClick={() => setActiveTab('form')}
                         className={
                             `text-sm px-4 py-2 rounded-lg font-medium transition 
@@ -157,6 +196,18 @@ export default function ContactModal() {
                             }`}
                     >
                         Enviar mensaje
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => setActiveTab('channels')}
+                        className={
+                            `text-sm px-4 py-2 rounded-lg font-medium transition 
+                            ${activeTab === 'channels'
+                                ? 'text-white bg-primary'
+                                : 'hover:bg-white/10 text-white/60 bg-white/5 hover:text-white'
+                            }`}
+                    >
+                        Canales de contacto
                     </button>
                 </div>
 
@@ -287,12 +338,54 @@ export default function ContactModal() {
                     )
                 }
 
+                {/* Sent */}
+                {
+                    activeTab === 'form' && sentTo && (
+                        <div className="space-y-5" role="status" aria-live="polite">
+                            <div className="flex size-12 items-center justify-center rounded-full bg-emerald-500/15">
+                                <svg className="meeting-check size-6" viewBox="0 0 24 24" aria-hidden="true">
+                                    <path pathLength={1} d="M5 12.5 10 17 19 7" fill="none" stroke="#34d399" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" />
+                                </svg>
+                            </div>
+                            <div>
+                                <p className="text-lg font-semibold text-white">Recibido, {sentTo.name}</p>
+                                <p className="mt-1 text-sm text-neutral-300">
+                                    Te respondemos a <span className="font-medium text-white">{sentTo.email}</span> en menos de 24 horas hábiles.
+                                </p>
+                            </div>
+                            <div className="flex flex-wrap gap-2">
+                                <button
+                                    type="button"
+                                    onClick={closeModal}
+                                    className="rounded-lg bg-white/10 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-white/15"
+                                >
+                                    Cerrar
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setSentTo(null);
+                                        goToSchedule();
+                                    }}
+                                    className="rounded-lg px-4 py-2.5 text-sm font-medium text-neutral-300 transition hover:bg-white/10 hover:text-white"
+                                >
+                                    Agendar 30 min de conversación
+                                </button>
+                            </div>
+                        </div>
+                    )
+                }
+
                 {/* Contact Form */}
                 {
-                    activeTab === 'form' && (
+                    activeTab === 'form' && !sentTo && (
                         <form
                             className="space-y-3 max-sm:overflow-y-auto max-sm:p-0.5"
                             onSubmit={handleContactSubmit}
+                            onFocusCapture={() => {
+                                startedAt.current ??= Date.now();
+                            }}
+                            noValidate
                         >
                             <input
                                 type="text"
@@ -300,138 +393,151 @@ export default function ContactModal() {
                                 tabIndex={-1}
                                 autoComplete="off"
                                 aria-hidden="true"
+                                value={fields.website}
+                                onChange={(event) => updateField("website", event.target.value)}
                                 className="hidden"
                             />
-                        
+
                             {/* Name */}
-                            <div className="relative w-full">
-                                <input
-                                    type="text"
-                                    id="name"
-                                    name="name"
-                                    placeholder=""
-                                    required
-                                    autoComplete="off"
-                                    className="peer w-full border text-sm border-white/10 bg-white/5 rounded-lg px-4 pt-6.5 pb-3 placeholder-transparent hover:shadow focus:outline-none focus:ring-2 focus:ring-primary hover:bg-white/10"
-                                />
-                                <label
-                                    htmlFor="name"
-                                    className="absolute left-4 top-1/2 -translate-y-1/2 text-white/60 transition-all duration-200
-                                        peer-placeholder-shown:top-1/2
-                                        peer-placeholder-shown:text-base
-                                        peer-[:not(:placeholder-shown)]:top-4
-                                        peer-[:not(:placeholder-shown)]:text-xs
-                                        peer-[:not(:placeholder-shown)]:font-medium
-                                        peer-focus:top-4
-                                        peer-focus:font-medium
-                                        peer-focus:text-xs"
-                                >
-                                    Nombres Completos
-                                </label>
+                            <div>
+                                <div className="relative w-full">
+                                    <input
+                                        type="text"
+                                        id="contact-name"
+                                        name="name"
+                                        placeholder=" "
+                                        autoComplete="name"
+                                        value={fields.name}
+                                        onChange={(event) => updateField("name", event.target.value)}
+                                        aria-invalid={invalid.includes("name")}
+                                        aria-describedby="contact-name-error"
+                                        className={inputClass}
+                                    />
+                                    <label htmlFor="contact-name" className={labelClass}>
+                                        Nombre completo
+                                    </label>
+                                </div>
+                                {invalid.includes("name") && <p id="contact-name-error" className="mt-1.5 text-sm text-red-300">{FIELD_MESSAGES.name}</p>}
                             </div>
 
-                            {/* Email */}
-                            <div className="relative w-full">
-                                <input
-                                    type="email"
-                                    id="email"
-                                    name="email"
-                                    placeholder=""
-                                    required
-                                    autoComplete="off"
-                                    className="peer w-full border text-sm border-white/10 bg-white/5 rounded-lg px-4 pt-6.5 pb-3 placeholder-transparent hover:shadow focus:outline-none focus:ring-2 focus:ring-primary hover:bg-white/10"
-                                />
-                                <label
-                                    htmlFor="email"
-                                    className="absolute left-4 top-1/2 -translate-y-1/2 text-white/60 transition-all duration-200
-                                        peer-placeholder-shown:top-1/2
-                                        peer-placeholder-shown:text-base
-                                        peer-[:not(:placeholder-shown)]:top-4
-                                        peer-[:not(:placeholder-shown)]:text-xs
-                                        peer-[:not(:placeholder-shown)]:font-medium
-                                        peer-focus:top-4
-                                        peer-focus:font-medium
-                                        peer-focus:text-xs"
-                                >
-                                    Correo Electrónico
-                                </label>
+                            <div className="grid gap-3 sm:grid-cols-2">
+                                {/* Email */}
+                                <div>
+                                    <div className="relative w-full">
+                                        <input
+                                            type="email"
+                                            id="contact-email"
+                                            name="email"
+                                            placeholder=" "
+                                            inputMode="email"
+                                            autoComplete="email"
+                                            value={fields.email}
+                                            onChange={(event) => updateField("email", event.target.value)}
+                                            aria-invalid={invalid.includes("email")}
+                                            aria-describedby="contact-email-error"
+                                            className={inputClass}
+                                        />
+                                        <label htmlFor="contact-email" className={labelClass}>
+                                            Correo electrónico
+                                        </label>
+                                    </div>
+                                    {invalid.includes("email") && <p id="contact-email-error" className="mt-1.5 text-sm text-red-300">{FIELD_MESSAGES.email}</p>}
+                                </div>
+
+                                {/* Phone */}
+                                <div className="relative w-full">
+                                    <input
+                                        type="tel"
+                                        id="contact-phone"
+                                        name="phone"
+                                        placeholder=" "
+                                        inputMode="tel"
+                                        autoComplete="tel"
+                                        value={fields.phone}
+                                        onChange={(event) => updateField("phone", event.target.value)}
+                                        className={inputClass}
+                                    />
+                                    <label htmlFor="contact-phone" className={labelClass}>
+                                        Teléfono (opcional)
+                                    </label>
+                                </div>
                             </div>
 
-                            {/* Phone */}
-                            <div className="relative w-full">
-                                <input
-                                    type="tel"
-                                    id="phone"
-                                    name="phone"
-                                    placeholder=""
-                                    required
-                                    autoComplete="off"
-                                    className="peer w-full border text-sm border-white/10 bg-white/5 rounded-lg px-4 pt-6.5 pb-3 placeholder-transparent hover:shadow focus:outline-none focus:ring-2 focus:ring-primary hover:bg-white/10"
-                                />
-                                <label
-                                    htmlFor="phone"
-                                    className="absolute left-4 top-1/2 -translate-y-1/2 text-white/60 transition-all duration-200
-                                        peer-placeholder-shown:top-1/2
-                                        peer-placeholder-shown:text-base
-                                        peer-[:not(:placeholder-shown)]:top-4
-                                        peer-[:not(:placeholder-shown)]:text-xs
-                                        peer-[:not(:placeholder-shown)]:font-medium
-                                        peer-focus:top-4
-                                        peer-focus:font-medium
-                                        peer-focus:text-xs"
-                                >
-                                    Teléfono
-                                </label>
+                            {/* Service */}
+                            <div className="pt-1">
+                                <p id="contact-service-label" className="mb-2 text-sm text-neutral-300">
+                                    ¿Qué tienes en mente? <span className="text-neutral-500">(opcional)</span>
+                                </p>
+                                <div className="flex flex-wrap gap-1.5" role="group" aria-labelledby="contact-service-label">
+                                    {MEETING_SERVICES.map((item) => {
+                                        const selected = item.id === service;
+
+                                        return (
+                                            <button
+                                                key={item.id}
+                                                type="button"
+                                                aria-pressed={selected}
+                                                onClick={() => setService(selected ? null : item.id)}
+                                                className={`rounded-full border px-3.5 py-1.5 text-sm transition active:scale-[0.97] ${
+                                                    selected
+                                                        ? "border-primary bg-primary/15 text-white"
+                                                        : "border-white/10 bg-white/5 text-neutral-300 hover:border-white/30 hover:text-white"
+                                                }`}
+                                            >
+                                                {SERVICE_CHIPS[item.id]}
+                                            </button>
+                                        );
+                                    })}
+                                </div>
                             </div>
 
                             {/* Message */}
-                            <div className="relative w-full overflow-hidden rounded-lg">
-                                <textarea
-                                    id="message"
-                                    name="message"
-                                    placeholder=""
-                                    required
-                                    autoComplete="off"
-                                    maxLength={300}
-                                    rows={4}
-                                    className="peer w-full border text-sm border-white/10 bg-white/5 rounded-lg px-4 pt-6.5 pb-3 placeholder-transparent hover:shadow focus:outline-none focus:ring-2 focus:ring-primary hover:bg-white/10 resize-none"
-                                />
-                                <label
-                                    htmlFor="message"
-                                    className="absolute left-4 top-6.5 -translate-y-1/2 text-white/60 transition-all duration-200
-                                        peer-placeholder-shown:top-6.5
-                                        peer-placeholder-shown:text-base
-                                        peer-[:not(:placeholder-shown)]:top-4
-                                        peer-[:not(:placeholder-shown)]:text-xs
-                                        peer-[:not(:placeholder-shown)]:font-medium
-                                        peer-focus:top-4
-                                        peer-focus:font-medium
-                                        peer-focus:text-xs"
-                                >
-                                    Cuéntanos tu idea
+                            <div>
+                                <label htmlFor="contact-message" className="mb-2 block text-sm text-neutral-300">
+                                    ¿Qué quieres crear o qué problema necesitas resolver?
                                 </label>
+                                <textarea
+                                    id="contact-message"
+                                    name="message"
+                                    maxLength={3000}
+                                    rows={4}
+                                    value={fields.message}
+                                    onChange={(event) => updateField("message", event.target.value)}
+                                    aria-invalid={invalid.includes("message")}
+                                    aria-describedby="contact-message-error"
+                                    placeholder="Por ejemplo: hoy gestionamos las reservas por WhatsApp y queremos automatizarlas."
+                                    className="w-full border text-sm border-white/10 bg-white/5 rounded-lg px-4 py-3 text-white placeholder:text-white/40 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-primary resize-none aria-[invalid=true]:border-red-400/70"
+                                />
+                                {invalid.includes("message") && <p id="contact-message-error" className="mt-1 text-sm text-red-300">{FIELD_MESSAGES.message}</p>}
                             </div>
 
                             {/* Submit Button */}
                             <button
                                 type="submit"
                                 disabled={isSubmitting}
-                                className="w-full bg-primary text-white py-2.5 font-medium rounded-lg hover:bg-primary-dark transition disabled:cursor-not-allowed disabled:opacity-60"
+                                aria-busy={isSubmitting}
+                                className="flex h-12 w-full items-center justify-center gap-2 bg-primary text-white text-sm font-medium rounded-lg hover:bg-primary-dark active:scale-[0.98] transition disabled:cursor-progress disabled:opacity-80"
                             >
-                                {isSubmitting ? "Enviando..." : "Enviar mensaje"}
+                                {isSubmitting && <span className="meeting-spinner" aria-hidden="true" />}
+                                {isSubmitting ? "Enviando…" : "Enviar mi consulta"}
                             </button>
 
-                            {submitMessage && (
-                                <p
-                                    className={`text-sm ${
-                                        submitStatus === "success" ? "text-emerald-400" : "text-red-400"
-                                    }`}
-                                    role="status"
-                                    aria-live="polite"
-                                >
-                                    {submitMessage}
+                            {errorMessage && (
+                                <p className="rounded-lg bg-red-500/10 px-4 py-3 text-sm text-red-300" role="alert">
+                                    {errorMessage}
                                 </p>
                             )}
+
+                            <p className="text-center text-sm text-neutral-400">
+                                ¿Prefieres conversarlo?{" "}
+                                <button
+                                    type="button"
+                                    onClick={goToSchedule}
+                                    className="font-medium text-white underline decoration-white/20 underline-offset-4 transition hover:decoration-primary"
+                                >
+                                    Agenda 30 minutos
+                                </button>
+                            </p>
                         </form>
                     )
                 }

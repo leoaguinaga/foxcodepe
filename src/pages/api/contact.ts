@@ -1,16 +1,24 @@
 import type { APIRoute } from "astro";
-import postgres from "postgres";
 import { z } from "zod";
+import { MEETING_SERVICES } from "@/core/meetingSlots";
+import { callPanelApi, forwardPanelResponse, isAllowedOrigin, jsonResponse } from "@/core/panelMeetings";
+import {
+    filledTooFast,
+    getClientIp,
+    hitMemoryLimit,
+    tooManyRequests,
+} from "@/core/rateLimit";
 
 const MAX_BODY_SIZE = 12_000;
-const CONTACT_STATUS = "NEW";
-const CONTACT_SOURCE = "contact_modal";
-
+// Límites anti-spam (ver core/rateLimit.ts).
+const IP_LIMIT = { requests: 5, windowMs: 10 * 60_000 };
+const SERVICE_IDS = MEETING_SERVICES.map((service) => service.id) as [string, ...string[]];
 const contactSchema = z.object({
     name: z.string().trim().min(1).max(120),
     email: z.string().trim().email().max(160),
     phone: z.string().trim().max(40).optional().or(z.literal("")),
     message: z.string().trim().min(1).max(3_000),
+    service: z.enum(SERVICE_IDS).optional(),
     metadata: z
         .object({
             pagePath: z.string().trim().max(300).optional(),
@@ -18,75 +26,23 @@ const contactSchema = z.object({
         })
         .optional(),
     website: z.string().max(0).optional().or(z.literal("")),
+    elapsedMs: z.number().int().min(0).max(86_400_000).optional(),
 });
 
-let sqlClient: postgres.Sql | null = null;
-
-function getEnv(name: "DATABASE_URL" | "PUBLIC_SITE_URL") {
-    const nodeProcess = (globalThis as typeof globalThis & {
-        process?: { env?: Partial<Record<"DATABASE_URL" | "PUBLIC_SITE_URL", string>> };
-    }).process as
-        | { env?: Partial<Record<"DATABASE_URL" | "PUBLIC_SITE_URL", string>> }
-        | undefined;
-
-    return nodeProcess?.env?.[name] || import.meta.env[name];
-}
-
-function jsonResponse(body: unknown, status: number) {
-    return new Response(JSON.stringify(body), {
-        status,
-        headers: {
-            "content-type": "application/json; charset=utf-8",
-        },
-    });
-}
-
-function getSqlClient() {
-    const databaseUrl = getEnv("DATABASE_URL");
-
-    if (!databaseUrl) {
-        throw new Error("DATABASE_URL is not configured");
-    }
-
-    sqlClient ??= postgres(databaseUrl, {
-        max: 1,
-        prepare: false,
-    });
-
-    return sqlClient;
-}
-
-function isAllowedOrigin(request: Request) {
-    const origin = request.headers.get("origin");
-
-    if (!origin) {
-        return true;
-    }
-
-    try {
-        const allowedHosts = new Set<string>();
-        allowedHosts.add(new URL(request.url).host);
-
-        const publicSiteUrl = getEnv("PUBLIC_SITE_URL");
-
-        if (publicSiteUrl) {
-            allowedHosts.add(new URL(publicSiteUrl).host);
-        }
-
-        return allowedHosts.has(new URL(origin).host);
-    } catch {
-        return false;
-    }
-}
-
-function createId() {
-    return crypto.randomUUID();
-}
-
-export const POST: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({ request, clientAddress }) => {
     try {
         if (!isAllowedOrigin(request)) {
             return jsonResponse({ ok: false, error: "Origen no permitido." }, 400);
+        }
+
+        const ipWait = hitMemoryLimit(
+            `contact:${getClientIp(request, clientAddress)}`,
+            IP_LIMIT.requests,
+            IP_LIMIT.windowMs,
+        );
+
+        if (ipWait) {
+            return tooManyRequests("Enviaste varios mensajes seguidos. Espera unos minutos y vuelve a intentarlo.", ipWait);
         }
 
         const rawBody = await request.text();
@@ -110,41 +66,15 @@ export const POST: APIRoute = async ({ request }) => {
         }
 
         const payload = result.data;
-        const sql = getSqlClient();
-        const contactMessageId = createId();
-        const metadata = {
-            ...payload.metadata,
-            userAgent: request.headers.get("user-agent") || payload.metadata?.userAgent || "",
-            receivedAt: new Date().toISOString(),
-        };
 
-        await sql`
-            insert into "ContactMessage" (
-                "id",
-                "name",
-                "email",
-                "phone",
-                "message",
-                "status",
-                "source",
-                "metadata",
-                "createdAt",
-                "updatedAt"
-            ) values (
-                ${contactMessageId},
-                ${payload.name},
-                ${payload.email},
-                ${payload.phone || null},
-                ${payload.message},
-                ${CONTACT_STATUS}::"ContactMessageStatus",
-                ${CONTACT_SOURCE},
-                ${JSON.stringify(metadata)}::jsonb,
-                now(),
-                now()
-            )
-        `;
+        if (filledTooFast(payload.elapsedMs)) {
+            return jsonResponse({ ok: false, error: "Revisa tus datos y vuelve a enviarlos en unos segundos." }, 400);
+        }
 
-        return jsonResponse({ ok: true, contactMessageId }, 201);
+        const { website: _website, ...contact } = payload;
+        const response = await callPanelApi("contact", { method: "POST", body: contact });
+
+        return forwardPanelResponse(response, "No se pudo enviar el mensaje.");
     } catch (error) {
         console.error("Contact message failed", error);
         return jsonResponse({ ok: false, error: "No se pudo enviar el mensaje." }, 500);

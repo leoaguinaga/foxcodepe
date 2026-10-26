@@ -1,16 +1,27 @@
 import type { APIRoute } from "astro";
-import postgres from "postgres";
 import { z } from "zod";
+import { MEETING_SERVICES, isBookableSlot } from "@/core/meetingSlots";
+import { callPanelApi, forwardPanelResponse, isAllowedOrigin, jsonResponse } from "@/core/panelMeetings";
+import {
+    filledTooFast,
+    getClientIp,
+    hitMemoryLimit,
+    tooManyRequests,
+} from "@/core/rateLimit";
 
 const MAX_BODY_SIZE = 15_000;
-const MEETING_STATUS = "NEW";
-const MEETING_SOURCE = "landing";
+// Límites anti-spam (ver core/rateLimit.ts).
+const IP_LIMIT = { requests: 5, windowMs: 10 * 60_000 };
+const SERVICE_IDS = MEETING_SERVICES.map((service) => service.id) as [string, ...string[]];
 
 const meetingSchema = z.object({
     name: z.string().trim().min(1).max(120),
     email: z.string().trim().email().max(160),
     phone: z.string().trim().max(40).optional().or(z.literal("")),
-    scheduledAt: z.string().trim().min(1).max(60),
+    service: z.enum(SERVICE_IDS),
+    message: z.string().trim().min(1).max(3_000),
+    date: z.string().trim().regex(/^\d{4}-\d{2}-\d{2}$/),
+    time: z.string().trim().regex(/^\d{2}:\d{2}$/),
     metadata: z
         .object({
             pagePath: z.string().trim().max(300).optional(),
@@ -18,81 +29,23 @@ const meetingSchema = z.object({
         })
         .optional(),
     website: z.string().max(0).optional().or(z.literal("")),
+    elapsedMs: z.number().int().min(0).max(86_400_000).optional(),
 });
 
-let sqlClient: postgres.Sql | null = null;
-
-function getEnv(name: "DATABASE_URL" | "PUBLIC_SITE_URL") {
-    const nodeProcess = (globalThis as typeof globalThis & {
-        process?: { env?: Partial<Record<"DATABASE_URL" | "PUBLIC_SITE_URL", string>> };
-    }).process as
-        | { env?: Partial<Record<"DATABASE_URL" | "PUBLIC_SITE_URL", string>> }
-        | undefined;
-
-    return nodeProcess?.env?.[name] || import.meta.env[name];
-}
-
-function jsonResponse(body: unknown, status: number) {
-    return new Response(JSON.stringify(body), {
-        status,
-        headers: {
-            "content-type": "application/json; charset=utf-8",
-        },
-    });
-}
-
-function getSqlClient() {
-    const databaseUrl = getEnv("DATABASE_URL");
-
-    if (!databaseUrl) {
-        throw new Error("DATABASE_URL is not configured");
-    }
-
-    sqlClient ??= postgres(databaseUrl, {
-        max: 1,
-        prepare: false,
-    });
-
-    return sqlClient;
-}
-
-function isAllowedOrigin(request: Request) {
-    const origin = request.headers.get("origin");
-
-    if (!origin) {
-        return true;
-    }
-
-    try {
-        const allowedHosts = new Set<string>();
-        allowedHosts.add(new URL(request.url).host);
-
-        const publicSiteUrl = getEnv("PUBLIC_SITE_URL");
-
-        if (publicSiteUrl) {
-            allowedHosts.add(new URL(publicSiteUrl).host);
-        }
-
-        return allowedHosts.has(new URL(origin).host);
-    } catch {
-        return false;
-    }
-}
-
-function createId() {
-    return crypto.randomUUID();
-}
-
-function parseScheduledAt(value: string) {
-    const scheduledAt = new Date(value);
-
-    return Number.isNaN(scheduledAt.getTime()) ? null : scheduledAt;
-}
-
-export const POST: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({ request, clientAddress }) => {
     try {
         if (!isAllowedOrigin(request)) {
             return jsonResponse({ ok: false, error: "Origen no permitido." }, 400);
+        }
+
+        const ipWait = hitMemoryLimit(
+            `meetings:${getClientIp(request, clientAddress)}`,
+            IP_LIMIT.requests,
+            IP_LIMIT.windowMs,
+        );
+
+        if (ipWait) {
+            return tooManyRequests("Hiciste varias solicitudes seguidas. Espera unos minutos y vuelve a intentarlo.", ipWait);
         }
 
         const rawBody = await request.text();
@@ -116,47 +69,19 @@ export const POST: APIRoute = async ({ request }) => {
         }
 
         const payload = result.data;
-        const scheduledAt = parseScheduledAt(payload.scheduledAt);
 
-        if (!scheduledAt) {
-            return jsonResponse({ ok: false, error: "Fecha inválida." }, 400);
+        if (filledTooFast(payload.elapsedMs)) {
+            return jsonResponse({ ok: false, error: "Revisa tus datos y vuelve a enviarlos en unos segundos." }, 400);
         }
 
-        const sql = getSqlClient();
-        const meetingId = createId();
-        const metadata = {
-            ...payload.metadata,
-            userAgent: request.headers.get("user-agent") || payload.metadata?.userAgent || "",
-            receivedAt: new Date().toISOString(),
-        };
+        if (!isBookableSlot(payload.date, payload.time)) {
+            return jsonResponse({ ok: false, error: "Elige un día hábil y una hora disponible." }, 400);
+        }
 
-        await sql`
-            insert into "MeetingRequest" (
-                "id",
-                "name",
-                "email",
-                "phone",
-                "scheduledAt",
-                "status",
-                "source",
-                "metadata",
-                "createdAt",
-                "updatedAt"
-            ) values (
-                ${meetingId},
-                ${payload.name},
-                ${payload.email},
-                ${payload.phone || null},
-                ${scheduledAt},
-                ${MEETING_STATUS}::"MeetingRequestStatus",
-                ${MEETING_SOURCE},
-                ${JSON.stringify(metadata)}::jsonb,
-                now(),
-                now()
-            )
-        `;
+        const { website: _website, ...meeting } = payload;
+        const response = await callPanelApi("meetings", { method: "POST", body: meeting });
 
-        return jsonResponse({ ok: true, meetingId }, 201);
+        return forwardPanelResponse(response, "No se pudo agendar la reunión.");
     } catch (error) {
         console.error("Meeting request failed", error);
         return jsonResponse({ ok: false, error: "No se pudo agendar la reunión." }, 500);

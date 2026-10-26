@@ -82,14 +82,6 @@ import { seoPages } from "@/core/SeoData";
     opacity: 1;
   }
 
-  /* Team: el anillo de texto aparece girando y acelera al pasar el mouse. */
-  .reveal-ready .staff-card .staff-ring {
-    opacity: 0;
-    transition: opacity 0.9s 0.4s;
-  }
-  .reveal-ready .staff-card.is-in .staff-ring { opacity: 1; }
-  .staff-card:hover .staff-ring { animation-duration: 6s; }
-
   /* Testimonials: barra de acento que crece. */
   .quote::after {
     content: "";
@@ -108,9 +100,6 @@ import { seoPages } from "@/core/SeoData";
   .reveal-ready .quote.is-featured:not(.is-in)::after { transform: scaleY(0); }
   .reveal-ready .quote.is-featured.is-in::after { transition-delay: 0.6s; }
 
-  @media (prefers-reduced-motion: reduce) {
-    .staff-card:hover .staff-ring { animation: none; }
-  }
 </style>
 
 <script>

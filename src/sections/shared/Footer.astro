@@ -5,7 +5,9 @@ import Tiktok from "@/assets/icons/tiktok.svg";
 import { getProjects } from "@/core/ProjectsData";
 
 // Productos propios: salen de la colección de /proyectos.
-const products = (await getProjects()).filter((p) => p.data.tipo === "producto");
+const products = (await getProjects()).filter(
+    (p) => p.data.tipo === "producto",
+);
 ---
 
 <!-- Footer Section -->
@@ -51,7 +53,7 @@ const products = (await getProjects()).filter((p) => p.data.tipo === "producto")
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
                             viewBox="0 0 24 24"
-                            class="size-5 fill-white sm:size-6 hover:opacity-80 transition-opacity"
+                            class="size-5 fill-white sm:size-6 hover:opacity-80 transition-opacity ml-1.5"
                             aria-hidden="true"
                         >
                             <path
@@ -75,6 +77,11 @@ const products = (await getProjects()).filter((p) => p.data.tipo === "producto")
                     href="/servicios"
                     class="text-white/60 hover:text-white hover:underline w-fit"
                     >Desarrollo</a
+                >
+                <a
+                    href="/proyectos"
+                    class="text-white/60 hover:text-white hover:underline w-fit"
+                    >Proyectos</a
                 >
                 <a
                     href="/nosotros"
@@ -105,7 +112,7 @@ const products = (await getProjects()).filter((p) => p.data.tipo === "producto")
                     Contáctanos
                 </h3>
                 <a
-                    href="mailto:contacto@foxcode.com"
+                    href="mailto:foxcode.pe@outlook.com"
                     class="flex items-center gap-x-2 text-white/60 hover:text-white hover:underline w-fit"
                 >
                     <svg
@@ -123,7 +130,7 @@ const products = (await getProjects()).filter((p) => p.data.tipo === "producto")
                         ></path><rect x="2" y="4" width="20" height="16" rx="2"
                         ></rect></svg
                     >
-                    contacto&#8203;@foxcode.com
+                    foxcode.pe@outlook.com
                 </a>
                 <a
                     href="tel:+51907280391"
@@ -171,7 +178,7 @@ const products = (await getProjects()).filter((p) => p.data.tipo === "producto")
             class="flex flex-wrap justify-center items-center gap-x-3 gap-y-2 mt-20 text-xs sm:text-sm"
         >
             <p class="text-center text-white/60">
-                &copy; {new Date().getFullYear()} Foxcode.
+                &copy; {new Date().getFullYear()} FoxCode.
             </p>
 
             <div class="rounded-full size-1 bg-white/60"></div>
